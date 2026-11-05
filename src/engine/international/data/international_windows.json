@@ -1,0 +1,28 @@
+{
+  "windows": [
+    {
+      "id": "IW1",
+      "label": "September Window"
+    },
+    {
+      "id": "IW2",
+      "label": "October Window"
+    },
+    {
+      "id": "IW3",
+      "label": "November Window"
+    },
+    {
+      "id": "IW4",
+      "label": "January Window"
+    },
+    {
+      "id": "IW5",
+      "label": "March Window"
+    },
+    {
+      "id": "IW6",
+      "label": "June Window"
+    }
+  ]
+}

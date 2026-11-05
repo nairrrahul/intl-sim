@@ -1,0 +1,325 @@
+import { ROW_HIGHLIGHT } from "../../styles";
+import type { RowHighlights } from "../../styles";
+import { useState } from "react";
+import { getConfederation, getNationName } from "../../../engine/nations/nations";
+import { getInternationalCupStandings } from "../../../engine/international/competitions/cupCommon";
+import type { InternationalCompetitionEdition } from "../../../engine/international/competitions/cupCommon";
+import { Empty, NationLink, PageHeader, Panel, SeasonSelect, Tabs } from "../../components/common";
+import { CupBracketTree } from "../../components/brackets";
+import { InternationalGroupMatchdays } from "../../components/InternationalGroupMatchdays";
+import { InternationalGroupTable, InternationalNthPlacedTeamsTable } from "../../components/tables";
+import type { CupSnap, TeamRef } from "../../bracketTypes";
+
+type Tab = "draw" | "groups" | "knockout" | "history";
+
+interface InternationalCupPageProps {
+  title: string;
+  subtitle: string;
+  editions: InternationalCompetitionEdition[];
+  afconHighlights?: boolean;
+  groupHighlights?: RowHighlights;
+  groupQualifiedByConfederation?: boolean;
+  nthPlaceAdvancement?: { place: number; advancingCount: number; tieBreakers?: ("goalDifference" | "goalsFor")[] };
+}
+
+function GroupPanel(props: {
+  edition: InternationalCompetitionEdition;
+  group: InternationalCompetitionEdition["groups"][number];
+  rows: ReturnType<typeof getInternationalCupStandings>;
+  afconHighlights: boolean;
+  groupHighlights?: RowHighlights;
+}) {
+  const highlights = props.groupHighlights ?? (props.afconHighlights
+    ? { 1: ROW_HIGHLIGHT.GREEN, 2: ROW_HIGHLIGHT.GREEN, 3: ROW_HIGHLIGHT.YELLOW }
+    : { 1: ROW_HIGHLIGHT.GREEN, 2: ROW_HIGHLIGHT.GREEN });
+  return (
+    <Panel title={`Group ${props.group.name}`}>
+      <InternationalGroupTable rows={props.rows} highlights={highlights} />
+      <InternationalGroupMatchdays rounds={props.group.matches} />
+    </Panel>
+  );
+}
+
+function GroupStage(props: {
+  edition: InternationalCompetitionEdition;
+  afconHighlights: boolean;
+  groupHighlights?: RowHighlights;
+  nthPlaceAdvancement?: InternationalCupPageProps["nthPlaceAdvancement"];
+}) {
+  const { edition } = props;
+  const groupRows = edition.groups.map(group => ({
+    group,
+    rows: getInternationalCupStandings(edition, group)
+  }));
+  const place = props.nthPlaceAdvancement?.place;
+  const nthPlaceRows = place !== undefined
+    ? groupRows.flatMap(({ group, rows }) => {
+        const row = rows[place - 1];
+        return row ? [{ ...row, group: group.name }] : [];
+      })
+    : [];
+  return (
+    <div className="space-y-5">
+      <div className="grid items-start gap-4 xl:grid-cols-2">{groupRows.map(({ group, rows }) => (
+        <GroupPanel
+          key={group.name}
+          edition={edition}
+          group={group}
+          rows={rows}
+          afconHighlights={props.afconHighlights}
+          groupHighlights={props.groupHighlights}
+        />
+      ))}</div>
+      {props.nthPlaceAdvancement && (
+        <InternationalNthPlacedTeamsTable
+          place={props.nthPlaceAdvancement.place}
+          advancingCount={props.nthPlaceAdvancement.advancingCount}
+          tieBreakers={props.nthPlaceAdvancement.tieBreakers}
+          seedRanks={edition.seedRanks}
+          rows={nthPlaceRows}
+        />
+      )}
+    </div>
+  );
+}
+
+function DrawResults(props: {
+  title: string;
+  edition: InternationalCompetitionEdition;
+  groupQualifiedByConfederation?: boolean;
+}) {
+  const { edition } = props;
+  const hosts = new Set(edition.hosts);
+  const playoffTeams = new Set(edition.playoffTeams ?? []);
+  return (
+    <div className="space-y-5">
+      <Panel title={`Qualified teams · ${edition.teams.length}`}>
+        {props.groupQualifiedByConfederation ? (
+          <div className="overflow-x-auto">
+            <table className="tbl">
+              <thead><tr><th>Confederation</th><th>Qualified teams</th></tr></thead>
+              <tbody>
+                {["UEFA", "CONMEBOL", "CONCACAF", "AFC", "CAF", "OFC", "Other"].flatMap(confederation => {
+                  const teams = edition.teams.filter(code =>
+                    (getConfederation(code) ?? "Other") === confederation
+                  );
+                  if (teams.length === 0) return [];
+                  return [(
+                    <tr key={confederation}>
+                      <td className="whitespace-nowrap font-semibold">{confederation}</td>
+                      <td><div className="flex flex-wrap gap-x-4 gap-y-2">
+                        {teams.map(code => <NationLink key={code} code={code} />)}
+                      </div></td>
+                    </tr>
+                  )];
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="tbl min-w-max">
+              <tbody>
+                {Array.from({ length: Math.ceil(edition.teams.length / 6) }, (_, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {Array.from({ length: 6 }, (_, columnIndex) => {
+                      const code = edition.teams[rowIndex * 6 + columnIndex];
+                      return (
+                        <td key={columnIndex} className="whitespace-nowrap">
+                          {code && (
+                            <div className="flex items-center gap-2">
+                              <NationLink code={code} />
+                              {hosts.has(code) && <span className="rounded bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold text-black">Host</span>}
+                              {playoffTeams.has(code) && <span className="rounded bg-red-600 px-1.5 py-0.5 text-[10px] font-bold text-white">PO</span>}
+                            </div>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Panel>
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Panel title={`${props.title} pots`}>
+          <div className="divide-y divide-navy-700/60">
+            {edition.pots.map((pot, index) => (
+              <details key={index} className="group" open={index === 0}>
+                <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-3 text-xs font-bold uppercase tracking-wider text-navy-300 hover:text-white">
+                  <span className="text-[10px] transition-transform group-open:rotate-90">▶</span>
+                  Pot {index + 1}
+                </summary>
+                <div className="divide-y divide-navy-700/40">
+                  {pot.map(code => (
+                    <div key={code} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+                      <NationLink code={code} />
+                      {hosts.has(code) && (
+                        <span className="rounded bg-amber-400 px-2 py-0.5 text-xs font-bold text-black">Host</span>
+                      )}
+                      {playoffTeams.has(code) && (
+                        <span className="rounded bg-red-600 px-2 py-0.5 text-xs font-bold text-white">PO</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </details>
+            ))}
+          </div>
+        </Panel>
+        <Panel title="Groups drawn">
+          <div className="grid max-w-[52rem] grid-cols-1 gap-3 p-3 sm:grid-cols-2 lg:grid-cols-3">
+            {edition.groups.map(group => (
+              <table key={group.name} className="tbl w-full max-w-64 overflow-hidden rounded border border-navy-600">
+                <thead>
+                  <tr><th>Group {group.name}</th></tr>
+                </thead>
+                <tbody>
+                  {group.teams.map(code => (
+                    <tr key={code}><td><NationLink code={code} /></td></tr>
+                  ))}
+                </tbody>
+              </table>
+            ))}
+          </div>
+        </Panel>
+      </div>
+    </div>
+  );
+}
+
+function toTeamRef(code: string, edition: InternationalCompetitionEdition): TeamRef {
+  return { id: edition.teams.indexOf(code) + 1, name: code, countrycode: code };
+}
+
+function toCupSnap(edition: InternationalCompetitionEdition): CupSnap {
+  return {
+    rounds: (edition.knockout ?? []).map((round, roundIndex) => ({
+      round: roundIndex + 1,
+      label: round.label,
+      // Every cup plays three group matchdays before its knockout rounds.
+      matchday: roundIndex + 4,
+      matches: round.matches.map(match => ({
+        id: match.id,
+        home: toTeamRef(match.home, edition),
+        away: toTeamRef(match.away, edition),
+        score: match.fixture.homeGoals === null || match.fixture.awayGoals === null
+          ? null
+          : {
+              h: match.fixture.homeGoals,
+              a: match.fixture.awayGoals,
+              ...(match.fixture.homePenalties && match.fixture.awayPenalties
+                ? {
+                    ph: match.fixture.homePenalties.filter(kick => kick === "O").length,
+                    pa: match.fixture.awayPenalties.filter(kick => kick === "O").length
+                  }
+                : {})
+            },
+        winner: match.winner ? toTeamRef(match.winner, edition) : null,
+        bye: false,
+        fixture: match.fixture
+      }))
+    })),
+    complete: edition.completed,
+    winner: edition.winner ? toTeamRef(edition.winner, edition) : null,
+    runnerUp: edition.runnerUp ? toTeamRef(edition.runnerUp, edition) : null
+  };
+}
+
+function getSemifinalLosers(edition: InternationalCompetitionEdition): string[] {
+  const semiFinals = edition.knockout?.find(round => round.label === "Semi-finals");
+  if (!semiFinals) return edition.semifinalists;
+  return semiFinals.matches.flatMap(match => {
+    if (!match.winner) return [];
+    return [match.winner === match.home ? match.away : match.home];
+  });
+}
+
+function HistoryTable(props: { title: string; editions: InternationalCompetitionEdition[]; onSelect: (year: number) => void }) {
+  const completed = [...props.editions].filter(edition => edition.completed).sort((a, b) => b.year - a.year);
+  if (completed.length === 0) return <Panel><Empty>No completed {props.title} editions yet.</Empty></Panel>;
+  return (
+    <Panel title={`${props.title} history`}>
+      <div className="overflow-x-auto">
+        <table className="tbl">
+          <thead><tr><th>Year</th><th>Hosts</th><th>Winner</th><th>Runner-up</th><th>Semi-finalists</th><th></th></tr></thead>
+          <tbody>
+            {completed.map(edition => (
+              <tr key={edition.id}>
+                <td className="font-semibold">{edition.year + 1}</td>
+                <td>{edition.hosts.map(getNationName).join(" / ")}</td>
+                <td>{edition.winner && <NationLink code={edition.winner} />}</td>
+                <td>{edition.runnerUp && <NationLink code={edition.runnerUp} />}</td>
+                <td><div className="flex flex-wrap gap-x-3 gap-y-1">
+                  {getSemifinalLosers(edition).map(code => <NationLink key={code} code={code} />)}
+                </div></td>
+                <td className="text-right"><button className="btn-ghost btn-sm" onClick={() => props.onSelect(edition.year)}>View edition</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Panel>
+  );
+}
+
+export default function InternationalCupPage(props: InternationalCupPageProps) {
+  const { title, subtitle, editions } = props;
+  const latest = editions.at(-1) ?? null;
+  const [tab, setTab] = useState<Tab>("groups");
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const year = selectedYear ?? latest?.year ?? 2026;
+  const selected = editions.find(edition => edition.year === year) ?? latest;
+  const years = [...new Set(editions.map(edition => edition.year))].sort((a, b) => a - b);
+  if (!years.includes(year)) years.push(year);
+
+  return (
+    <div>
+      <PageHeader
+        title={title}
+        subtitle={selected
+          ? `${selected.year+1}· ${selected.completed ? `Champions: ${getNationName(selected.winner)}` : selected.knockout ? "Knockout stage" : "Group stage"} · Hosts: ${selected.hosts.map(getNationName).join(" / ")}`
+          : subtitle}
+        right={years.length > 1 ? <SeasonSelect years={years.map(value => ({ year: value, label: String(value+1) }))} value={year} onChange={setSelectedYear} /> : undefined}
+      />
+      <Tabs
+        tabs={[
+          { id: "draw", label: "Draw Results" },
+          { id: "groups", label: "Group Stage" },
+          { id: "knockout", label: "Knockout bracket" },
+          { id: "history", label: "History" }
+        ]}
+        value={tab}
+        onChange={setTab}
+      />
+      {tab === "draw" && (!selected
+        ? <Panel><Empty>The {title} draw has not been made yet.</Empty></Panel>
+        : <DrawResults
+          title={title}
+          edition={selected}
+          groupQualifiedByConfederation={props.groupQualifiedByConfederation}
+        />
+      )}
+      {tab === "groups" && (!selected
+        ? <Panel><Empty>The {title} group stage has not been drawn yet.</Empty></Panel>
+        : <GroupStage
+          edition={selected}
+          afconHighlights={props.afconHighlights ?? false}
+          groupHighlights={props.groupHighlights}
+          nthPlaceAdvancement={props.nthPlaceAdvancement}
+        />
+      )}
+      {tab === "knockout" && (!selected?.knockout
+        ? <Panel><Empty>The knockout bracket is drawn after all group matches have been played.</Empty></Panel>
+        : <CupBracketTree cup={toCupSnap(selected)} showFlag />
+      )}
+      {tab === "history" && <HistoryTable
+        title={title}
+        editions={editions}
+        onSelect={selectedEditionYear => { setSelectedYear(selectedEditionYear); setTab("groups"); }}
+      />}
+    </div>
+  );
+}
