@@ -4,7 +4,7 @@ import { getWindowMatchdayCount } from "./lanes";
 import { freezeCompletedEditions, isTrackedTournamentMatch } from "./editionInsights";
 import { generateMatchDetails } from "./matchEvents";
 import type { MatchSquad } from "./matchEvents";
-import { isYouthMatch, playMatch } from "./matchResolution";
+import { isKnockoutMatch, isYouthMatch, playMatch } from "./matchResolution";
 import { onRoundPlayed } from "./roundProgression";
 import { STARTING_XI_SIZE } from "./squads";
 import type { TrophyTeam } from "./roundProgression";
@@ -40,7 +40,8 @@ function recordMatchDetails(match: InternationalMatch, window: WindowRecord, wor
     match.homeGoals ?? 0,
     match.awayGoals ?? 0,
     youth ? getU20MatchSquad(world, match.home, playersById) : getMatchSquad(window, match.home, playersById),
-    youth ? getU20MatchSquad(world, match.away, playersById) : getMatchSquad(window, match.away, playersById)
+    youth ? getU20MatchSquad(world, match.away, playersById) : getMatchSquad(window, match.away, playersById),
+    isKnockoutMatch(match)
   );
   match.goals = details.goals;
   match.substitutions = details.substitutions;

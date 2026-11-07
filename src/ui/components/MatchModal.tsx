@@ -12,15 +12,36 @@ type TimelineEvent =
   | { type: "substitution"; minute: number; side: MatchSide; substitution: SubstitutionEvent }
   | { type: "goal"; minute: number; side: MatchSide; goal: GoalEvent };
 
+type MatchTimeline = {
+  firstHalf: TimelineEvent[];
+  secondHalf: TimelineEvent[];
+  firstExtraTime: TimelineEvent[];
+  secondExtraTime: TimelineEvent[];
+  hasExtraTime: boolean;
+  totalEvents: number;
+};
+
 const countScored = (kicks: string[] | undefined): number => (kicks ?? []).filter(kick => kick === "O").length;
 
 /** Goals and the substitutions behind them in minute order (a substitution comes before a goal in the same minute). */
-function buildTimeline(match: InternationalMatch): TimelineEvent[] {
+function buildTimeline(match: InternationalMatch): MatchTimeline {
   const events: TimelineEvent[] = [
     ...(match.substitutions ?? []).map(substitution => ({ type: "substitution" as const, minute: substitution.minute, side: substitution.side, substitution })),
     ...(match.goals ?? []).map(goal => ({ type: "goal" as const, minute: goal.minute, side: goal.side, goal }))
-  ];
-  return events.sort((a, b) => a.minute - b.minute || (a.type === b.type ? 0 : a.type === "substitution" ? -1 : 1));
+  ].sort((a, b) => a.minute - b.minute || (a.type === b.type ? 0 : a.type === "substitution" ? -1 : 1));
+  const firstHalf = events.filter(e => e.minute >= 1 && e.minute <= 45);
+  const secondHalf = events.filter(e => e.minute >= 46 && e.minute <= 90);
+  const firstExtraTime = events.filter(e => e.minute >= 91 && e.minute <= 105);
+  const secondExtraTime = events.filter(e => e.minute >= 106);
+
+  return {
+    firstHalf,
+    secondHalf,
+    firstExtraTime,
+    secondExtraTime,
+    hasExtraTime: firstExtraTime.length > 0 || secondExtraTime.length > 0,
+    totalEvents: events.length
+  };
 }
 
 /** One match's report: team names either side, events running down the page by minute. */
@@ -36,7 +57,7 @@ function MatchReport(props: { match: InternationalMatch; heading?: string; onClo
       : <span className="text-navy-300">Unknown player</span>;
   };
 
-  const timeline = buildTimeline(match);
+  const {firstHalf, secondHalf, firstExtraTime, secondExtraTime, hasExtraTime, totalEvents} = buildTimeline(match);
   const hasDetails = match.goals !== undefined;
   const homePens = countScored(match.homePenalties);
   const awayPens = countScored(match.awayPenalties);
@@ -75,21 +96,26 @@ function MatchReport(props: { match: InternationalMatch; heading?: string; onClo
           .filter(Boolean).join(" · ")}
       </div>
 
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 mb-5">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-4 gap-y-2 mb-5">
         <div className="text-right text-lg font-semibold"><NationLink code={match.home} /></div>
         <div className="text-center">
           <div className="text-3xl font-bold tabular-nums">{match.homeGoals} – {match.awayGoals}</div>
           {shootout && <div className="text-xs text-navy-300">{homePens} – {awayPens} on penalties</div>}
         </div>
         <div className="text-left text-lg font-semibold"><NationLink code={match.away} /></div>
+        {((match.homeGoals != match.awayGoals) && hasExtraTime) && 
+          <div className="col-start-2 text-center text-[12px] uppercase tracking-widest text-navy-200 font-bold">A.E.T.</div>
+        }
       </div>
+
+      
 
       {!hasDetails ? (
         <p className="text-center text-sm text-navy-300 py-6">Match details are not available for this match.</p>
       ) : (
         <div className="border-t border-navy-700 pt-3">
-          {timeline.length === 0 && <p className="text-center text-sm text-navy-300 py-4">No goals.</p>}
-          {timeline.map((event, index) => (
+          {totalEvents === 0 && <p className="text-center text-sm text-navy-300 py-4">No goals.</p>}
+          {firstHalf.map((event, index) => (
             <div key={index} className="grid grid-cols-[1fr_3.5rem_1fr] items-start gap-3 py-1.5">
               <div>{event.side === "home" && renderEvent(event)}</div>
               <div className="text-center">
@@ -98,11 +124,90 @@ function MatchReport(props: { match: InternationalMatch; heading?: string; onClo
               <div>{event.side === "away" && renderEvent(event)}</div>
             </div>
           ))}
-          <div className="grid grid-cols-[1fr_3.5rem_1fr] gap-3 pt-2">
+          {totalEvents !== 0 && 
+          <div className="grid grid-cols-[1fr_4.5rem_1fr] gap-3 pt-2">
             <div />
-            <div className="text-center text-[10px] uppercase tracking-widest text-navy-400">Full time</div>
+            <div className="text-center text-[10px] uppercase tracking-widest text-navy-400">Half time</div>
             <div />
           </div>
+          }
+          {secondHalf.map((event, index) => (
+            <div key={index} className="grid grid-cols-[1fr_3.5rem_1fr] items-start gap-3 py-1.5">
+              <div>{event.side === "home" && renderEvent(event)}</div>
+              <div className="text-center">
+                <span className="inline-block rounded bg-navy-700 px-2 py-0.5 text-xs font-bold tabular-nums">{event.minute}'</span>
+              </div>
+              <div>{event.side === "away" && renderEvent(event)}</div>
+            </div>
+          ))}
+          <div className="grid grid-cols-[1fr_7.5rem_1fr] gap-3 pt-2">
+            <div />
+            <div className="text-center text-[12px] uppercase tracking-widest text-navy-400">{hasExtraTime ? "Regulation Time" : "Full time"}</div>
+            <div />
+          </div>
+
+          {hasExtraTime && 
+          <>
+            {firstExtraTime.map((event, index) => (
+              <div key={index} className="grid grid-cols-[1fr_3.5rem_1fr] items-start gap-3 py-1.5">
+                <div>{event.side === "home" && renderEvent(event)}</div>
+                <div className="text-center">
+                  <span className="inline-block rounded bg-navy-700 px-2 py-0.5 text-xs font-bold tabular-nums">{event.minute}'</span>
+                </div>
+                <div>{event.side === "away" && renderEvent(event)}</div>
+              </div>
+            ))}
+            <div className="grid grid-cols-[1fr_8.5rem_1fr] gap-3 pt-2">
+              <div />
+              <div className="text-center text-[10px] uppercase tracking-widest text-navy-400">E.T. Half Time</div>
+              <div />
+            </div>
+            {secondExtraTime.map((event, index) => (
+              <div key={index} className="grid grid-cols-[1fr_3.5rem_1fr] items-start gap-3 py-1.5">
+                <div>{event.side === "home" && renderEvent(event)}</div>
+                <div className="text-center">
+                  <span className="inline-block rounded bg-navy-700 px-2 py-0.5 text-xs font-bold tabular-nums">{event.minute}'</span>
+                </div>
+                <div>{event.side === "away" && renderEvent(event)}</div>
+              </div>
+            ))}
+            <div className="grid grid-cols-[1fr_7.5rem_1fr] gap-3 pt-2">
+              <div />
+              <div className="text-center text-[12px] uppercase tracking-widest text-navy-400">Full Time</div>
+              <div />
+            </div>
+          </>
+          }
+          {
+            (match.homePenalties && match.awayPenalties) &&
+            <div className="grid grid-cols-[1fr_7.5rem_1fr] items-center gap-3 py-2">
+              <div className="flex justify-end gap-1">
+                {match.homePenalties?.map((value, index) => (
+                  <span
+                    key={index}
+                    className={`text-lg font-bold ${value === "X" ? "text-red-500" : "text-green-500"}`}
+                  >
+                    {value === "X" ? "✕" : "○"}
+                  </span>
+                ))}
+              </div>
+
+              <div className="text-center text-[12px] font-bold uppercase tracking-widest text-navy-400">
+                Penalties
+              </div>
+
+              <div className="flex justify-start gap-1">
+                {match.awayPenalties?.map((value, index) => (
+                  <span
+                    key={index}
+                    className={`text-lg font-bold ${value === "X" ? "text-red-500" : "text-green-500"}`}
+                  >
+                    {value === "X" ? "✕" : "○"}
+                  </span>
+                ))}
+              </div>
+            </div>
+          }
         </div>
       )}
     </section>

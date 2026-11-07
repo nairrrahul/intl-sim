@@ -23,7 +23,7 @@ const toMatchTeam = (state: InternationalState, code: string, youth = false): Ma
   code, overall: youth ? state.nations[code].u20.overall : state.nations[code].overall
 });
 
-function isKnockoutMatch(match: InternationalMatch): boolean {
+export function isKnockoutMatch(match: InternationalMatch): boolean {
   return match.goldCupStage === "knockout" || match.copaAmericaStage === "knockout" || match.confedCupStage === "knockout" ||
     match.u20WorldCupStage === "knockout" ||
     match.afconStage === "knockout" || match.afcCupStage === "knockout" || match.ofcCupStage === "knockout" ||

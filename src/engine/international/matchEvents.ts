@@ -20,6 +20,7 @@ export interface MatchDetails {
 }
 
 const MATCH_MINUTES = 90;
+const EXTRA_TIME_MATCH_MINUTES = 120;
 const FIRST_SUBSTITUTION_MINUTE = 46;
 const LAST_SUBSTITUTION_MINUTE = 88;
 
@@ -73,13 +74,53 @@ function planSubstitutions(squad: MatchSquad): PlannedSubstitution[] {
   return plan;
 }
 
+// Helper to get a random number from an exponential distribution
+function randomExponentialInt(): number {
+  const ZERO_GOALS_FACTOR = 0.4;
+  const lambda = -Math.log(ZERO_GOALS_FACTOR);
+  const u = Math.random();
+
+  return Math.floor(-Math.log(1 - u) / lambda);
+}
+
+function getExtraTimeGoals(goalDelta: number, count: number, randInt: number) : number {
+  if(randInt == 0) {
+    return randInt;
+  } else {
+    if(count % 2 == 0) {
+      return Math.min(count, Math.max(goalDelta,randInt * 2));
+    } else {
+      return Math.min(count, Math.max(goalDelta,randInt % 2 == 0 ? randInt + 1 : randInt));
+    }
+  }
+}
+
 /**
  * Distinct goal minutes for the whole match (no two goals share a minute): the minutes 1-90 are
  * shuffled and the first `count` taken. (Beyond 90 goals, minutes necessarily repeat.)
  */
-function pickGoalMinutes(count: number): number[] {
+function pickGoalMinutes(homeGoals: number, awayGoals: number, isKnockout: boolean): {goalMinutes: number[], extraTimeGoals: number} {
+  //if a knockout match, we need to know how many goals arrive after extra time, if any
+  const count = homeGoals + awayGoals;
+  const goalDelta = Math.abs(homeGoals - awayGoals);
+  const randomExpValue = randomExponentialInt();
+  const extraTimeGoalsCount = isKnockout ? getExtraTimeGoals(goalDelta, count, randomExpValue) : 0;
   const minutes = shuffledCopy(Array.from({ length: MATCH_MINUTES }, (_, index) => index + 1));
-  return Array.from({ length: count }, (_, index) => minutes[index % MATCH_MINUTES]).sort((a, b) => a - b);
+  const extraTimeMinutes = shuffledCopy(Array.from({ length: EXTRA_TIME_MATCH_MINUTES - MATCH_MINUTES }, (_, index) => index + 1 + MATCH_MINUTES));
+  if(extraTimeGoalsCount === 0) {
+    return { 
+      goalMinutes: Array.from({ length: count }, (_, index) => minutes[index % MATCH_MINUTES]).sort((a, b) => a - b) ,
+      extraTimeGoals: extraTimeGoalsCount
+    };
+  } else {
+    const regTimeGoals = Array.from({ length: count - extraTimeGoalsCount}, (_, index) => minutes[index % MATCH_MINUTES]).sort((a, b) => a - b);
+    const extraTimeGoals = Array.from({ length: extraTimeGoalsCount }, (_, index) => extraTimeMinutes[index % (EXTRA_TIME_MATCH_MINUTES - MATCH_MINUTES)]).sort((a, b) => a - b);
+    return {
+      goalMinutes: Array.from([...regTimeGoals, ...extraTimeGoals]).sort((a,b) => a-b),
+      extraTimeGoals: extraTimeGoalsCount
+    };
+  }
+  
 }
 
 /**
@@ -121,7 +162,8 @@ export function generateMatchDetails(
   homeGoals: number,
   awayGoals: number,
   home: MatchSquad,
-  away: MatchSquad
+  away: MatchSquad,
+  isKnockout: boolean
 ): MatchDetails {
   const sides: Record<MatchSide, SideDraft> = {
     home: { squad: home, plan: planSubstitutions(home) },
@@ -129,11 +171,21 @@ export function generateMatchDetails(
   };
 
   // Each minute goes to one side: a shuffled list of sides (home x homeGoals, away x awayGoals) is paired with the minutes.
-  const goalSides = shuffledCopy([
-    ...Array<MatchSide>(homeGoals).fill("home"),
-    ...Array<MatchSide>(awayGoals).fill("away")
-  ]);
-  const goalMinutes = pickGoalMinutes(goalSides.length);
+  const {goalMinutes, extraTimeGoals} = pickGoalMinutes(homeGoals, awayGoals, isKnockout);
+  const homeExtraTimeGoals = Math.max(0,Math.floor((extraTimeGoals + homeGoals - awayGoals)/2));
+  const awayExtraTimeGoals = Math.max(0,Math.floor((extraTimeGoals - homeGoals + awayGoals)/2));
+
+  const preExtraTimeGoals = [
+    ...Array<MatchSide>(homeGoals - homeExtraTimeGoals).fill("home"),
+    ...Array<MatchSide>(awayGoals - awayExtraTimeGoals).fill("away")
+  ]
+  
+  const postExtraTimeGoals = [
+    ...Array<MatchSide>(homeExtraTimeGoals).fill("home"),
+    ...Array<MatchSide>(awayExtraTimeGoals).fill("away")
+  ]
+
+  const goalSides = [...shuffledCopy(preExtraTimeGoals), ...shuffledCopy(postExtraTimeGoals)];
 
   const goals: GoalEvent[] = [];
   goalSides.forEach((side, index) => {
