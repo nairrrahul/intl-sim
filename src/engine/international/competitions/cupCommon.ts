@@ -71,8 +71,9 @@ export interface InternationalCompetitionEdition {
   thirdPlace?: string | null;
   /** Set once the winner's players have been given the trophy. */
   trophyAwarded?: boolean;
-  /** Frozen at completion: the predicted ranking and the top-10 stat leaders (computed live until then). */
+  /** Frozen at completion: predicted and actual rankings, plus the top-10 stat leaders. */
   predictedRanking?: PredictedTier[];
+  actualRanking?: PredictedTier[];
   statLeaders?: StatLeaders;
   playoffTeams?: string[];
 }

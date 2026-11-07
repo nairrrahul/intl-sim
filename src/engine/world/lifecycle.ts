@@ -8,9 +8,10 @@ import { DEVELOPMENT_FACILITY_RATING } from "../players/config";
 import { formatPlayerId } from "../players/ids";
 import { advancePlayerOneYear } from "../players/growth";
 import { loadPlayersFromFile, nextSequenceAfter } from "../players/loader";
-import { applyWonderkids, generateNationNewgens } from "../players/newgen";
+import { applyNewgenAdjustments, applyWonderkids, generateNationNewgens } from "../players/newgen";
 import { pruneRetiredPlayers, retireScheduledPlayers, schedulePlayerRetirements } from "../players/retirement";
 import type { World } from "./world";
+import { Player } from "../players/types";
 
 /** A new world: players loaded from players.json, retirements scheduled, and the first window open. */
 export function createWorld(): World {
@@ -35,11 +36,28 @@ export function allocatePlayerId(world: World): string {
  * Adds the new season's 11 fifteen-year-old newgens for every nation, based on its youth rating,
  * then picks a handful of the whole intake to be wonderkids.
  */
+function youthTier(rating: number): "high" | "mid" | "low" {
+  if (rating > 115) return "high";
+  if (rating >= 60) return "mid";
+  return "low";
+}
+
 function generateSeasonNewgens(world: World): void {
-  const intake = Object.values(world.international.nations).flatMap(nation =>
-    generateNationNewgens(nation.code, nation.youthRating, world.year, () => allocatePlayerId(world))
-  );
-  applyWonderkids(intake);
+  const groups = { high: [], mid: [], low: [] } as Record<"high" | "mid" | "low", Player[]>;
+  for (const nation of Object.values(world.international.nations)) {
+    const newgens = generateNationNewgens(
+      nation.code, nation.youthRating, world.year, () => allocatePlayerId(world)
+    );
+    groups[youthTier(nation.youthRating)].push(...newgens);
+  }
+  applyNewgenAdjustments({
+    highPot: groups.high,
+    midPot: groups.mid,
+    lowPot: groups.low
+  });
+  const intake = [...groups.high, ...groups.mid, ...groups.low];
+  
+  applyWonderkids(intake);          // still picks from the whole intake
   world.players.push(...intake);
 }
 

@@ -1,5 +1,6 @@
 import { advanceWorldCupKnockout, startWorldCupRoundOf32 } from "./competitions/worldcup/tournament";
 import type { InternationalCompetitionEdition } from "./competitions/cupCommon";
+import { getInternationalCupStandings } from "./competitions/cupCommon";
 import type { WorldCupTournament } from "./competitions/worldcup/types";
 import { computeRankings } from "./rankings";
 import { TOURNAMENTS } from "./roundProgression";
@@ -10,7 +11,7 @@ import type {
 
 /**
  * Predictions and stat leaders for the cup tournaments (not qualifiers or the Nations League).
- * Both are computed live while a tournament is in progress and frozen onto the edition when it completes.
+ * Predictions are frozen when the tournament is drawn; actual results and stats are frozen on completion.
  */
 export type CompetitionKey =
   | "worldCup" | "euro" | "copaAmerica" | "goldCup" | "afcon" | "afcCup" | "ofcCup" | "confedCup" | "u20WorldCup";
@@ -26,6 +27,7 @@ export interface CupEditionLike {
   runnerUp: string | null;
   thirdPlace?: string | null;
   predictedRanking?: PredictedTier[];
+  actualRanking?: PredictedTier[];
   statLeaders?: StatLeaders;
 }
 
@@ -159,6 +161,62 @@ export function predictRanking(competition: CompetitionKey, source: CupEditionLi
   return tiers;
 }
 
+/** Ranks a completed tournament by its final results, using group-stage performance to order teams tied by knockout stage. */
+export function rankActualResults(source: CupEditionLike, strength: TeamStrength): PredictedTier[] {
+  const ranks = Object.fromEntries(source.teams.map(code => [code, strength.rank(code)]));
+  const groupStandings = source.groups.flatMap(group => getInternationalCupStandings({ seedRanks: ranks }, group));
+  const groupByTeam = new Map(groupStandings.map(row => [row.code, row]));
+  const knockoutOrder = (a: string, b: string): number =>
+    (groupByTeam.get(b)?.points ?? 0) - (groupByTeam.get(a)?.points ?? 0) ||
+    strength.rank(a) - strength.rank(b) ||
+    a.localeCompare(b);
+  const groupOrder = (a: string, b: string): number => {
+    const first = groupByTeam.get(a);
+    const second = groupByTeam.get(b);
+    return (second?.points ?? 0) - (first?.points ?? 0) ||
+      (second?.goalDifference ?? 0) - (first?.goalDifference ?? 0) ||
+      (second?.goalsFor ?? 0) - (first?.goalsFor ?? 0) ||
+      strength.rank(a) - strength.rank(b) ||
+      a.localeCompare(b);
+  };
+  const rounds = source.knockout ?? [];
+  const tiers: PredictedTier[] = [];
+  const addTier = (label: string, teams: string[], compare: (a: string, b: string) => number) => {
+    if (teams.length > 0) tiers.push({ label, teams: [...teams].sort(compare) });
+  };
+  const winnerOf = (match: NonNullable<CupEditionLike["knockout"]>[number]["matches"][number]): string => {
+    if (!match.winner) throw new Error(`Completed tournament has no winner for knockout match "${match.id}".`);
+    return match.winner;
+  };
+  const losersOf = (round: NonNullable<CupEditionLike["knockout"]>[number]): string[] =>
+    round.matches.map(match => {
+      const winner = winnerOf(match);
+      return winner === match.home ? match.away : match.home;
+    });
+
+  const finalRound = rounds.at(-1);
+  if (finalRound) {
+    const final = finalRound.matches.find(match => match.id === "F") ?? finalRound.matches[0];
+    if (!final) throw new Error("Completed tournament has no final match.");
+    addTier("Winner", [winnerOf(final)], knockoutOrder);
+    addTier("Runner-Up", losersOf({ label: "", matches: [final] }), knockoutOrder);
+    const thirdPlaceMatch = finalRound.matches.find(match => match.id === "3P");
+    if (thirdPlaceMatch) {
+      addTier("Third Place", [winnerOf(thirdPlaceMatch)], knockoutOrder);
+      addTier("Fourth Place", losersOf({ label: "", matches: [thirdPlaceMatch] }), knockoutOrder);
+    } else {
+      const semiFinals = rounds.at(-2);
+      if (semiFinals) addTier("Semi-Finalists", losersOf(semiFinals), knockoutOrder);
+    }
+    for (let index = rounds.length - 3; index >= 0; index--) {
+      addTier(TIER_LABELS[rounds[index].label] ?? rounds[index].label, losersOf(rounds[index]), knockoutOrder);
+    }
+  }
+  const inKnockout = new Set(rounds[0]?.matches.flatMap(match => [match.home, match.away]) ?? []);
+  addTier("Group Stage", source.teams.filter(code => !inKnockout.has(code)), groupOrder);
+  return tiers;
+}
+
 // ---------------------------------------------------------------------------
 // Stat leaders
 // ---------------------------------------------------------------------------
@@ -224,9 +282,17 @@ export function computeStatLeaders(
 // Live-or-frozen accessors and completion
 // ---------------------------------------------------------------------------
 
-/** The frozen ranking for a finished edition, otherwise computed from the current team overalls. */
-export function getPredictedRanking(state: InternationalState, competition: CompetitionKey, edition: CupEditionLike): PredictedTier[] {
-  return edition.predictedRanking ?? predictRanking(competition, edition, createTeamStrength(state, COMPETITIONS[competition].youth));
+/** The prediction frozen when the tournament was drawn. */
+export function getPredictedRanking(edition: CupEditionLike): PredictedTier[] {
+  if (!edition.predictedRanking) throw new Error("Tournament prediction has not been frozen.");
+  return edition.predictedRanking;
+}
+
+/** The frozen final ranking for a completed edition, or null until it completes. */
+export function getActualRanking(edition: CupEditionLike): PredictedTier[] | null {
+  if (!edition.completed) return null;
+  if (!edition.actualRanking) throw new Error("Completed tournament has no frozen actual ranking.");
+  return edition.actualRanking;
 }
 
 /** The frozen stat leaders for a finished edition, otherwise computed from the matches played so far. */
@@ -234,13 +300,25 @@ export function getStatLeaders(state: InternationalState, competition: Competiti
   return edition.statLeaders ?? computeStatLeaders(edition, playersById, createTeamStrength(state, COMPETITIONS[competition].youth));
 }
 
-/** Freezes the prediction and stat leaders of any tournament that has just completed. */
-export function freezeCompletedEditions(state: InternationalState, playersById: Map<string, Player>): void {
+/** Freezes predictions for every tournament that has been drawn. Safe to call at every draw point. */
+export function freezeTournamentPredictions(state: InternationalState): void {
   for (const [key, info] of Object.entries(COMPETITIONS) as [CompetitionKey, CompetitionInfo][]) {
-    const latest = info.editions(state).at(-1);
-    if (!latest || !latest.completed || (latest.predictedRanking && latest.statLeaders)) continue;
-    const strength = createTeamStrength(state, info.youth);
-    latest.predictedRanking = predictRanking(key, latest, strength);
-    latest.statLeaders = computeStatLeaders(latest, playersById, strength);
+    for (const edition of info.editions(state)) {
+      if (edition.predictedRanking || edition.groups.length === 0) continue;
+      edition.predictedRanking = predictRanking(key, edition, createTeamStrength(state, info.youth));
+    }
+  }
+}
+
+/** Freezes predictions for drawn tournaments and actual results/stats for every completed edition. */
+export function freezeCompletedEditions(state: InternationalState, playersById: Map<string, Player>): void {
+  freezeTournamentPredictions(state);
+  for (const [key, info] of Object.entries(COMPETITIONS) as [CompetitionKey, CompetitionInfo][]) {
+    for (const edition of info.editions(state)) {
+      if (!edition.completed || (edition.actualRanking && edition.statLeaders)) continue;
+      const strength = createTeamStrength(state, info.youth);
+      edition.actualRanking ??= rankActualResults(edition, strength);
+      edition.statLeaders ??= computeStatLeaders(edition, playersById, strength);
+    }
   }
 }

@@ -17,7 +17,10 @@ export default function Home() {
   const nextRounds = window?.rounds.filter(round => round.matchday === nextMatchday) ?? [];
 
   const topNations = getWorldRankings(game).points.slice(0, 10);
-  const topPlayers = [...world.players].sort((a, b) => b.overall - a.overall || b.potential - a.potential).slice(0, 10);
+  const topPlayers = world.players
+    .filter(player => !player.isRetired)
+    .sort((a, b) => b.overall - a.overall || b.potential - a.potential)
+    .slice(0, 10);
 
   return (
     <div>

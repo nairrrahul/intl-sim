@@ -2,9 +2,9 @@ import { useMemo } from "react";
 import { useGame } from "../../store/gameStore";
 import { getPlayersById } from "../../engine/players/lookup";
 import { getPlayerName } from "../../engine/players/display";
-import { getPredictedRanking, getStatLeaders } from "../../engine/international/editionInsights";
+import { getActualRanking, getPredictedRanking, getStatLeaders } from "../../engine/international/editionInsights";
 import type { CompetitionKey, CupEditionLike } from "../../engine/international/editionInsights";
-import type { StatLeader } from "../../engine/international/types";
+import type { PredictedTier, StatLeader } from "../../engine/international/types";
 import { Empty, NationTag, Panel, PlayerLink } from "./common";
 import { FlagIcon } from "./FlagIcon";
 
@@ -16,36 +16,47 @@ function useInsights(competition: CompetitionKey, edition: CupEditionLike) {
   const finished = edition.completed && edition.predictedRanking !== undefined;
   // Live results change with every simulated match; frozen ones never do.
   const liveKey = finished ? 0 : game.version;
-  const ranking = useMemo(() => getPredictedRanking(state, competition, edition), [state, competition, edition, liveKey]);
+  const ranking = useMemo(() => getPredictedRanking(edition), [edition]);
+  const actualRanking = useMemo(() => getActualRanking(edition), [edition]);
   const leaders = useMemo(() => getStatLeaders(state, competition, edition, playersById), [state, competition, edition, playersById, liveKey]);
-  return { ranking, leaders, playersById };
+  return { ranking, actualRanking, leaders, playersById };
+}
+
+function RankingTable(props: { ranking: PredictedTier[] }) {
+  let place = 0;
+  return (
+    <table className="tbl">
+      {props.ranking.map(tier => (
+        <tbody key={tier.label}>
+          <tr><th colSpan={2} className="bg-navy-900 text-xs uppercase tracking-wider text-navy-300 !py-1.5">{tier.label}</th></tr>
+          {tier.teams.map(code => (
+            <tr key={code}>
+              <td className="w-14 text-center tabular-nums text-navy-200">{++place}</td>
+              <td><NationTag code={code} label="name" /></td>
+            </tr>
+          ))}
+        </tbody>
+      ))}
+    </table>
+  );
 }
 
 /** Predicted final standings: every match is simulated from the draw using team overall (world ranking breaks ties). */
 export function PredictionsTab(props: { competition: CompetitionKey; edition: CupEditionLike }) {
-  const { ranking } = useInsights(props.competition, props.edition);
-  let place = 0;
+  const { ranking, actualRanking } = useInsights(props.competition, props.edition);
   return (
-    <Panel title="Predicted results">
-      <p className="px-4 py-2 text-xs text-navy-300">
-        {props.edition.completed
-          ? "The prediction made for this edition from team overalls (frozen once it finished)."
-          : "Every match is simulated using team overall (world ranking breaks ties). Updates as team overalls change."}
-      </p>
-      <table className="tbl">
-        {ranking.map(tier => (
-          <tbody key={tier.label}>
-            <tr><th colSpan={2} className="bg-navy-900 text-xs uppercase tracking-wider text-navy-300 !py-1.5">{tier.label}</th></tr>
-            {tier.teams.map(code => (
-              <tr key={code}>
-                <td className="w-14 text-center tabular-nums text-navy-200">{++place}</td>
-                <td><NationTag code={code} label="name" /></td>
-              </tr>
-            ))}
-          </tbody>
-        ))}
-      </table>
-    </Panel>
+    <div className="grid gap-6 lg:grid-cols-2">
+      <Panel title="Predicted results">
+        <RankingTable ranking={ranking} />
+      </Panel>
+      <Panel title="Actual results">
+        {!actualRanking ? <Empty>Actual results are available once the tournament is complete.</Empty> : (
+          <>
+            <RankingTable ranking={actualRanking} />
+          </>
+        )}
+      </Panel>
+    </div>
   );
 }
 

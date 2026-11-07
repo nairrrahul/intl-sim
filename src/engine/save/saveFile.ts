@@ -3,6 +3,8 @@ import type { Game } from "../game";
 import { createConfedCupState } from "../international/competitions/confedCup";
 import { createU20WorldCupState } from "../international/competitions/u20WorldCup";
 import { createEmptySquadState, refreshAllNationSquads } from "../international/squads";
+import { freezeCompletedEditions } from "../international/editionInsights";
+import { getPlayersById } from "../players/lookup";
 import { compareGraphs, deserializeGraph, serializeGraph } from "./graphSerializer";
 import type { World } from "../world/world";
 
@@ -117,6 +119,7 @@ export function gameFromSave(file: SaveFile): Game {
       season.trophies ??= [];
     }
   }
+  freezeCompletedEditions(world.international, getPlayersById(world.players));
   return { world, version: 0 };
 }
 

@@ -19,6 +19,7 @@ import {
 } from "./competitions/worldcup/worldCup";
 import { computeRankings, getWorldRanks } from "./rankings";
 import { drawWorldCupFinals } from "./worldCupWindow";
+import { freezeTournamentPredictions } from "./editionInsights";
 import type { InternationalState, WindowRecord } from "./types";
 
 const CONFEDERATIONS = ["UEFA", "CONCACAF", "CONMEBOL", "OFC", "AFC", "CAF"] as const;
@@ -146,4 +147,5 @@ export function completeWindow(state: InternationalState, window: WindowRecord):
   drawEuroQualifyingIfNext(state, window);
   drawU20WorldCupIfNext(state, window);
   drawWorldCupPhasesIfNext(state, window);
+  freezeTournamentPredictions(state);
 }

@@ -429,7 +429,7 @@ function scheduledRows(state: InternationalState, code: string, currentYear: num
     match.windowYear !== undefined && match.windowId
   );
   scheduled.push(...projectEuroQualifyingFixtures(ownCandidates, code, currentYear));
-  scheduled.push(...projectWorldCupFixtures(state, code, currentYear));
+  if (!youth) scheduled.push(...projectWorldCupFixtures(state, code, currentYear));
 
   const unique = new Map<string, InternationalMatch>();
   for (const match of scheduled) {

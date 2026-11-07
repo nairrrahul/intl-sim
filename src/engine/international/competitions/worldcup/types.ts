@@ -62,6 +62,7 @@ export interface WorldCupTournament {
   thirdPlace?: string | null;
   trophyAwarded?: boolean;
   predictedRanking?: PredictedTier[];
+  actualRanking?: PredictedTier[];
   statLeaders?: StatLeaders;
   semifinalists: string[];
   playoffTeams: string[];

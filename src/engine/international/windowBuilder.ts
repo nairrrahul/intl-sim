@@ -31,6 +31,7 @@ import { FRIENDLY_SETS_PER_WINDOW, pairKey, scheduleFriendlies } from "./friendl
 import { getLaneKey } from "./lanes";
 import { getWorldRanks } from "./rankings";
 import { getWorldCupWindowType } from "./competitions/worldcup/worldCup";
+import { freezeTournamentPredictions } from "./editionInsights";
 import type { World } from "../world/world";
 import type { NationsLeagueEdition } from "./competitions/nationsLeague";
 import type { InternationalRound, InternationalState, ScheduledRound, WindowRecord } from "./types";
@@ -365,5 +366,6 @@ export function openNextWindow(world: World): WindowRecord {
     callUps
   };
   state.windows.push(record);
+  freezeTournamentPredictions(state);
   return record;
 }

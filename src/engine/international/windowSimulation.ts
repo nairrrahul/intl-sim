@@ -104,7 +104,7 @@ function playRound(world: World, window: WindowRecord, round: ScheduledRound, pl
     recordMatchDetails(match, window, world, playersById);
   }
   onRoundPlayed(world.international, window, round, (code, trophy, team) => awardTrophy(world, window, playersById, code, trophy, team));
-  if (round.matches[0] && isTrackedTournamentMatch(round.matches[0])) freezeCompletedEditions(world.international, playersById);
+  freezeCompletedEditions(world.international, playersById);
 }
 
 export interface MatchdayOutcome {

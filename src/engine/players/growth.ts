@@ -67,8 +67,8 @@ export function calculateOverallChange(player: Player, facilityRating = 3): numb
       );
     }
   } else if (age >= peakStart && age <= peakEnd) {
-    if (overall < 0.75 * growthPotential || overall < growthPotential - 11) {
-      newOverall = overall + 0.25 * (growthPotential - overall);
+    if (overall < 0.85 * growthPotential || overall < growthPotential - 9) {
+      newOverall = overall + randInt(25,40)/100 * (growthPotential - overall);
     } else {
       newOverall = Math.min(overall + randInt(-2, 2), growthPotential);
     }
