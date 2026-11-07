@@ -5,6 +5,7 @@ export default function AfcCupPage() {
   const editions = useGame().world.international.afcCup.editions;
   return (
     <InternationalCupPage
+      competition="afcCup"
       title="Asian Cup"
       subtitle="Asian Cup"
       editions={editions}

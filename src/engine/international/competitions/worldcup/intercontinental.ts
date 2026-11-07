@@ -90,7 +90,8 @@ export function recordIntercontinentalPlayoffRound(
       homeGoals: match.homeGoals,
       awayGoals: match.awayGoals,
       ...(match.homePenalties ? { homePenalties: [...match.homePenalties] } : {}),
-      ...(match.awayPenalties ? { awayPenalties: [...match.awayPenalties] } : {})
+      ...(match.awayPenalties ? { awayPenalties: [...match.awayPenalties] } : {}),
+      fixture: match
     };
     bracketMatch.winner = match.worldCupWinner;
   }

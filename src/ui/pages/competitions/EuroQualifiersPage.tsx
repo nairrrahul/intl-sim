@@ -84,6 +84,7 @@ function Playoffs(props: {
           const away = bracketMatch.player2?.team ?? fixture?.away ?? null;
           return {
             id: bracketMatch.id,
+            fixture,
             home: toTeamRef(home),
             away: toTeamRef(away),
             score: fixture && fixture.homeGoals !== null && fixture.awayGoals !== null

@@ -26,8 +26,10 @@ export interface CupMatchSnap {
   legs?: [ScoreSnap | null, ScoreSnap | null];
   aggregate?: { h: number; a: number } | null;
   tiebreak?: ScoreSnap | null;
-  /** The live fixture behind a single-leg match (lets God Mode rig it). */
+  /** The live fixture behind a single-leg match (lets God Mode rig it and the report open on click). */
   fixture?: InternationalMatch;
+  /** Every played leg, for a two-legged tie. */
+  fixtures?: InternationalMatch[];
 }
 
 export interface CupRoundSnap {
@@ -54,6 +56,8 @@ export interface EuroTieSnap {
   aggregate: { h: number; a: number } | null;
   tiebreak: ScoreSnap | null;
   winner: TeamRef | null;
+  /** The tie's legs (first, then second), so the report can open on click. */
+  fixtures?: InternationalMatch[];
 }
 
 export interface EuroRoundSnap {

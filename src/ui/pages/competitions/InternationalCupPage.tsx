@@ -6,16 +6,22 @@ import { getInternationalCupStandings } from "../../../engine/international/comp
 import type { InternationalCompetitionEdition } from "../../../engine/international/competitions/cupCommon";
 import { Empty, NationLink, PageHeader, Panel, SeasonSelect, Tabs } from "../../components/common";
 import { CupBracketTree } from "../../components/brackets";
+import { GoldenBoot, PredictionsTab, StatsTab } from "../../components/competitionInsights";
+import type { CompetitionKey, CupEditionLike } from "../../../engine/international/editionInsights";
 import { InternationalGroupMatchdays } from "../../components/InternationalGroupMatchdays";
 import { InternationalGroupTable, InternationalNthPlacedTeamsTable } from "../../components/tables";
 import type { CupSnap, TeamRef } from "../../bracketTypes";
 
-type Tab = "draw" | "groups" | "knockout" | "history";
+type Tab = "draw" | "predictions" | "groups" | "knockout" | "stats" | "history";
 
 interface InternationalCupPageProps {
   title: string;
   subtitle: string;
   editions: InternationalCompetitionEdition[];
+  /** Which competition this is (drives the Predictions and Stats tabs). */
+  competition: CompetitionKey;
+  /** Maps a displayed edition to the engine's edition when the page shows a derived copy (the World Cup). */
+  resolveEngineEdition?: (edition: InternationalCompetitionEdition) => CupEditionLike;
   afconHighlights?: boolean;
   groupHighlights?: RowHighlights;
   groupQualifiedByConfederation?: boolean;
@@ -237,27 +243,59 @@ function getSemifinalLosers(edition: InternationalCompetitionEdition): string[] 
   });
 }
 
-function HistoryTable(props: { title: string; editions: InternationalCompetitionEdition[]; onSelect: (year: number) => void }) {
+/** The third-place match of an edition, if it had one: who won it and who finished fourth. */
+function getThirdAndFourth(edition: InternationalCompetitionEdition): { third: string; fourth: string } | null {
+  const match = edition.knockout?.at(-1)?.matches.find(candidate => candidate.id === "3P");
+  if (!match?.winner) return null;
+  return { third: match.winner, fourth: match.winner === match.home ? match.away : match.home };
+}
+
+function HistoryTable(props: {
+  title: string;
+  competition: CompetitionKey;
+  editions: InternationalCompetitionEdition[];
+  resolve: (edition: InternationalCompetitionEdition) => CupEditionLike;
+  onSelect: (year: number) => void;
+}) {
   const completed = [...props.editions].filter(edition => edition.completed).sort((a, b) => b.year - a.year);
   if (completed.length === 0) return <Panel><Empty>No completed {props.title} editions yet.</Empty></Panel>;
+  // Cups with a third-place match list third and fourth place instead of the semi-finalists.
+  const hasThirdPlace = completed.some(edition => getThirdAndFourth(edition) !== null);
   return (
     <Panel title={`${props.title} history`}>
       <div className="overflow-x-auto">
         <table className="tbl">
-          <thead><tr><th>Year</th><th>Hosts</th><th>Winner</th><th>Runner-up</th><th>Semi-finalists</th><th></th></tr></thead>
+          <thead>
+            <tr>
+              <th>Year</th><th>Hosts</th><th>Winner</th><th>Runner-up</th>
+              {hasThirdPlace ? <><th>Third place</th><th>Fourth place</th></> : <th>Semi-finalists</th>}
+              <th>Golden boot</th><th></th>
+            </tr>
+          </thead>
           <tbody>
-            {completed.map(edition => (
-              <tr key={edition.id}>
-                <td className="font-semibold">{edition.year + 1}</td>
-                <td>{edition.hosts.map(getNationName).join(" / ")}</td>
-                <td>{edition.winner && <NationLink code={edition.winner} />}</td>
-                <td>{edition.runnerUp && <NationLink code={edition.runnerUp} />}</td>
-                <td><div className="flex flex-wrap gap-x-3 gap-y-1">
-                  {getSemifinalLosers(edition).map(code => <NationLink key={code} code={code} />)}
-                </div></td>
-                <td className="text-right"><button className="btn-ghost btn-sm" onClick={() => props.onSelect(edition.year)}>View edition</button></td>
-              </tr>
-            ))}
+            {completed.map(edition => {
+              const placings = getThirdAndFourth(edition);
+              return (
+                <tr key={edition.id}>
+                  <td className="font-semibold">{edition.year + 1}</td>
+                  <td>{edition.hosts.map(getNationName).join(" / ")}</td>
+                  <td>{edition.winner && <NationLink code={edition.winner} />}</td>
+                  <td>{edition.runnerUp && <NationLink code={edition.runnerUp} />}</td>
+                  {hasThirdPlace ? (
+                    <>
+                      <td>{placings ? <NationLink code={placings.third} /> : <span className="text-navy-400">–</span>}</td>
+                      <td>{placings ? <NationLink code={placings.fourth} /> : <span className="text-navy-400">–</span>}</td>
+                    </>
+                  ) : (
+                    <td><div className="flex flex-wrap gap-x-3 gap-y-1">
+                      {getSemifinalLosers(edition).map(code => <NationLink key={code} code={code} />)}
+                    </div></td>
+                  )}
+                  <td><GoldenBoot competition={props.competition} edition={props.resolve(edition)} /></td>
+                  <td className="text-right"><button className="btn-ghost btn-sm" onClick={() => props.onSelect(edition.year)}>View edition</button></td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -267,6 +305,7 @@ function HistoryTable(props: { title: string; editions: InternationalCompetition
 
 export default function InternationalCupPage(props: InternationalCupPageProps) {
   const { title, subtitle, editions } = props;
+  const resolve = props.resolveEngineEdition ?? ((edition: InternationalCompetitionEdition) => edition as unknown as CupEditionLike);
   const latest = editions.at(-1) ?? null;
   const [tab, setTab] = useState<Tab>("groups");
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
@@ -287,8 +326,10 @@ export default function InternationalCupPage(props: InternationalCupPageProps) {
       <Tabs
         tabs={[
           { id: "draw", label: "Draw Results" },
+          { id: "predictions", label: "Predictions" },
           { id: "groups", label: "Group Stage" },
           { id: "knockout", label: "Knockout bracket" },
+          { id: "stats", label: "Stats" },
           { id: "history", label: "History" }
         ]}
         value={tab}
@@ -301,6 +342,10 @@ export default function InternationalCupPage(props: InternationalCupPageProps) {
           edition={selected}
           groupQualifiedByConfederation={props.groupQualifiedByConfederation}
         />
+      )}
+      {tab === "predictions" && (!selected
+        ? <Panel><Empty>Predictions are available once the {title} has been drawn.</Empty></Panel>
+        : <PredictionsTab competition={props.competition} edition={resolve(selected)} />
       )}
       {tab === "groups" && (!selected
         ? <Panel><Empty>The {title} group stage has not been drawn yet.</Empty></Panel>
@@ -315,8 +360,14 @@ export default function InternationalCupPage(props: InternationalCupPageProps) {
         ? <Panel><Empty>The knockout bracket is drawn after all group matches have been played.</Empty></Panel>
         : <CupBracketTree cup={toCupSnap(selected)} showFlag />
       )}
+      {tab === "stats" && (!selected
+        ? <Panel><Empty>Stats are available once the {title} has started.</Empty></Panel>
+        : <StatsTab competition={props.competition} edition={resolve(selected)} />
+      )}
       {tab === "history" && <HistoryTable
         title={title}
+        competition={props.competition}
+        resolve={resolve}
         editions={editions}
         onSelect={selectedEditionYear => { setSelectedYear(selectedEditionYear); setTab("groups"); }}
       />}

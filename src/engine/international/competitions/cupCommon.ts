@@ -1,6 +1,6 @@
 import { shuffledCopy } from "../../shared/random";
 import hostGroupAllocationRaw from "../data/host_group_allocation.json";
-import type { InternationalMatch, InternationalRound } from "../types";
+import type { InternationalMatch, InternationalRound, PredictedTier, StatLeaders } from "../types";
 
 export type InternationalCup = "goldCup" | "copaAmerica" | "confedCup" | "u20WorldCup" | "afcon" | "afcCup" | "ofcCup" | "euro";
 /** Cups whose knockout fixtures are built with makeKnockoutMatch. */
@@ -71,6 +71,9 @@ export interface InternationalCompetitionEdition {
   thirdPlace?: string | null;
   /** Set once the winner's players have been given the trophy. */
   trophyAwarded?: boolean;
+  /** Frozen at completion: the predicted ranking and the top-10 stat leaders (computed live until then). */
+  predictedRanking?: PredictedTier[];
+  statLeaders?: StatLeaders;
   playoffTeams?: string[];
 }
 

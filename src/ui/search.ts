@@ -1,5 +1,6 @@
 import { getPlayerName } from "../engine/players/display";
 import type { Game } from "../engine/game";
+import type { Player } from "../engine/players/types";
 import { nationInfo } from "../engine/nations/nations";
 import { computeRankings } from "../engine/international/rankings";
 import { getCompetitionSections } from "./competitions";
@@ -21,11 +22,23 @@ const startsWithQuery = (query: string) => (a: SearchResult, b: SearchResult): n
   return aStarts - bStarts || a.label.localeCompare(b.label);
 };
 
+/** Normalised searchable text per player (computed once; names do not change). */
+const searchTextCache = new WeakMap<Player, string>();
+
+function searchTextOf(player: Player): string {
+  let text = searchTextCache.get(player);
+  if (text === undefined) {
+    text = normalizeText(`${getPlayerName(player)} ${player.firstName} ${player.lastName}`);
+    searchTextCache.set(player, text);
+  }
+  return text;
+}
+
 function searchPlayers(game: Game, query: string): SearchResult[] {
   const results: SearchResult[] = [];
   for (const player of game.world.players) {
+    if (!searchTextOf(player).includes(query)) continue;
     const name = getPlayerName(player);
-    if (!normalizeText(`${name} ${player.firstName} ${player.lastName}`).includes(query)) continue;
     results.push({
       kind: "player",
       key: `p-${player.id}`,

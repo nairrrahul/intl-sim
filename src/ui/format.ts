@@ -23,3 +23,9 @@ export function formatScore(score: ScoreSnap | null): string {
 export function normalizeText(text: string): string {
   return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
+
+/** A number with an explicit sign for gains and losses, e.g. "+1.25", "-0.40", "0.00". */
+export function signed(value: number, digits = 2): string {
+  const text = Math.abs(value).toFixed(digits);
+  return value > 0 ? `+${text}` : value < 0 ? `-${text}` : text;
+}

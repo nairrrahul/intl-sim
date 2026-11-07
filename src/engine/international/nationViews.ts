@@ -189,12 +189,13 @@ function competitionLink(match: InternationalMatch, nationCode: string): string 
 
 const countScored = (kicks: string[]): number => kicks.filter(kick => kick === "O").length;
 
-function playedRows(state: InternationalState, code: string): NationMatchRow[] {
+function playedRows(state: InternationalState, code: string, youth: boolean): NationMatchRow[] {
   const rows: NationMatchRow[] = [];
   for (const window of state.windows) {
     for (const round of window.rounds) {
       for (const match of round.matches) {
         if (match.home !== code && match.away !== code) continue;
+        if (isYouthMatch(match) !== youth) continue;
         if (match.homeGoals === null || match.awayGoals === null) continue;
 
         const isHome = match.home === code;
@@ -254,7 +255,17 @@ function isUnplayedMatch(value: unknown): value is InternationalMatch {
  * Walks every competition's state and collects the unplayed fixtures it holds. Matches inherit the
  * year and window of the window record that contains them when they carry none themselves.
  */
-function collectUnplayedMatches(state: InternationalState): Map<string, InternationalMatch> {
+function collectUnplayedMatches(state: InternationalState, version?: number): Map<string, InternationalMatch> {
+  if (version !== undefined && unplayedCache?.state === state && unplayedCache.version === version) return unplayedCache.value;
+  const value = findUnplayedMatches(state);
+  if (version !== undefined) unplayedCache = { state, version, value };
+  return value;
+}
+
+/** The last result, reused while the game has not changed (the walk below touches every competition). */
+let unplayedCache: { state: InternationalState; version: number; value: Map<string, InternationalMatch> } | null = null;
+
+function findUnplayedMatches(state: InternationalState): Map<string, InternationalMatch> {
   const roots: unknown[] = [
     state.windows, state.nationsLeague, state.goldCup, state.copaAmerica, state.confedCup, state.u20WorldCup, state.afcon, state.afcCup,
     state.ofcCup, state.euroQualifiers, state.euro, state.worldCup
@@ -271,6 +282,9 @@ function collectUnplayedMatches(state: InternationalState): Map<string, Internat
     }
 
     const record = value as Record<string, unknown>;
+    // Finished things hold no unplayed fixtures, so skip them (this keeps the walk fast late in a long game).
+    if (record.status === "played" || record.status === "complete") return;
+    if (record.completed === true && "groups" in record && "knockout" in record) return;
     const windowContext = Array.isArray(record.rounds) && typeof record.year === "number" && typeof record.windowId === "string"
       ? value as WindowRecord
       : parentWindow;
@@ -406,9 +420,9 @@ function projectWorldCupFixtures(state: InternationalState, code: string, curren
   return projected;
 }
 
-function scheduledRows(state: InternationalState, code: string, currentYear: number): NationMatchRow[] {
-  const candidates = collectUnplayedMatches(state);
-  const ownCandidates = [...candidates.values()].filter(match => match.home === code || match.away === code);
+function scheduledRows(state: InternationalState, code: string, currentYear: number, youth: boolean, version?: number): NationMatchRow[] {
+  const candidates = collectUnplayedMatches(state, version);
+  const ownCandidates = [...candidates.values()].filter(match => (match.home === code || match.away === code) && isYouthMatch(match) === youth);
 
   const scheduled: InternationalMatch[] = ownCandidates.filter(match =>
     !(match.kind === "euroQualifier" && match.euroStage === "qualifying") &&
@@ -458,9 +472,19 @@ function scheduledRows(state: InternationalState, code: string, currentYear: num
   return rows;
 }
 
-/** Played matches and scheduled fixtures for a nation, oldest first. */
-export function getNationMatches(state: InternationalState, code: string, currentYear: number): NationMatchRow[] {
-  const rows = [...playedRows(state, code), ...scheduledRows(state, code, currentYear)];
+
+/**
+ * Played matches and scheduled fixtures for a nation's senior team (or, with `team: "u20"`, its U20 team),
+ * oldest first. Pass the game's version to reuse the (expensive) search for scheduled fixtures between changes.
+ */
+export function getNationMatches(
+  state: InternationalState,
+  code: string,
+  currentYear: number,
+  options: { team?: "senior" | "u20"; version?: number } = {}
+): NationMatchRow[] {
+  const youth = options.team === "u20";
+  const rows = [...playedRows(state, code, youth), ...scheduledRows(state, code, currentYear, youth, options.version)];
   rows.sort((a, b) =>
     a.year - b.year || a.windowId.localeCompare(b.windowId) || Number(a.scheduled) - Number(b.scheduled));
   return rows;

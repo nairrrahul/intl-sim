@@ -24,6 +24,7 @@ function toTie(tie: GoldCupPlayoffTie): EuroTieSnap {
   const secondPlayed = tie.secondLeg.homeGoals !== null && tie.secondLeg.awayGoals !== null;
   return {
     id: tie.id,
+    fixtures: [tie.firstLeg, tie.secondLeg],
     home,
     away,
     bye: false,

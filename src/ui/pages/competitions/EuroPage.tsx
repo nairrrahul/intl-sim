@@ -6,6 +6,7 @@ export default function EuroPage() {
   const editions = useGame().world.international.euro.editions;
   return (
     <InternationalCupPage
+      competition="euro"
       title="UEFA EURO"
       subtitle="UEFA European Championship"
       editions={editions}

@@ -1,12 +1,14 @@
 import { completeWindow } from "./windowCompletion";
 import { getActiveWindow } from "./calendar/windows";
 import { getWindowMatchdayCount } from "./lanes";
+import { freezeCompletedEditions, isTrackedTournamentMatch } from "./editionInsights";
 import { generateMatchDetails } from "./matchEvents";
 import type { MatchSquad } from "./matchEvents";
 import { isYouthMatch, playMatch } from "./matchResolution";
 import { onRoundPlayed } from "./roundProgression";
 import { STARTING_XI_SIZE } from "./squads";
 import type { TrophyTeam } from "./roundProgression";
+import { getPlayersById } from "../players/lookup";
 import { getSeasonRow } from "../players/progression";
 import type { World } from "../world/world";
 import type { Player } from "../players/types";
@@ -42,6 +44,17 @@ function recordMatchDetails(match: InternationalMatch, window: WindowRecord, wor
   );
   match.goals = details.goals;
   match.substitutions = details.substitutions;
+
+  // Tournament matches also keep who played and who kept clean sheets, for the competition stats tab.
+  if (isTrackedTournamentMatch(match)) {
+    match.appearances = {
+      home: details.appearances.home.map(player => player.id),
+      away: details.appearances.away.map(player => player.id)
+    };
+    match.cleanSheets = {};
+    if (details.cleanSheets.home) match.cleanSheets.home = details.cleanSheets.home.id;
+    if (details.cleanSheets.away) match.cleanSheets.away = details.cleanSheets.away.id;
+  }
 
   if (youth) {
     for (const side of ["home", "away"] as const) {
@@ -90,6 +103,7 @@ function playRound(world: World, window: WindowRecord, round: ScheduledRound, pl
     recordMatchDetails(match, window, world, playersById);
   }
   onRoundPlayed(world.international, window, round, (code, trophy, team) => awardTrophy(world, window, playersById, code, trophy, team));
+  if (round.matches[0] && isTrackedTournamentMatch(round.matches[0])) freezeCompletedEditions(world.international, playersById);
 }
 
 export interface MatchdayOutcome {
@@ -110,7 +124,7 @@ export function simulateMatchday(world: World): MatchdayOutcome | null {
   if (!window) return null;
 
   const matchday = window.matchdaysPlayed + 1;
-  const playersById: PlayersById = new Map(world.players.map(player => [player.id, player]));
+  const playersById = getPlayersById(world.players);
   const roundsToPlay = window.rounds.filter(round => round.matchday === matchday);
   for (const round of roundsToPlay) playRound(world, window, round, playersById);
   window.matchdaysPlayed = matchday;

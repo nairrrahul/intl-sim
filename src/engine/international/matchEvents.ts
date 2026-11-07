@@ -1,5 +1,5 @@
 import { POSITION_GROUP } from "../players/positions";
-import { pickRandom, weightedPick } from "../shared/random";
+import { pickRandom, shuffledCopy, weightedPick } from "../shared/random";
 import type { Player, Position } from "../players/types";
 import type { GoalEvent, MatchSide, SubstitutionEvent } from "./types";
 
@@ -26,8 +26,8 @@ const LAST_SUBSTITUTION_MINUTE = 88;
 /** How many substitutions a side makes (weighted). */
 const SUBSTITUTION_COUNTS: [number, number][] = [[3, 25], [4, 30], [5, 45]];
 
-/** Chance a goal is assisted. */
-const ASSIST_CHANCE = 0.75;
+/** Chance a goal is a penalty (penalties have no assister). */
+const PENALTY_CHANCE = 0.1;
 
 /** Substitutes are less likely to be the one involved in a goal than a starter in the same position. */
 const SUBSTITUTE_FACTOR = 0.75;
@@ -73,9 +73,13 @@ function planSubstitutions(squad: MatchSquad): PlannedSubstitution[] {
   return plan;
 }
 
-/** A goal minute, skewed slightly towards the later part of the match. */
-function randomGoalMinute(): number {
-  return Math.min(MATCH_MINUTES, Math.max(1, Math.round(1 + (MATCH_MINUTES - 1) * Math.pow(Math.random(), 0.9))));
+/**
+ * Distinct goal minutes for the whole match (no two goals share a minute): the minutes 1-90 are
+ * shuffled and the first `count` taken. (Beyond 90 goals, minutes necessarily repeat.)
+ */
+function pickGoalMinutes(count: number): number[] {
+  const minutes = shuffledCopy(Array.from({ length: MATCH_MINUTES }, (_, index) => index + 1));
+  return Array.from({ length: count }, (_, index) => minutes[index % MATCH_MINUTES]).sort((a, b) => a - b);
 }
 
 /**
@@ -123,22 +127,32 @@ export function generateMatchDetails(
     home: { squad: home, plan: planSubstitutions(home) },
     away: { squad: away, plan: planSubstitutions(away) }
   };
-  const goalCounts: Record<MatchSide, number> = { home: homeGoals, away: awayGoals };
+
+  // Each minute goes to one side: a shuffled list of sides (home x homeGoals, away x awayGoals) is paired with the minutes.
+  const goalSides = shuffledCopy([
+    ...Array<MatchSide>(homeGoals).fill("home"),
+    ...Array<MatchSide>(awayGoals).fill("away")
+  ]);
+  const goalMinutes = pickGoalMinutes(goalSides.length);
 
   const goals: GoalEvent[] = [];
-  for (const side of ["home", "away"] as MatchSide[]) {
+  goalSides.forEach((side, index) => {
+    const minute = goalMinutes[index];
     const { squad, plan } = sides[side];
-    const minutes = Array.from({ length: goalCounts[side] }, randomGoalMinute).sort((a, b) => a - b);
-    for (const minute of minutes) {
-      const onPitch = [...squad.starters, ...squad.bench].filter(player => isOnPitch(player, minute, squad, plan));
-      const scorer = pickInvolved(onPitch, SCORING_WEIGHT, squad) ?? onPitch.find(player => player.position !== "GK") ?? onPitch[0];
-      if (!scorer) continue;
-      const assister = Math.random() < ASSIST_CHANCE
-        ? pickInvolved(onPitch.filter(player => player !== scorer), ASSIST_WEIGHT, squad)
-        : null;
-      goals.push({ minute, side, scorerId: scorer.id, assistId: assister?.id ?? null });
+    const onPitch = [...squad.starters, ...squad.bench].filter(player => isOnPitch(player, minute, squad, plan));
+    const outfield = onPitch.filter(player => player.position !== "GK");
+
+    if (Math.random() < PENALTY_CHANCE && outfield.length > 0) {
+      // Penalties are scored by the best outfield player on the pitch and are never assisted.
+      const taker = outfield.reduce((best, player) => (player.overall > best.overall ? player : best));
+      goals.push({ minute, side, scorerId: taker.id, assistId: null, penalty: true });
+      return;
     }
-  }
+    const scorer = pickInvolved(onPitch, SCORING_WEIGHT, squad) ?? outfield[0] ?? onPitch[0];
+    if (!scorer) return;
+    const assister = pickInvolved(onPitch.filter(player => player !== scorer), ASSIST_WEIGHT, squad);
+    goals.push({ minute, side, scorerId: scorer.id, assistId: assister?.id ?? null });
+  });
   goals.sort((a, b) => a.minute - b.minute || (a.side === b.side ? 0 : a.side === "home" ? -1 : 1));
 
   const involvedIds = new Set(goals.flatMap(goal => [goal.scorerId, goal.assistId]));

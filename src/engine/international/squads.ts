@@ -23,23 +23,27 @@ function getFillOrder(requirements: Position[]): number[] {
     .sort((a, b) => countOf(requirements[a]) - countOf(requirements[b]));
 }
 
+/** Players best-first. The sort is stable, so equal overalls keep their original order. */
+function rankByOverall(players: Player[]): Player[] {
+  return [...players].sort((a, b) => b.overall - a.overall);
+}
+
 /**
  * Best starting XI for a formation, aligned with getFormationRequirements(formation) (result[i] is the
- * player for slot i). Returns null when the squad cannot fill every position.
+ * player for slot i). Returns null when the squad cannot fill every position. `ranked` is the squad sorted
+ * best-first (pass it when trying several formations to avoid re-sorting).
  */
-export function selectBestStartingXI(players: Player[], formation: string): Player[] | null {
+export function selectBestStartingXI(players: Player[], formation: string, ranked = rankByOverall(players)): Player[] | null {
   const requirements = getFormationRequirements(formation);
-  const unused = new Set(players);
+  const used = new Set<Player>();
   const selected: Player[] = new Array(requirements.length);
 
   for (const slotIndex of getFillOrder(requirements)) {
     const required = requirements[slotIndex];
-    const best = [...unused]
-      .filter(player => canPlayPosition(player.position, required))
-      .sort((a, b) => b.overall - a.overall)[0];
+    const best = ranked.find(player => !used.has(player) && canPlayPosition(player.position, required));
     if (!best) return null;
     selected[slotIndex] = best;
-    unused.delete(best);
+    used.add(best);
   }
   return selected;
 }
@@ -80,8 +84,9 @@ export interface FormationOption {
 /** Every formation the squad can fill, best first. */
 export function getViableFormations(players: Player[]): FormationOption[] {
   const options: FormationOption[] = [];
+  const ranked = rankByOverall(players);
   for (const formation of Object.keys(FORMATIONS)) {
-    const xi = selectBestStartingXI(players, formation);
+    const xi = selectBestStartingXI(players, formation, ranked);
     if (xi) options.push({ formation, overall: averageOverall(xi) });
   }
   return options.sort((a, b) => b.overall - a.overall);

@@ -134,6 +134,7 @@ function drawWorldCupPhasesIfNext(state: InternationalState, window: WindowRecor
 export function completeWindow(state: InternationalState, window: WindowRecord): void {
   drawCopaAmericaIfDue(state, window.year, window.windowId);
   window.status = "played";
+  window.callUps = {}; // squads are only needed while the window is being played
   completeNationsLeagueEditions(state.nationsLeague);
   state.rankingHistory.push({
     year: window.year,

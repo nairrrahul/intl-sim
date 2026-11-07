@@ -1,8 +1,8 @@
-import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useGame } from "../../store/gameStore";
 import { formatWindowLabel } from "../../engine/international/calendar/windows";
 import { getMatchStage } from "../../engine/international/nationViews";
+import { getPlayersById } from "../../engine/players/lookup";
 import { getPlayerName } from "../../engine/players/display";
 import { getCompetitionNameForKind } from "../competitions";
 import type { GoalEvent, InternationalMatch, MatchSide, SubstitutionEvent } from "../../engine/international/types";
@@ -23,11 +23,11 @@ function buildTimeline(match: InternationalMatch): TimelineEvent[] {
   return events.sort((a, b) => a.minute - b.minute || (a.type === b.type ? 0 : a.type === "substitution" ? -1 : 1));
 }
 
-/** A match report: team names either side, events running down the page by minute. */
-export function MatchModal(props: { match: InternationalMatch; onClose: () => void }) {
+/** One match's report: team names either side, events running down the page by minute. */
+function MatchReport(props: { match: InternationalMatch; heading?: string; onClose: () => void }) {
   const { match } = props;
   const game = useGame();
-  const playersById = useMemo(() => new Map(game.world.players.map(player => [player.id, player])), [game.world.players]);
+  const playersById = getPlayersById(game.world.players);
 
   const playerLink = (id: string) => {
     const player = playersById.get(id);
@@ -48,7 +48,10 @@ export function MatchModal(props: { match: InternationalMatch; onClose: () => vo
     if (event.type === "goal") {
       return (
         <div className={align}>
-          <div className="font-semibold">⚽ {playerLink(event.goal.scorerId)}</div>
+          <div className="font-semibold">
+            ⚽ {playerLink(event.goal.scorerId)}
+            {event.goal.penalty && <span className="ml-1 text-xs font-normal text-navy-300">(P)</span>}
+          </div>
           {event.goal.assistId && (
             <div className="text-xs text-navy-300">Assist: {playerLink(event.goal.assistId)}</div>
           )}
@@ -65,7 +68,8 @@ export function MatchModal(props: { match: InternationalMatch; onClose: () => vo
   };
 
   return (
-    <Modal title={getCompetitionNameForKind(match.kind)} onClose={props.onClose} wide>
+    <section>
+      {props.heading && <h3 className="text-center text-sm font-bold uppercase tracking-wider text-accent-yellow mb-1">{props.heading}</h3>}
       <div className="text-center text-xs text-navy-300 mb-4">
         {[stage, match.windowYear !== undefined && match.windowId ? formatWindowLabel(match.windowYear, match.windowId) : null]
           .filter(Boolean).join(" · ")}
@@ -101,6 +105,23 @@ export function MatchModal(props: { match: InternationalMatch; onClose: () => vo
           </div>
         </div>
       )}
+    </section>
+  );
+}
+
+const LEG_HEADINGS = ["First leg", "Second leg"];
+
+/** The report for a match, or for each leg of a two-legged tie. */
+export function MatchModal(props: { matches: InternationalMatch[]; onClose: () => void }) {
+  const [first] = props.matches;
+  const multiple = props.matches.length > 1;
+  return (
+    <Modal title={getCompetitionNameForKind(first.kind)} onClose={props.onClose} wide>
+      <div className="space-y-8">
+        {props.matches.map((match, index) => (
+          <MatchReport key={index} match={match} heading={multiple ? LEG_HEADINGS[index] ?? `Leg ${index + 1}` : undefined} onClose={props.onClose} />
+        ))}
+      </div>
     </Modal>
   );
 }

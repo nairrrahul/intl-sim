@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useGameStore } from "../../store/gameStore";
+import { compressText, readSaveText } from "../../engine/save/compression";
 import { parseSaveText } from "../../engine/save/saveFile";
 import type { SaveFile } from "../../engine/save/saveFile";
 import { ConfirmDialog, Modal } from "./common";
@@ -8,19 +9,20 @@ export function SaveGameButton(props: { className?: string }) {
   const exportSave = useGameStore(s => s.exportSave);
   const notify = useGameStore(s => s.notify);
 
-  const save = () => {
+  const save = async () => {
     const result = exportSave();
     if (!result) return;
-    const blob = new Blob([result.json], { type: "application/json" });
+    const filename = `${result.filename}.gz`;
+    const blob = new Blob([await compressText(result.json) as unknown as BlobPart], { type: "application/gzip" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = result.filename;
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
-    notify("success", `Game saved as ${result.filename} (${(blob.size / 1048576).toFixed(2)} MB).`);
+    notify("success", `Game saved as ${filename} (${(blob.size / 1048576).toFixed(2)} MB).`);
   };
 
   return (
@@ -45,7 +47,7 @@ export function LoadGameButton(props: { className?: string; label?: string; conf
   const handleFile = async (file: File | undefined) => {
     if (!file) return;
     try {
-      const parsed = parseSaveText(await file.text());
+      const parsed = parseSaveText(await readSaveText(new Uint8Array(await file.arrayBuffer())));
       if (props.confirmReplace) setPending(parsed);
       else load(parsed);
     } catch (e) {
@@ -58,7 +60,7 @@ export function LoadGameButton(props: { className?: string; label?: string; conf
       <input
         ref={input}
         type="file"
-        accept=".json,application/json"
+        accept=".gz,.json,application/gzip,application/json"
         className="hidden"
         onChange={event => {
           const file = event.target.files?.[0];

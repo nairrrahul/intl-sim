@@ -1,29 +1,25 @@
+import { signed } from "../../format";
 import NationSquad from "./NationSquad";
-import { useMatchInteractions } from "../../components/matchInteractions";
+import { YouthRatingInput } from "../../components/YouthRatingInput";
+import { NationMatches } from "./NationMatches";
+import NationU20Team from "./NationU20Team";
 import { getPlayerName } from "../../../engine/players/display";
 import { useState } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
-import { useGame, useGameStore } from "../../../store/gameStore";
+import { Navigate, useParams } from "react-router-dom";
+import { useGame } from "../../../store/gameStore";
 import { getWorldRankings } from "../../../engine/queries";
 import { getConfederation, getNationName } from "../../../engine/nations/nations";
 import { getNationTrophies } from "../../../engine/international/trophies";
-import { getNationMatches } from "../../../engine/international/nationViews";
 import { getNationRankingHistory } from "../../../engine/international/rankings";
 import { seasonDisplay } from "../../../engine/config";
-import { getCompetitionNameForKind } from "../../competitions";
 import {
-  Empty, NationLink, OvrBadge, PageHeader, Panel, PlayerLink, PosBadge, SeasonSelect, ShortlistButton, Stat, Tabs, RetiringMark } from "../../components/common";
+  Empty, OvrBadge, PageHeader, Panel, PlayerLink, PosBadge, ShortlistButton, Stat, Tabs, RetiringMark } from "../../components/common";
 import { FlagIcon } from "../../components/FlagIcon";
 
 type Tab = "overview" | "squad" | "u20" | "players" | "ranking" | "matches" | "history";
 
 /** Seasons of ranking history shown ("past 5 years"). */
 const RANKING_HISTORY_YEARS = 10;
-
-function signed(value: number, digits = 2): string {
-  const text = Math.abs(value).toFixed(digits);
-  return value > 0 ? `+${text}` : value < 0 ? `-${text}` : text;
-}
 
 function PlayersTab(props: { code: string }) {
   const game = useGame();
@@ -168,101 +164,12 @@ function RankingTab(props: { code: string }) {
 /** The nation's youth rating; editable in God Mode. */
 function YouthRatingStat(props: { code: string }) {
   const game = useGame();
-  const setRating = useGameStore(s => s.godSetYouthRating);
-  const nation = game.world.international.nations[props.code];
-  const [draft, setDraft] = useState<string | null>(null);
-
-  if (!game.world.godMode) {
-    return <Stat label="Youth rating" value={nation.youthRating} sub="Drives newgen quality" />;
-  }
-  const commit = () => {
-    if (draft !== null && draft !== "") setRating(props.code, Number(draft));
-    setDraft(null);
-  };
   return (
     <Stat
       label="Youth rating"
-      value={
-        <input
-          className="input w-20 text-center"
-          inputMode="numeric"
-          value={draft ?? String(nation.youthRating)}
-          onChange={event => setDraft(event.target.value.replace(/\D/g, ""))}
-          onBlur={commit}
-          onKeyDown={event => { if (event.key === "Enter") commit(); }}
-          aria-label="Youth rating"
-        />
-      }
-      sub="0-200 · God Mode"
+      value={<YouthRatingInput code={props.code} />}
+      sub={game.world.godMode ? "0-200 · God Mode" : "Drives newgen quality"}
     />
-  );
-}
-
-function MatchesTab(props: { code: string }) {
-  const game = useGame();
-  const interactions = useMatchInteractions();
-  const matches = getNationMatches(game.world.international, props.code, game.world.year);
-  const matchYears = matches.map(match => match.year);
-  const firstYear = Math.min(game.world.year, ...matchYears);
-  const lastYear = Math.max(game.world.year, ...matchYears);
-  const years = Array.from({ length: lastYear - firstYear + 1 }, (_, index) => firstYear + index);
-  const [year, setYear] = useState(game.world.year);
-  const rows = matches.filter(match => match.year === year);
-
-  return (
-    <div>
-      <div className="flex justify-end mb-3">
-        <SeasonSelect years={years.map(y => ({ year: y, label: seasonDisplay(y) }))} value={year} onChange={setYear} />
-      </div>
-      <Panel title={`Matches — ${seasonDisplay(year)}`}>
-        {rows.length === 0 ? (
-          <Empty>No international matches or fixtures in this season.</Empty>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="tbl">
-              <thead>
-                <tr><th>Window</th><th>Competition</th><th>Stage</th><th>Opponent</th><th></th><th>Result</th><th className="num">Rating</th></tr>
-              </thead>
-              <tbody>
-                {rows.map((match, index) => (
-                  <tr key={index} className={interactions.matchClass(match.match)} {...interactions.matchProps(match.match)}>
-                    <td className="text-navy-200">{match.windowLabel}</td>
-                    <td>
-                      {match.kind === "friendly" ? "Friendly" : match.competitionLink ? (
-                        <Link className="link" to={match.competitionLink}>
-                          {getCompetitionNameForKind(match.kind)}
-                        </Link>
-                      ) : match.kind}
-                    </td>
-                    <td className="text-xs text-navy-300">{match.stage ?? "–"}</td>
-                    <td><NationLink code={match.opponent} /></td>
-                    <td className="text-xs text-navy-300">{match.home ? "H" : "A"}</td>
-                    <td className="tabular-nums">
-                      {match.scheduled ? <span className="text-navy-300">Scheduled</span> : (
-                        <>
-                          <span className={`font-bold mr-1.5 ${match.outcome === "win" ? "text-accent-yellow" : match.outcome === "loss" ? "text-navy-300" : "text-white"}`}>
-                            {match.outcome === "win" ? "W" : match.outcome === "loss" ? "L" : "D"}
-                          </span>
-                          {match.goalsFor}-{match.goalsAgainst}
-                        </>
-                      )}
-                      {match.penaltyShootout && (
-                        <span className="ml-1.5 text-navy-300">
-                          ({match.penaltyShootout.goalsFor}-{match.penaltyShootout.goalsAgainst} PSO)
-                        </span>
-                      )}
-                    </td>
-                    <td className={`num ${match.pointsChange !== null && match.pointsChange > 0 ? "text-accent-yellow" : "text-navy-300"}`}>
-                      {match.pointsChange === null ? "–" : signed(match.pointsChange)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Panel>
-    </div>
   );
 }
 
@@ -332,7 +239,7 @@ export default function NationPage() {
         tabs={[
           { id: "overview", label: "Overview" },
           { id: "squad", label: "Starting XI" },
-          { id: "u20", label: "U20 Squad" },
+          { id: "u20", label: "U20 Team" },
           { id: "players", label: "Best players" },
           { id: "ranking", label: "Ranking history" },
           { id: "matches", label: "Match history" },
@@ -343,7 +250,7 @@ export default function NationPage() {
       />
 
       {tab === "squad" && <NationSquad code={code} />}
-      {tab === "u20" && <NationSquad code={code} team="u20" />}
+      {tab === "u20" && <NationU20Team code={code} />}
 
       {tab === "overview" && (
         <div className="space-y-6">
@@ -379,7 +286,7 @@ export default function NationPage() {
       )}
       {tab === "players" && <PlayersTab code={code} />}
       {tab === "ranking" && <RankingTab code={code} />}
-      {tab === "matches" && <MatchesTab code={code} />}
+      {tab === "matches" && <NationMatches code={code} />}
       {tab === "history" && <NationHistoryTab code={code} />}
     </div>
   );

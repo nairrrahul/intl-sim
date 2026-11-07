@@ -50,8 +50,10 @@ export interface GoalEvent {
   side: MatchSide;
   /** Player ID of the scorer. */
   scorerId: string;
-  /** Player ID of the assister (null for an unassisted goal). */
+  /** Player ID of the assister (null for a penalty, which has no assist). */
   assistId: string | null;
+  /** True for a penalty, always taken by the team's highest-rated outfield player on the pitch. */
+  penalty?: boolean;
 }
 
 export interface SubstitutionEvent {
@@ -61,6 +63,27 @@ export interface SubstitutionEvent {
   offId: string;
   /** Player ID of the player brought on. */
   onId: string;
+}
+
+/** One tier of a predicted final ranking (e.g. "Quarter-Finalists") with its teams in rank order. */
+export interface PredictedTier {
+  label: string;
+  teams: string[];
+}
+
+/** A player in a competition's top-10 for goals, assists or clean sheets. */
+export interface StatLeader {
+  playerId: string;
+  nation: string;
+  value: number;
+  /** Games played in the competition (fewer is better when values tie). */
+  games: number;
+}
+
+export interface StatLeaders {
+  goals: StatLeader[];
+  assists: StatLeader[];
+  cleanSheets: StatLeader[];
 }
 
 export interface InternationalMatch {
@@ -74,6 +97,10 @@ export interface InternationalMatch {
   awayChange: number | null;
   /** Goals of the match in minute order (set once it has been played). */
   goals?: GoalEvent[];
+  /** Players who played, per side (only recorded for tournament matches, to power competition stats). */
+  appearances?: Record<MatchSide, string[]>;
+  /** Goalkeepers credited with a clean sheet, per side (tournament matches only). */
+  cleanSheets?: Partial<Record<MatchSide, string>>;
   /** Substitutions that matter to the match story: those that brought on a goalscorer or assister. */
   substitutions?: SubstitutionEvent[];
   /** God Mode: the result this match is forced to when played (a drawn knockout goes to random penalties). */
@@ -238,5 +265,7 @@ export interface InternationalState {
   worldCup: WorldCupState;
   /** The nation left out of the most recent set of fixtures (never left out twice in a row). */
   lastLeftOut: string | null;
+  /** The season whose player ratings the nations' squads were last built from (squads only change at rollover). */
+  squadsSeason?: number;
 }
 

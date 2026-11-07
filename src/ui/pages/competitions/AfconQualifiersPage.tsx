@@ -35,6 +35,7 @@ function toTie(tie: GoldCupPlayoffTie): EuroTieSnap {
   ];
   return {
     id: tie.id,
+    fixtures: [tie.firstLeg, tie.secondLeg],
     home,
     away,
     bye: false,

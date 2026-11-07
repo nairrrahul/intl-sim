@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { MouseEvent, ReactNode } from "react";
+import { useLocation } from "react-router-dom";
 import { useGameStore } from "../../store/gameStore";
 import { getNationName } from "../../engine/nations/nations";
 import type { InternationalMatch } from "../../engine/international/types";
@@ -11,17 +12,26 @@ const RIGGED_CLASS = "outline outline-2 -outline-offset-2 outline-red-500 rounde
 
 const isPlayed = (match: InternationalMatch): boolean => match.homeGoals !== null && match.awayGoals !== null;
 
+/** One fixture, or every leg of a two-legged tie. */
+type MatchTarget = InternationalMatch | InternationalMatch[] | undefined;
+
+const toList = (target: MatchTarget): InternationalMatch[] =>
+  Array.isArray(target) ? target : target ? [target] : [];
+
+/** Hover feedback for a fixture that can be opened: clearly visible, and distinct from the red rigged outline. */
+const CLICKABLE_CLASS = "cursor-pointer transition-colors hover:!bg-accent-purple/25";
+
 interface MatchInteractionApi {
-  /** Extra class names for a fixture element: the red outline when rigged, a pointer when it can be opened. */
-  matchClass: (match: InternationalMatch | undefined) => string;
+  /** Extra class names for a fixture element: the red outline when rigged, hover feedback when it can be opened. */
+  matchClass: (target: MatchTarget) => string;
   /**
-   * Props to spread on a fixture element: clicking a played match opens its details, and in God Mode
-   * right-clicking an unplayed match opens the rigging menu.
+   * Props to spread on a fixture element: clicking a played match (or tie) opens its details, and in
+   * God Mode right-clicking an unplayed match opens the rigging menu.
    */
-  matchProps: (match: InternationalMatch | undefined) => {
+  matchProps: (target: MatchTarget) => {
     onClick?: (event: MouseEvent) => void;
     onContextMenu?: (event: MouseEvent) => void;
-    title?: string;
+    "data-tooltip"?: string;
   };
 }
 
@@ -73,7 +83,15 @@ export function MatchInteractionsProvider(props: { godMode: boolean; children: R
   const clearRig = useGameStore(s => s.godClearRig);
   const [menu, setMenu] = useState<MenuState | null>(null);
   const [dialogMatch, setDialogMatch] = useState<InternationalMatch | null>(null);
-  const [detailsMatch, setDetailsMatch] = useState<InternationalMatch | null>(null);
+  const [detailsMatches, setDetailsMatches] = useState<InternationalMatch[]>([]);
+  const location = useLocation();
+
+  // Moving to another page (by any link, e.g. a nation or a player in the report) dismisses open dialogs.
+  useEffect(() => {
+    setDetailsMatches([]);
+    setDialogMatch(null);
+    setMenu(null);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (!menu) return;
@@ -87,28 +105,36 @@ export function MatchInteractionsProvider(props: { godMode: boolean; children: R
   }, [menu]);
 
   const api: MatchInteractionApi = {
-    matchClass: match => {
-      if (!match) return "";
-      return `${match.rigged ? RIGGED_CLASS : ""} ${isPlayed(match) ? "cursor-pointer" : ""}`.trim();
+    matchClass: target => {
+      const matches = toList(target);
+      const classes = [
+        matches.some(match => match.rigged) ? RIGGED_CLASS : "",
+        matches.some(isPlayed) ? CLICKABLE_CLASS : ""
+      ];
+      return classes.filter(Boolean).join(" ");
     },
-    matchProps: match => {
-      if (!match) return {};
-      if (isPlayed(match)) {
+    matchProps: target => {
+      const matches = toList(target);
+      const played = matches.filter(isPlayed);
+      if (played.length > 0) {
         return {
           // Links inside a fixture (nations, players) keep their own behaviour.
           onClick: event => {
-            if (!(event.target as HTMLElement).closest("a")) setDetailsMatch(match);
+            if (!(event.target as HTMLElement).closest("a")) setDetailsMatches(played);
           },
-          title: "Click for match details"
+          "data-tooltip": "Click for match details"
         };
       }
-      if (!props.godMode) return {};
+      const unplayed = matches[0];
+      if (!props.godMode || !unplayed) return {};
       return {
         onContextMenu: event => {
           event.preventDefault();
-          setMenu({ match, x: event.clientX, y: event.clientY });
+          setMenu({ match: unplayed, x: event.clientX, y: event.clientY });
         },
-        title: match.rigged ? `Rigged ${match.rigged.homeGoals}-${match.rigged.awayGoals} (right-click to change)` : "Right-click to rig this match"
+        "data-tooltip": unplayed.rigged
+          ? `Rigged ${unplayed.rigged.homeGoals}-${unplayed.rigged.awayGoals} (right-click to change)`
+          : "Right-click to rig this match"
       };
     }
   };
@@ -132,7 +158,7 @@ export function MatchInteractionsProvider(props: { godMode: boolean; children: R
         </div>
       )}
       {dialogMatch && <RigDialog match={dialogMatch} onClose={() => setDialogMatch(null)} />}
-      {detailsMatch && <MatchModal match={detailsMatch} onClose={() => setDetailsMatch(null)} />}
+      {detailsMatches.length > 0 && <MatchModal matches={detailsMatches} onClose={() => setDetailsMatches([])} />}
     </MatchInteractionContext.Provider>
   );
 }

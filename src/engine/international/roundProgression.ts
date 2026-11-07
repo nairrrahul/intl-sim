@@ -78,7 +78,7 @@ const findKnockoutRoundIndex: KnockoutRoundIndexFinder = (edition, round) =>
     knockoutRound.matches.some(knockoutMatch => round.matches.includes(knockoutMatch.fixture))
   ) ?? -1;
 
-interface TournamentRules {
+export interface TournamentRules {
   editions: (state: InternationalState) => InternationalCompetitionEdition[];
   editionId: (round: ScheduledRound) => string | undefined;
   stage: (round: ScheduledRound) => string | undefined;
@@ -91,7 +91,7 @@ interface TournamentRules {
   afterKnockout: (edition: InternationalCompetitionEdition, roundIndex: number) => InternationalRound | null;
 }
 
-const TOURNAMENTS: Record<string, TournamentRules> = {
+export const TOURNAMENTS: Record<string, TournamentRules> = {
   goldCup: {
     name: "Gold Cup",
     trophy: "Gold Cup",

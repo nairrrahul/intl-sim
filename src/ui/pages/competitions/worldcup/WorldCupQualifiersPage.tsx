@@ -1,3 +1,4 @@
+import type { CupEditionLike } from "../../../../engine/international/editionInsights";
 import { ROW_HIGHLIGHT } from "../../../styles";
 import type { RowHighlights } from "../../../styles";
 import { useState } from "react";
@@ -53,6 +54,7 @@ function toTie(tie: WorldCupPhase["ties"][number], teams: string[]): EuroTieSnap
     : null;
   return {
     id: tie.id,
+    fixtures: [tie.firstLeg, tie.secondLeg],
     home,
     away,
     bye: false,
@@ -88,6 +90,7 @@ function bracketSnapshot(phase: WorldCupPhase, pathIndex: number): CupSnap {
         const awayPenalties = result?.awayPenalties;
         return {
           id: match.id,
+          fixture: result?.fixture,
           home: match.player1?.team ? teamRef(match.player1.team, path.teams) : null,
           away: match.player2?.team ? teamRef(match.player2.team, path.teams) : null,
           score: result ? {
@@ -265,7 +268,10 @@ export default function WorldCupQualifiersPage(props: { confederation: WorldCupC
 }
 
 export function WorldCupPage() {
-  const editions = useGame().world.international.worldCup.editions.flatMap(edition => {
+  const worldCupEditions = useGame().world.international.worldCup.editions;
+  // The page shows a derived copy of each tournament; predictions and stats use the engine's own object.
+  const tournamentsById = new Map(worldCupEditions.flatMap(edition => (edition.tournament ? [[edition.tournament.id, edition.tournament] as const] : [])));
+  const editions = worldCupEditions.flatMap(edition => {
     const tournament = edition.tournament;
     if (!tournament) return [];
     return [{
@@ -292,6 +298,8 @@ export function WorldCupPage() {
     <InternationalCupPage
       title="World Cup"
       subtitle="The FIFA World Cup"
+      competition="worldCup"
+      resolveEngineEdition={edition => tournamentsById.get(edition.id) as unknown as CupEditionLike}
       editions={editions}
       groupHighlights={{ 1: ROW_HIGHLIGHT.GREEN, 2: ROW_HIGHLIGHT.GREEN, 3: ROW_HIGHLIGHT.YELLOW }}
       nthPlaceAdvancement={{ place: 3, advancingCount: 8, tieBreakers: ["goalsFor", "goalDifference"] }}

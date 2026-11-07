@@ -9,10 +9,10 @@ const DUAL_NATIONALITIES = dualNatsRaw as unknown as Record<string, Record<strin
 const NATION_INFO = nationInfoRaw as unknown as Record<string, { threeLetterCode: string }>;
 const FULL_MAPPINGS = fullMappings;
 
+const NATION_BY_CODE = new Map(Object.entries(NATION_INFO).map(([name, info]) => [info.threeLetterCode, [name, info] as [string, { threeLetterCode: string }]]));
+
 function getNationByCode(code: string): [string, { threeLetterCode: string }] | null {
-  return Object.entries(NATION_INFO).find(
-    ([, info]) => info.threeLetterCode === code
-  ) ?? null;
+  return NATION_BY_CODE.get(code) ?? null;
 }
 
 function getRandomNationality(probabilities: Record<string, number> | undefined): string | null {

@@ -1,6 +1,6 @@
 import type { Bracket } from "../../../shared/bracketTypes";
 import type { InternationalCompetitionGroup } from "../cupCommon";
-import type { InternationalMatch } from "../../types";
+import type { InternationalMatch, PredictedTier, StatLeaders } from "../../types";
 
 export type WorldCupConfederation = "UEFA" | "CONCACAF" | "CONMEBOL" | "OFC" | "AFC" | "CAF" | "ICPO";
 
@@ -17,7 +17,7 @@ export interface WorldCupPath {
   name: string;
   teams: string[];
   bracket: Bracket<string>;
-  results: Record<string, { homeGoals: number; awayGoals: number; homePenalties?: string[]; awayPenalties?: string[] }>;
+  results: Record<string, { homeGoals: number; awayGoals: number; homePenalties?: string[]; awayPenalties?: string[]; /** The played match (for its match report). */ fixture?: InternationalMatch }>;
 }
 
 export interface WorldCupPhase {
@@ -61,6 +61,8 @@ export interface WorldCupTournament {
   /** Winner of the third-place match. */
   thirdPlace?: string | null;
   trophyAwarded?: boolean;
+  predictedRanking?: PredictedTier[];
+  statLeaders?: StatLeaders;
   semifinalists: string[];
   playoffTeams: string[];
 }

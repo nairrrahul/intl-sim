@@ -24,8 +24,13 @@ const POSITION_ALIASES: Record<Position, Position[]> = {
   ST: ["ST"]
 };
 
+/** required position -> positions that can fill it, as sets (this is called millions of times). */
+const ELIGIBLE_POSITIONS: Record<string, ReadonlySet<Position>> = Object.fromEntries(
+  Object.entries(POSITION_ALIASES).map(([required, aliases]) => [required, new Set(aliases)])
+);
+
 export function canPlayPosition(playerPosition: Position, requiredPosition: Position): boolean {
-  return (POSITION_ALIASES[requiredPosition] ?? [requiredPosition]).includes(playerPosition);
+  return ELIGIBLE_POSITIONS[requiredPosition]?.has(playerPosition) ?? requiredPosition === playerPosition;
 }
 
 /** Formation name -> required positions count. */
@@ -33,12 +38,18 @@ export function getFormation(form: string): Partial<Record<Position, number>> | 
   return FORMATIONS[form] ?? null;
 }
 
+const requirementsCache = new Map<string, Position[]>();
+
+/** The positions a formation needs, one entry per slot. The returned array is shared; do not modify it. */
 export function getFormationRequirements(form: string): Position[] {
+  const cached = requirementsCache.get(form);
+  if (cached) return cached;
   const formation = getFormation(form);
-  if (!formation) return [];
-  return Object.entries(formation).flatMap(([position, count]) =>
-    Array<Position>(count as number).fill(position as Position)
-  );
+  const requirements = formation
+    ? Object.entries(formation).flatMap(([position, count]) => Array<Position>(count as number).fill(position as Position))
+    : [];
+  requirementsCache.set(form, requirements);
+  return requirements;
 }
 
 /**

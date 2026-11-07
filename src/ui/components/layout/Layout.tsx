@@ -5,6 +5,7 @@ import { Sidebar } from "./Sidebar";
 import { SettingsMenu } from "./SettingsMenu";
 import { SimControls } from "./SimControls";
 import { Toasts } from "./Toasts";
+import { TooltipLayer } from "./TooltipLayer";
 import { MatchInteractionsProvider } from "../matchInteractions";
 
 export function Layout(props: { children: ReactNode }) {
@@ -27,6 +28,7 @@ export function Layout(props: { children: ReactNode }) {
         </main>
       </div>
       <Toasts />
+      <TooltipLayer />
     </div>
     </MatchInteractionsProvider>
   );

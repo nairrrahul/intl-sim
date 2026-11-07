@@ -120,10 +120,10 @@ export function NationTag(props: { code: string | null; muted?: boolean; label?:
     </>
   );
   if (props.noLink || !getConfederation(props.code)) {
-    return <span title={getNationName(props.code)} className={className}>{content}</span>;
+    return <span data-tooltip={getNationName(props.code)} className={className}>{content}</span>;
   }
   return (
-    <Link to={`/nation/${props.code}`} title={getNationName(props.code)} className={`${className} link`}>
+    <Link to={`/nation/${props.code}`} data-tooltip={getNationName(props.code)} className={`${className} link`}>
       {content}
     </Link>
   );
@@ -297,8 +297,8 @@ export function RetirementIcon(props: { title?: string; className?: string }) {
       style={{ width: "1.1em", height: "1.1em" }}
       role="img"
       aria-label={props.title ?? "Retiring at the end of the season"}
+      data-tooltip={props.title ?? "Retiring at the end of the season"}
     >
-      <title>{props.title ?? "Retiring at the end of the season"}</title>
       <path fill="currentColor" d="M13 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8v-2H5V5h8v4h2V5a2 2 0 0 0-2-2Zm5.59 8L16 8.41 14.59 9.83 16.76 12h-7.17v2h7.17l-2.17 2.17L16 17.59 20.59 13 18.59 11Z" />
     </svg>
   );
@@ -307,7 +307,7 @@ export function RetirementIcon(props: { title?: string; className?: string }) {
 /** Trophy icon; hover shows the competition that was won. */
 export function TrophyIcon(props: { name: string }) {
   return (
-    <span title={props.name} className="inline-block cursor-help text-accent-yellow" role="img" aria-label={`${props.name} winner`}>
+    <span data-tooltip={props.name} className="inline-block cursor-help text-accent-yellow" role="img" aria-label={`${props.name} winner`}>
       <svg viewBox="0 0 24 24" style={{ width: "1.2em", height: "1.2em" }} className="inline-block align-[-0.2em]">
         <path fill="currentColor" d="M7 3h10v2h3a1 1 0 0 1 1 1v2a4 4 0 0 1-4 4h-.35A5.01 5.01 0 0 1 13 14.9V17h3v2H8v-2h3v-2.1A5.01 5.01 0 0 1 7.35 12H7a4 4 0 0 1-4-4V6a1 1 0 0 1 1-1h3V3Zm-2 4v1a2 2 0 0 0 2 2V7H5Zm14 0h-2v3a2 2 0 0 0 2-2V7Z" />
       </svg>

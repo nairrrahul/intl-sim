@@ -1,3 +1,4 @@
+import { YouthRatingInput } from "../../components/YouthRatingInput";
 import { useState } from "react";
 import { useGame } from "../../../store/gameStore";
 import { getWorldRankings } from "../../../engine/queries";
@@ -67,7 +68,7 @@ export default function Rankings() {
             <div className="overflow-x-auto max-h-[75vh] overflow-y-auto">
               <table className="tbl">
                 <thead>
-                  <tr><th className="w-14 text-center">#</th><th>Country</th><th>Confederation</th><th>Overall</th></tr>
+                  <tr><th className="w-14 text-center">#</th><th>Country</th><th>Confederation</th><th>Overall</th><th className="num">Youth rating</th></tr>
                 </thead>
                 <tbody>
                   {overallRows.map(row => (
@@ -76,6 +77,7 @@ export default function Rankings() {
                       <td><NationLink code={row.code} /></td>
                       <td className="text-navy-200">{getConfederation(row.code)}</td>
                       <td><OvrBadge value={Math.round(row.overall)} /></td>
+                      <td className="num"><YouthRatingInput code={row.code} /></td>
                     </tr>
                   ))}
                 </tbody>

@@ -37,8 +37,9 @@ function TeamRow(props: {
 /** A match card; in God Mode its live fixture can be right-clicked to rig it (rigged matches get a red outline). */
 export function CupMatchCard(props: { match: CupMatchSnap; highlightID?: number; showFlag?: boolean }) {
   const interactions = useMatchInteractions();
+  const target = props.match.fixtures ?? props.match.fixture;
   return (
-    <div className={interactions.matchClass(props.match.fixture)} {...interactions.matchProps(props.match.fixture)}>
+    <div className={interactions.matchClass(target)} {...interactions.matchProps(target)}>
       <CupMatchCardBody {...props} />
     </div>
   );
@@ -168,7 +169,17 @@ export function CupBracketTree(props: { cup: CupSnap; highlightID?: number; show
   );
 }
 
+/** A tie card; the legs' reports open on click. */
 export function EuroTieCard(props: { tie: EuroTieSnap; round: EuroRoundSnap; highlightID?: number }) {
+  const interactions = useMatchInteractions();
+  return (
+    <div className={interactions.matchClass(props.tie.fixtures)} {...interactions.matchProps(props.tie.fixtures)}>
+      <EuroTieCardBody {...props} />
+    </div>
+  );
+}
+
+function EuroTieCardBody(props: { tie: EuroTieSnap; round: EuroRoundSnap; highlightID?: number }) {
   const { tie } = props;
   if (tie.bye) {
     const team = tie.home ?? tie.away;

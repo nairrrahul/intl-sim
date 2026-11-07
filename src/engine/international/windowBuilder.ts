@@ -312,7 +312,12 @@ export function openNextWindow(world: World): WindowRecord {
   if (year !== world.year) throw new Error(`Window ${windowId} of ${year} cannot open in season ${world.year}.`);
 
   prepareNationsLeagueDraws(state.nationsLeague, year, windowId);
-  refreshAllNationSquads(world);
+  // Players only change at the season rollover (or in God Mode, which refreshes the nation itself), so
+  // squads are rebuilt once per season rather than every window.
+  if (state.squadsSeason !== world.year) {
+    refreshAllNationSquads(world);
+    state.squadsSeason = world.year;
+  }
   const callUps = getMatchdaySquads(state.nations);
   const overalls = Object.fromEntries(Object.values(state.nations).map(nation => [nation.code, nation.overall]));
 

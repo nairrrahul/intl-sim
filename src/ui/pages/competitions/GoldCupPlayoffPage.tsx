@@ -30,6 +30,7 @@ function toEuroTie(tie: GoldCupPlayoffTie): EuroTieSnap {
   ].filter((leg): leg is NonNullable<typeof leg> => leg !== null);
   return {
     id: tie.id,
+    fixtures: [tie.firstLeg, tie.secondLeg],
     home: team1,
     away: team2,
     bye: false,
