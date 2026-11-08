@@ -29,6 +29,7 @@ export interface CupEditionLike {
   predictedRanking?: PredictedTier[];
   actualRanking?: PredictedTier[];
   statLeaders?: StatLeaders;
+  youthRatingImpactApplied?: boolean;
 }
 
 interface CompetitionInfo {
@@ -217,6 +218,78 @@ export function rankActualResults(source: CupEditionLike, strength: TeamStrength
   return tiers;
 }
 
+function getTeamRounds(ranking: PredictedTier[], knockoutRounds: NonNullable<CupEditionLike["knockout"]>): Map<string, number> {
+  const totalRounds = knockoutRounds.length + 1;
+  const roundsByTeam = new Map<string, number>();
+  for (const tier of ranking) {
+    let round: number;
+    switch (tier.label) {
+      case "Winner": round = totalRounds; break;
+      case "Runner-Up": round = totalRounds - 1; break;
+      case "Third Place":
+      case "Fourth Place":
+      case "Semi-Finalists": round = totalRounds - 2; break;
+      case "Group Stage": round = 0; break;
+      default: {
+        const index = knockoutRounds.findIndex(item =>
+          TIER_LABELS[item.label] === tier.label || item.label === tier.label
+        );
+        if (index < 0) throw new Error(`Unknown tournament placement tier "${tier.label}".`);
+        round = index + 1;
+      }
+    }
+    for (const team of tier.teams) roundsByTeam.set(team, round);
+  }
+  return roundsByTeam;
+}
+
+function getPlacementScore(round: number, totalRounds: number, lambda = 0.5): number {
+  if (totalRounds <= 0) return 0;
+  const boundedRound = Math.max(0, Math.min(round, totalRounds));
+  return totalRounds * (1 - Math.exp(-lambda * boundedRound)) / (1 - Math.exp(-lambda * totalRounds));
+}
+
+function exponentialYouthScore(value: number): number {
+  const a = 2.08269;
+  const b = 0.00849443;
+  const K = 1;
+  return (a * (1 - Math.exp(-b * value))) / (1 - Math.exp(-b * K));
+}
+
+function applyYouthRatingImpacts(state: InternationalState): void {
+  for (const [key, info] of Object.entries(COMPETITIONS) as [CompetitionKey, CompetitionInfo][]) {
+    if (info.youth) continue;
+    for (const edition of info.editions(state)) {
+      if (!edition.completed || edition.youthRatingImpactApplied) continue;
+      if (!edition.predictedRanking || !edition.actualRanking || !edition.knockout?.length) {
+        throw new Error(`Completed ${key} edition is missing frozen placement data.`);
+      }
+      const predictedRounds = getTeamRounds(edition.predictedRanking, edition.knockout);
+      const actualRounds = getTeamRounds(edition.actualRanking, edition.knockout);
+      const totalRounds = edition.knockout.length + 1;
+      const updates: [string, number][] = [];
+      for (const code of edition.teams) {
+        const nation = state.nations[code];
+        const predictedRound = predictedRounds.get(code);
+        const actualRound = actualRounds.get(code);
+        if (!nation || predictedRound === undefined || actualRound === undefined) {
+          throw new Error(`Completed ${key} edition has incomplete placement data for "${code}".`);
+        }
+        const netRoundScore =
+          getPlacementScore(actualRound, totalRounds) -
+          getPlacementScore(predictedRound, totalRounds);
+        const youthScore = exponentialYouthScore(nation.youthRating);
+        const ratingChange = netRoundScore >= 0
+          ? Math.round((200 - youthScore) * 0.05 * netRoundScore)
+          : Math.round(Math.max(0, Math.min(youthScore, 200 - youthScore)) * 0.04 * netRoundScore);
+        updates.push([code, Math.max(0, Math.min(200, nation.youthRating + ratingChange))]);
+      }
+      for (const [code, rating] of updates) state.nations[code].youthRating = rating;
+      edition.youthRatingImpactApplied = true;
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Stat leaders
 // ---------------------------------------------------------------------------
@@ -311,7 +384,11 @@ export function freezeTournamentPredictions(state: InternationalState): void {
 }
 
 /** Freezes predictions for drawn tournaments and actual results/stats for every completed edition. */
-export function freezeCompletedEditions(state: InternationalState, playersById: Map<string, Player>): void {
+export function freezeCompletedEditions(
+  state: InternationalState,
+  playersById: Map<string, Player>,
+  applyYouthImpacts = true
+): void {
   freezeTournamentPredictions(state);
   for (const [key, info] of Object.entries(COMPETITIONS) as [CompetitionKey, CompetitionInfo][]) {
     for (const edition of info.editions(state)) {
@@ -319,6 +396,18 @@ export function freezeCompletedEditions(state: InternationalState, playersById: 
       const strength = createTeamStrength(state, info.youth);
       edition.actualRanking ??= rankActualResults(edition, strength);
       edition.statLeaders ??= computeStatLeaders(edition, playersById, strength);
+    }
+  }
+  if (applyYouthImpacts) applyYouthRatingImpacts(state);
+}
+
+/** Freezes missing snapshots when loading a save without applying tournament effects retroactively. */
+export function initializeSavedTournamentInsights(state: InternationalState, playersById: Map<string, Player>): void {
+  freezeCompletedEditions(state, playersById, false);
+  for (const [key, info] of Object.entries(COMPETITIONS) as [CompetitionKey, CompetitionInfo][]) {
+    if (info.youth) continue;
+    for (const edition of info.editions(state)) {
+      if (edition.completed) edition.youthRatingImpactApplied ??= true;
     }
   }
 }

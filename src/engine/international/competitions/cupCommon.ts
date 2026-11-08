@@ -75,6 +75,7 @@ export interface InternationalCompetitionEdition {
   predictedRanking?: PredictedTier[];
   actualRanking?: PredictedTier[];
   statLeaders?: StatLeaders;
+  youthRatingImpactApplied?: boolean;
   playoffTeams?: string[];
 }
 

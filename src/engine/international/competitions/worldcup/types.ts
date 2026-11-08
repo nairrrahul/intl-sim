@@ -64,6 +64,7 @@ export interface WorldCupTournament {
   predictedRanking?: PredictedTier[];
   actualRanking?: PredictedTier[];
   statLeaders?: StatLeaders;
+  youthRatingImpactApplied?: boolean;
   semifinalists: string[];
   playoffTeams: string[];
 }

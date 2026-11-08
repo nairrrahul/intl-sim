@@ -92,14 +92,19 @@ export function getViableFormations(players: Player[]): FormationOption[] {
   return options.sort((a, b) => b.overall - a.overall);
 }
 
-/** The seven best remaining players, always including a backup goalkeeper when one is available. */
+/** Selects the bench by position-group quotas, then orders it by overall. */
 export function selectSubstitutes(players: Player[], startingXI: (Player | null)[]): Player[] {
   const starters = new Set(startingXI);
   const remaining = players.filter(player => !starters.has(player)).sort((a, b) => b.overall - a.overall);
-  const goalkeeper = remaining.find(player => player.position === "GK");
-  if (!goalkeeper) return remaining.slice(0, SUBSTITUTE_COUNT);
-  const others = remaining.filter(player => player !== goalkeeper).slice(0, SUBSTITUTE_COUNT - 1);
-  return [goalkeeper, ...others].sort((a, b) => b.overall - a.overall);
+  const quotas = { GK: 1, DEF: 2, MID: 2, FWD: 2 } as const;
+  const selected: Player[] = [];
+
+  for (const [group, quota] of Object.entries(quotas) as [keyof typeof quotas, number][]) {
+    selected.push(...remaining
+      .filter(player => POSITION_GROUP[player.position] === group)
+      .slice(0, quota));
+  }
+  return selected.sort((a, b) => b.overall - a.overall);
 }
 
 // ---------------------------------------------------------------------------
@@ -155,12 +160,16 @@ export function buildU20SquadState(candidates: Player[], previous: SquadState): 
   const keepLocked = previous.formationLocked && viableFormations.some(option => option.formation === previous.formation);
   const formation = keepLocked ? previous.formation : viableFormations[0].formation;
   const startingXI = selectBestStartingXI(candidates, formation) as Player[];
+  const substitutes = selectSubstitutes(candidates, startingXI);
+  if (substitutes.length < SUBSTITUTE_COUNT) {
+    return { ...createEmptySquadState(), formation: previous.formation };
+  }
   return {
     formed: true,
     formation,
     formationLocked: keepLocked,
     startingXI: startingXI.map(player => player.id),
-    substitutes: selectSubstitutes(candidates, startingXI).map(player => player.id),
+    substitutes: substitutes.map(player => player.id),
     overall: averageOverall(startingXI)
   };
 }
