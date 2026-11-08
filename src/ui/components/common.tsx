@@ -260,15 +260,20 @@ export function compareSortValues(a: string | number | null, b: string | number 
 }
 
 /** Flag + country name linking to the nation's page. */
-export function NationLink(props: { code: string; className?: string }) {
+export function NationLink(props: { code: string; className?: string; hasExtraTime?: boolean }) {
   return (
-    <Link
-      to={`/nation/${props.code}`}
-      className={`link inline-flex items-center gap-[0.4em] whitespace-nowrap ${props.className ?? ""}`}
-    >
-      <FlagIcon code={props.code} />
-      <span>{getNationName(props.code)}</span>
-    </Link>
+    <span className="inline-flex items-end gap-[0.4em] whitespace-nowrap">
+      <Link
+        to={`/nation/${props.code}`}
+        className={`link inline-flex items-center gap-[0.4em] ${props.className ?? ""}`}
+      >
+        <FlagIcon code={props.code} />
+        <span>{getNationName(props.code)}</span>
+      </Link>
+      {props.hasExtraTime && (
+        <span className="text-[calc(1em-2pt)]">(A.E.T.)</span>
+      )}
+    </span>
   );
 }
 

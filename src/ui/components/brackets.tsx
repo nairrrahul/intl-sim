@@ -10,6 +10,7 @@ function TeamRow(props: {
   cells: (string | number)[];
   highlightID?: number;
   showFlag?: boolean;
+  hasExtraTime?: boolean;
 }) {
   const mine = props.team && props.highlightID === props.team.id;
   return (
@@ -21,7 +22,7 @@ function TeamRow(props: {
       <span className="truncate">
         {props.team ? (
           <span className="inline-flex items-center gap-1.5">
-            {<NationLink code={props.team.countrycode ?? props.team.name} />}
+            {<NationLink code={props.team.countrycode ?? props.team.name} hasExtraTime={props.hasExtraTime ? props.hasExtraTime && props.winner : false} />}
           </span>
         ) : <span className="text-navy-400">TBD</span>}
       </span>
@@ -63,6 +64,7 @@ function CupMatchCardBody(props: { match: CupMatchSnap; highlightID?: number; sh
   const decided = match.score !== null;
   const homeWon = decided && match.winner?.id === match.home?.id;
   const awayWon = decided && match.winner?.id === match.away?.id;
+  const hasExtraTime = !!(decided && match.fixture?.goals?.length && match.fixture.homeGoals !== match.fixture.awayGoals && (match.fixture.goals.at(-1)?.minute ?? 0) > 90);
   const legs = match.legs;
   const tiebreak = match.tiebreak;
   if (legs && match.aggregate) {
@@ -85,6 +87,7 @@ function CupMatchCardBody(props: { match: CupMatchSnap; highlightID?: number; sh
           cells={homeCells}
           highlightID={props.highlightID}
           showFlag={props.showFlag}
+          hasExtraTime={hasExtraTime}
         />
         <TeamRow
           team={match.away}
@@ -93,6 +96,7 @@ function CupMatchCardBody(props: { match: CupMatchSnap; highlightID?: number; sh
           cells={awayCells}
           highlightID={props.highlightID}
           showFlag={props.showFlag}
+          hasExtraTime={hasExtraTime}
         />
         {tiebreak && (
           <div className="px-2 py-0.5 text-[10px] text-navy-300 border-t border-navy-700">
@@ -114,6 +118,7 @@ function CupMatchCardBody(props: { match: CupMatchSnap; highlightID?: number; sh
         highlightID={props.highlightID}
         showFlag={props.showFlag}
         cells={decided ? [match.score!.h, ...(pso ? [`(${match.score!.ph})`] : [])] : []}
+        hasExtraTime={hasExtraTime}
       />
       <TeamRow
         team={match.away}
@@ -122,6 +127,7 @@ function CupMatchCardBody(props: { match: CupMatchSnap; highlightID?: number; sh
         highlightID={props.highlightID}
         showFlag={props.showFlag}
         cells={decided ? [match.score!.a, ...(pso ? [`(${match.score!.pa})`] : [])] : []}
+        hasExtraTime={hasExtraTime}
       />
     </div>
   );

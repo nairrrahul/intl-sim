@@ -249,11 +249,18 @@ function getPlacementScore(round: number, totalRounds: number, lambda = 0.5): nu
   return totalRounds * (1 - Math.exp(-lambda * boundedRound)) / (1 - Math.exp(-lambda * totalRounds));
 }
 
-export function exponentialYouthScore(value: number): number {
+function exponentialYouthScore(value: number): number {
   const a = 2.08269;
   const b = 0.00849443;
   const K = 1;
   return (a * (1 - Math.exp(-b * value))) / (1 - Math.exp(-b * K));
+}
+
+export function exponentialNationOverallScore(value: number): number {
+  const a = 2.08269;
+  const b = 0.00849443;
+  const K = 1;
+  return (0.5*a * (1 - Math.exp(-b * value))) / (1 - Math.exp(-b * K));
 }
 
 function applyYouthRatingImpacts(state: InternationalState): void {
@@ -280,8 +287,8 @@ function applyYouthRatingImpacts(state: InternationalState): void {
           getPlacementScore(predictedRound, totalRounds);
         const youthScore = exponentialYouthScore(nation.youthRating);
         const ratingChange = netRoundScore >= 0
-          ? Math.round((200 - youthScore) * 0.05 * netRoundScore)
-          : Math.round(Math.max(0, Math.min(youthScore, 200 - youthScore)) * 0.04 * netRoundScore);
+          ? Math.round((200 - youthScore) * 0.025 * netRoundScore)
+          : Math.round(Math.max(0, Math.min(youthScore, 200 - youthScore)) * 0.01 * netRoundScore);
         updates.push([code, Math.max(0, Math.min(200, nation.youthRating + ratingChange))]);
       }
       for (const [code, rating] of updates) state.nations[code].youthRating = rating;

@@ -1,7 +1,7 @@
 import { getWorldRanks } from "./rankings";
 import type { InternationalState, NationTeam } from "./types";
 import { pickRandom, randInt, uniform } from "../shared/random";
-import { exponentialYouthScore } from "./editionInsights";
+import { exponentialNationOverallScore } from "./editionInsights";
 
 
 function endGoldenGeneration(nation: NationTeam, currentRank: number): void {
@@ -13,7 +13,7 @@ function endGoldenGeneration(nation: NationTeam, currentRank: number): void {
 }
 
 function startGoldenGeneration(nation: NationTeam, startingRank: number): void {
-  const amount = uniform(0.3, 0.4) * (200 - exponentialYouthScore(nation.youthRating));
+  const amount = uniform(0.4, 0.65) * (100 - exponentialNationOverallScore(nation.overall));
   const updatedRating = Math.round(Math.max(0, Math.min(nation.youthRating*3.5, Math.min(200, nation.youthRating + amount))));
   nation.goldenGeneration = {
     startingNationalTeamRank: startingRank,
