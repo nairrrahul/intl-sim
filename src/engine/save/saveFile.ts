@@ -107,7 +107,10 @@ export function gameFromSave(file: SaveFile): Game {
   world.international.confedCup ??= createConfedCupState();
   world.international.u20WorldCup ??= createU20WorldCupState();
   const missingU20 = Object.values(world.international.nations).some(nation => nation.u20 === undefined);
-  for (const nation of Object.values(world.international.nations)) nation.u20 ??= createEmptySquadState();
+  for (const nation of Object.values(world.international.nations)) {
+    nation.u20 ??= createEmptySquadState();
+    nation.goldenGeneration ??= null;
+  }
   for (const player of world.players) player.u20Caps ??= 0;
   if (missingU20) refreshAllNationSquads(world);
   for (const player of world.players) {

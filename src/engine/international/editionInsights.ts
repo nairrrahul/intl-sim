@@ -249,7 +249,7 @@ function getPlacementScore(round: number, totalRounds: number, lambda = 0.5): nu
   return totalRounds * (1 - Math.exp(-lambda * boundedRound)) / (1 - Math.exp(-lambda * totalRounds));
 }
 
-function exponentialYouthScore(value: number): number {
+export function exponentialYouthScore(value: number): number {
   const a = 2.08269;
   const b = 0.00849443;
   const K = 1;

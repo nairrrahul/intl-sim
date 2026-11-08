@@ -24,6 +24,12 @@ export interface SquadState {
   overall: number;
 }
 
+export interface GoldenGenerationInfo {
+  startingNationalTeamRank: number;
+  yearsLeft: number;
+  amount: number;
+}
+
 export interface NationTeam {
   code: string;
   /** Rounded average overall of the starting XI (recalculated whenever squads are refreshed). */
@@ -32,6 +38,8 @@ export interface NationTeam {
   points: number;
   /** Youth rating (0-200) that drives the quality of the nation's yearly newgen intake. */
   youthRating: number;
+  /** Active golden generation, or null when the nation has none. */
+  goldenGeneration: GoldenGenerationInfo | null;
   formation: string;
   /** True when the formation was chosen by hand (God Mode) instead of being the best available. */
   formationLocked: boolean;

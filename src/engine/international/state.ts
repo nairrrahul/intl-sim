@@ -28,6 +28,7 @@ export function createInternationalState(): InternationalState {
       overall: 0,
       points: info.rankingPts,
       youthRating: info.youthRating,
+      goldenGeneration: null,
       formation: "4-4-2",
       formationLocked: false,
       startingXI: [],

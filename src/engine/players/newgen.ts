@@ -130,7 +130,7 @@ export function applyWonderkids(intake: Player[]): Player[] {
   const eligible = intake.filter(player => player.potential <= WONDERKID_ELIGIBILITY_CEILING);
   const chosen = shuffledCopy(eligible).slice(0, WONDERKIDS_PER_SEASON);
   for (const player of chosen) {
-    player.potential = Math.round(randInt(WONDERKID_POTENTIAL_MIN, WONDERKID_POTENTIAL_MAX) * randInt(80, 100) / 100);
+    player.potential = Math.round(randInt(WONDERKID_POTENTIAL_MIN, WONDERKID_POTENTIAL_MAX) * randInt(70, 100) / 100);
     player.overall = Math.round(player.potential * uniform(WONDERKID_OVERALL_SHARE_MIN, WONDERKID_OVERALL_SHARE_MAX));
     const season = player.progression[0];
     season.potential = player.potential;

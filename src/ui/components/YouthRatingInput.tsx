@@ -8,21 +8,38 @@ export function YouthRatingInput(props: { code: string; className?: string }) {
   const nation = game.world.international.nations[props.code];
   const [draft, setDraft] = useState<string | null>(null);
 
-  if (!game.world.godMode) return <span className={props.className}>{nation.youthRating}</span>;
+  const rating = (
+    <span className={props.className}>
+      {nation.youthRating}
+      {nation.goldenGeneration && (
+        <span className="ml-1 text-accent-yellow" title={`Golden generation: ${nation.goldenGeneration.yearsLeft} years remaining`}>
+          ☀
+        </span>
+      )}
+    </span>
+  );
+  if (!game.world.godMode) return rating;
 
   const commit = () => {
     if (draft !== null && draft !== "") setRating(props.code, Number(draft));
     setDraft(null);
   };
   return (
-    <input
-      className={`input w-20 text-center ${props.className ?? ""}`}
-      inputMode="numeric"
-      value={draft ?? String(nation.youthRating)}
-      onChange={event => setDraft(event.target.value.replace(/\D/g, ""))}
-      onBlur={commit}
-      onKeyDown={event => { if (event.key === "Enter") commit(); }}
-      aria-label={`${props.code} youth rating`}
-    />
+    <span className="inline-flex items-center">
+      <input
+        className={`input w-20 text-center ${props.className ?? ""}`}
+        inputMode="numeric"
+        value={draft ?? String(nation.youthRating)}
+        onChange={event => setDraft(event.target.value.replace(/\D/g, ""))}
+        onBlur={commit}
+        onKeyDown={event => { if (event.key === "Enter") commit(); }}
+        aria-label={`${props.code} youth rating`}
+      />
+      {nation.goldenGeneration && (
+        <span className="ml-1 text-accent-yellow" title={`Golden generation: ${nation.goldenGeneration.yearsLeft} years remaining`}>
+          ☀
+        </span>
+      )}
+    </span>
   );
 }

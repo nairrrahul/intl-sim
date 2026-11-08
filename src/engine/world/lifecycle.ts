@@ -1,5 +1,6 @@
 import { SEASON_START_YEAR } from "../config";
 import { LAST_WINDOW_ID } from "../international/calendar/windows";
+import { advanceGoldenGenerations } from "../international/goldenGeneration";
 import { createInternationalState } from "../international/state";
 import { openNextWindow } from "../international/windowBuilder";
 import { simulateMatchday } from "../international/windowSimulation";
@@ -70,6 +71,7 @@ export function advanceYear(world: World): void {
   retireScheduledPlayers(world);
   pruneRetiredPlayers(world);
   world.year += 1;
+  advanceGoldenGenerations(world.international);
   for (const player of world.players) {
     if (player.isRetired) player.age += 1; // retired players keep ageing, but their ratings and history are frozen
     else advancePlayerOneYear(player, world.year, DEVELOPMENT_FACILITY_RATING);
