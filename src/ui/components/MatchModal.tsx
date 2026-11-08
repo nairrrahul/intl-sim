@@ -44,6 +44,12 @@ function buildTimeline(match: InternationalMatch): MatchTimeline {
   };
 }
 
+function renderMinute(event: TimelineEvent): string {
+  return event.type === "goal"
+    ? event.goal.displayMinute ?? String(event.minute)
+    : String(event.minute);
+}
+
 /** One match's report: team names either side, events running down the page by minute. */
 function MatchReport(props: { match: InternationalMatch; heading?: string; onClose: () => void }) {
   const { match } = props;
@@ -119,7 +125,7 @@ function MatchReport(props: { match: InternationalMatch; heading?: string; onClo
             <div key={index} className="grid grid-cols-[1fr_3.5rem_1fr] items-start gap-3 py-1.5">
               <div>{event.side === "home" && renderEvent(event)}</div>
               <div className="text-center">
-                <span className="inline-block rounded bg-navy-700 px-2 py-0.5 text-xs font-bold tabular-nums">{event.minute}'</span>
+                <span className="inline-block rounded bg-navy-700 px-2 py-0.5 text-xs font-bold tabular-nums">{renderMinute(event)}'</span>
               </div>
               <div>{event.side === "away" && renderEvent(event)}</div>
             </div>
@@ -135,14 +141,14 @@ function MatchReport(props: { match: InternationalMatch; heading?: string; onClo
             <div key={index} className="grid grid-cols-[1fr_3.5rem_1fr] items-start gap-3 py-1.5">
               <div>{event.side === "home" && renderEvent(event)}</div>
               <div className="text-center">
-                <span className="inline-block rounded bg-navy-700 px-2 py-0.5 text-xs font-bold tabular-nums">{event.minute}'</span>
+                <span className="inline-block rounded bg-navy-700 px-2 py-0.5 text-xs font-bold tabular-nums">{renderMinute(event)}'</span>
               </div>
               <div>{event.side === "away" && renderEvent(event)}</div>
             </div>
           ))}
-          <div className="grid grid-cols-[1fr_7.5rem_1fr] gap-3 pt-2">
+          <div className="grid grid-cols-[1fr_9.5rem_1fr] gap-3 pt-2">
             <div />
-            <div className="text-center text-[12px] uppercase tracking-widest text-navy-400">{hasExtraTime ? "Regulation Time" : "Full time"}</div>
+            <div className="text-center text-[12px] uppercase tracking-widest text-navy-400">{hasExtraTime ? "End Regulation Time" : "Full time"}</div>
             <div />
           </div>
 
@@ -152,7 +158,7 @@ function MatchReport(props: { match: InternationalMatch; heading?: string; onClo
               <div key={index} className="grid grid-cols-[1fr_3.5rem_1fr] items-start gap-3 py-1.5">
                 <div>{event.side === "home" && renderEvent(event)}</div>
                 <div className="text-center">
-                  <span className="inline-block rounded bg-navy-700 px-2 py-0.5 text-xs font-bold tabular-nums">{event.minute}'</span>
+                  <span className="inline-block rounded bg-navy-700 px-2 py-0.5 text-xs font-bold tabular-nums">{renderMinute(event)}'</span>
                 </div>
                 <div>{event.side === "away" && renderEvent(event)}</div>
               </div>
@@ -166,7 +172,7 @@ function MatchReport(props: { match: InternationalMatch; heading?: string; onClo
               <div key={index} className="grid grid-cols-[1fr_3.5rem_1fr] items-start gap-3 py-1.5">
                 <div>{event.side === "home" && renderEvent(event)}</div>
                 <div className="text-center">
-                  <span className="inline-block rounded bg-navy-700 px-2 py-0.5 text-xs font-bold tabular-nums">{event.minute}'</span>
+                  <span className="inline-block rounded bg-navy-700 px-2 py-0.5 text-xs font-bold tabular-nums">{renderMinute(event)}'</span>
                 </div>
                 <div>{event.side === "away" && renderEvent(event)}</div>
               </div>

@@ -47,6 +47,8 @@ export type MatchSide = "home" | "away";
 
 export interface GoalEvent {
   minute: number;
+  /** Frozen stoppage-time label, assigned the first time match details are opened. */
+  displayMinute?: string;
   side: MatchSide;
   /** Player ID of the scorer. */
   scorerId: string;
@@ -268,4 +270,3 @@ export interface InternationalState {
   /** The season whose player ratings the nations' squads were last built from (squads only change at rollover). */
   squadsSeason?: number;
 }
-

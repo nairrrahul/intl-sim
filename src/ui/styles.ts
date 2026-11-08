@@ -5,9 +5,9 @@
  *   RED    - relegated / eliminated
  */
 export const ROW_HIGHLIGHT = {
-  GREEN: "bg-green-500/10",
-  YELLOW: "bg-yellow-400/10",
-  RED: "bg-red-500/10"
+  GREEN: "bg-green-500/15",
+  YELLOW: "bg-yellow-400/15",
+  RED: "bg-red-500/15"
 } as const;
 
 export type RowHighlight = typeof ROW_HIGHLIGHT[keyof typeof ROW_HIGHLIGHT];

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import {
-  createGame, finishSeason, simulateNextMatchday, simulateRestOfWindow, simulateWindows, toggleShortlist
+  createGame, finishSeason, initializeGoalDisplayMinutes as initializeGoalDisplayMinutesAction,
+  simulateNextMatchday, simulateRestOfWindow, simulateWindows, toggleShortlist
 } from "../engine/game";
 import type { ActionResult, Game } from "../engine/game";
 import {
@@ -45,6 +46,8 @@ interface GameStore {
   finishSeason: () => void;
   /** Adds/removes a player from the shortlist (silent). */
   toggleShortlist: (playerId: string) => void;
+  /** Stores random stoppage-time labels for a match's goals on first open. */
+  initializeGoalDisplayMinutes: (matches: InternationalMatch[]) => void;
 
   /** God Mode. */
   setGodMode: (enabled: boolean) => void;
@@ -123,6 +126,12 @@ export const useGameStore = create<GameStore>()((set, get) => {
     playWindows: count => { act(game => simulateWindows(game, count)); },
     finishSeason: () => { act(finishSeason); },
     toggleShortlist: playerId => { act(game => toggleShortlist(game, playerId), true); },
+    initializeGoalDisplayMinutes: matches => {
+      const needsInitialization = matches.some(match =>
+        match.goals?.some(goal => goal.displayMinute === undefined && [45, 90, 105, 120].includes(goal.minute))
+      );
+      if (needsInitialization) act(game => initializeGoalDisplayMinutesAction(game, matches), true);
+    },
 
     setGodMode: enabled => { act(game => setGodMode(game, enabled), true); },
     godSetYouthRating: (code, rating) => act(game => setNationYouthRating(game, code, rating), true),

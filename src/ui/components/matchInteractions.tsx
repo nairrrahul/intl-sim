@@ -81,6 +81,7 @@ function RigDialog(props: { match: InternationalMatch; onClose: () => void }) {
 /** Provides match details (click) and God Mode rigging (right-click) to every fixture rendered beneath it. */
 export function MatchInteractionsProvider(props: { godMode: boolean; children: ReactNode }) {
   const clearRig = useGameStore(s => s.godClearRig);
+  const initializeGoalDisplayMinutes = useGameStore(s => s.initializeGoalDisplayMinutes);
   const [menu, setMenu] = useState<MenuState | null>(null);
   const [dialogMatch, setDialogMatch] = useState<InternationalMatch | null>(null);
   const [detailsMatches, setDetailsMatches] = useState<InternationalMatch[]>([]);
@@ -120,7 +121,10 @@ export function MatchInteractionsProvider(props: { godMode: boolean; children: R
         return {
           // Links inside a fixture (nations, players) keep their own behaviour.
           onClick: event => {
-            if (!(event.target as HTMLElement).closest("a")) setDetailsMatches(played);
+            if (!(event.target as HTMLElement).closest("a")) {
+              initializeGoalDisplayMinutes(played);
+              setDetailsMatches(played);
+            }
           },
           "data-tooltip": "Click for match details"
         };
