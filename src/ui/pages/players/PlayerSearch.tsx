@@ -64,8 +64,7 @@ export default function PlayerSearch() {
       const reverseName = `${player.lastName} ${player.firstName}`.toLocaleLowerCase();
       const matchesName = !query || fullName.includes(query) || reverseName.includes(query);
       const matchesNationality = !filters.nationality ||
-        player.primaryNationality === filters.nationality ||
-        player.secondaryNationality === filters.nationality;
+        player.primaryNationality === filters.nationality;
       const matchesPosition = !filters.position || player.position === filters.position;
       return matchesName && matchesNationality && matchesPosition &&
         withinRange(player.overall, filters.overallMin, filters.overallMax) &&
