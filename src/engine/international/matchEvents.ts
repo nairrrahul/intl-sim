@@ -1,5 +1,5 @@
 import { POSITION_GROUP } from "../players/positions";
-import { pickRandom, shuffledCopy, weightedPick } from "../shared/random";
+import { pickRandom, shuffledCopy, weightedPick, randInt } from "../shared/random";
 import type { Player, Position } from "../players/types";
 import type { GoalEvent, MatchSide, SubstitutionEvent } from "./types";
 
@@ -18,6 +18,12 @@ export interface MatchDetails {
   /** The goalkeeper credited with a clean sheet, per side. */
   cleanSheets: Record<MatchSide, Player | null>;
 }
+
+/** Extra, goal-neutral substitutions per side, grouped into "substitution windows" (several changes in one minute). */
+const MAX_EXTRA_SUBSTITUTIONS = 3;
+const MAX_EXTRA_WINDOWS = 2;
+const EXTRA_WINDOW_FIRST_MINUTE = 60;
+const EXTRA_WINDOW_LAST_MINUTE = 89;
 
 const MATCH_MINUTES = 90;
 const EXTRA_TIME_MATCH_MINUTES = 120;
@@ -154,6 +160,50 @@ interface SideDraft {
 }
 
 /**
+ * Adds up to 3 more substitutions once the goals are known, in 1-2 windows. They cannot change who scored
+ * or assisted: the players coming on are unused bench players (who cannot have been in a goal), and a
+ * starter is only taken off after the last goal or assist he was involved in.
+ */
+function planExtraSubstitutions(
+  squad: MatchSquad,
+  plan: PlannedSubstitution[],
+  goals: GoalEvent[],
+  side: MatchSide
+): PlannedSubstitution[] {
+  const usedOn = new Set(plan.map(substitution => substitution.on));
+  const usedOff = new Set(plan.map(substitution => substitution.off));
+  const benchLeft = squad.bench.filter(player => player.position !== "GK" && !usedOn.has(player));
+  const startersLeft = squad.starters.filter(player => player.position !== "GK" && !usedOff.has(player));
+
+  const lastInvolved = new Map<string, number>(); // player ID -> last minute he scored or assisted
+  for (const goal of goals) {
+    if (goal.side !== side) continue;
+    for (const id of [goal.scorerId, goal.assistId]) {
+      if (id) lastInvolved.set(id, Math.max(lastInvolved.get(id) ?? 0, goal.minute));
+    }
+  }
+
+  const count = Math.min(randInt(0, MAX_EXTRA_SUBSTITUTIONS), benchLeft.length, startersLeft.length);
+  const windows = Array.from(
+    { length: Math.min(randInt(1, MAX_EXTRA_WINDOWS), count) },
+    () => randInt(EXTRA_WINDOW_FIRST_MINUTE, EXTRA_WINDOW_LAST_MINUTE)
+  ).sort((a, b) => a - b);
+
+  const extras: PlannedSubstitution[] = [];
+  for (let index = 0; index < count; index++) {
+    const minute = windows[index % windows.length];
+    const offCandidates = startersLeft.filter(player => (lastInvolved.get(player.id) ?? 0) < minute);
+    if (offCandidates.length === 0) continue;
+    const on = pickRandom(benchLeft);
+    const off = pickRandom(offCandidates);
+    benchLeft.splice(benchLeft.indexOf(on), 1);
+    startersLeft.splice(startersLeft.indexOf(off), 1);
+    extras.push({ minute, off, on });
+  }
+  return extras;
+}
+
+/**
  * Works out the story of a played match: when each goal was scored, by whom and who assisted, which
  * substitutions mattered, who played and who kept a clean sheet. Scorers and assisters are always
  * players who are on the pitch at that minute.
@@ -207,6 +257,11 @@ export function generateMatchDetails(
   });
   goals.sort((a, b) => a.minute - b.minute || (a.side === b.side ? 0 : a.side === "home" ? -1 : 1));
 
+  const extraPlans: Record<MatchSide, PlannedSubstitution[]> = {
+    home: planExtraSubstitutions(home, sides.home.plan, goals, "home"),
+    away: planExtraSubstitutions(away, sides.away.plan, goals, "away")
+  };
+
   const involvedIds = new Set(goals.flatMap(goal => [goal.scorerId, goal.assistId]));
   const substitutions: SubstitutionEvent[] = [];
   for (const side of ["home", "away"] as MatchSide[]) {
@@ -216,11 +271,19 @@ export function generateMatchDetails(
       }
     }
   }
-  substitutions.sort((a, b) => a.minute - b.minute);
+  
+  //currently, let's not show all substitutions in the matchModal. However, this will be enabled in a future toggle
+  // const substitutions: SubstitutionEvent[] = (["home", "away"] as MatchSide[])
+  //   .flatMap(side => [...sides[side].plan, ...extraPlans[side]].map(substitution => ({
+  //     minute: substitution.minute, side, offId: substitution.off.id, onId: substitution.on.id
+  //   })))
+  //   .sort((a, b) => a.minute - b.minute);
+  // substitutions.sort((a, b) => a.minute - b.minute);
 
   const appearancesOf = (side: MatchSide) => [
     ...sides[side].squad.starters,
-    ...sides[side].plan.map(substitution => substitution.on)
+    ...sides[side].plan.map(substitution => substitution.on),
+    ...extraPlans[side].map(substitution => substitution.on)
   ];
   const goalkeeperOf = (side: MatchSide) => sides[side].squad.starters.find(player => player.position === "GK") ?? null;
 

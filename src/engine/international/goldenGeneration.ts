@@ -20,7 +20,6 @@ function startGoldenGeneration(nation: NationTeam, startingRank: number): void {
     yearsLeft: randInt(5, 9),
     amount: updatedRating - nation.youthRating
   };
-  console.log(nation);
   nation.youthRating = updatedRating;
 }
 
