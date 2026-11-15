@@ -68,7 +68,7 @@ function drawEuroQualifyingIfNext(state: InternationalState, window: WindowRecor
   createEuroQualifyingEdition(
     state.euroQualifiers,
     tournamentWindow.year,
-    getWorldRanks(state),
+    state.nationsLeague.editions,
     { year: window.year, windowId: window.windowId },
     previousHosts
   );

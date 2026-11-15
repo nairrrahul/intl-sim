@@ -102,9 +102,14 @@ function createQualifyingFixtures(
   ));
 }
 
-function groupPots(teams: string[], groupCount: number, worldRanks: Record<string, number>): string[][] {
+function groupPots(teams: string[], groupCount: number, nationsLeagueEditions: NationsLeagueEdition[]): string[][] {
+  const aggregate = getNationsLeagueDivisionHistory(
+    nationsLeagueEditions.filter(item => item.confederation === "UEFA")
+  ).rows;
+  const nlAggregateRanks =  Object.fromEntries(aggregate.map((aggregate) => [aggregate.code, aggregate.aggregateRank]));
+  
   const sorted = [...teams].sort((a, b) =>
-    (worldRanks[a] ?? Number.MAX_SAFE_INTEGER) - (worldRanks[b] ?? Number.MAX_SAFE_INTEGER) ||
+    (nlAggregateRanks[a] ?? Number.MAX_SAFE_INTEGER) - (nlAggregateRanks[b] ?? Number.MAX_SAFE_INTEGER) ||
     a.localeCompare(b)
   );
   const pots = Array.from({ length: Math.ceil(teams.length / groupCount) }, (_, index) =>
@@ -124,7 +129,7 @@ function groupPots(teams: string[], groupCount: number, worldRanks: Record<strin
 export function createEuroQualifyingEdition(
   state: EuroQualifiersState,
   tournamentYear: number,
-  rankings: Record<string, number>,
+  nationsLeagueEditions: NationsLeagueEdition[],
   initialWindow: { year: number; windowId: string },
   previousEditionHosts: string[] = []
 ): EuroQualifyingEdition {
@@ -147,7 +152,13 @@ export function createEuroQualifyingEdition(
   const hostSet = new Set(hosts);
   const qualifyingTeams = eligibleTeams.filter(code => !hostSet.has(code));
   const groupCount = hosts.length === 3 ? 9 : 10;
-  const groups = groupPots(qualifyingTeams, groupCount, rankings);
+  const groups = groupPots(qualifyingTeams, groupCount, nationsLeagueEditions);
+
+  const aggregate = getNationsLeagueDivisionHistory(
+    nationsLeagueEditions.filter(item => item.confederation === "UEFA")
+  ).rows;
+  const nlAggregateRanks =  Object.fromEntries(aggregate.map((aggregate) => [aggregate.code, aggregate.aggregateRank]));
+
   const id = `EUROQ-${tournamentYear}`;
   const groupRecords = groups.map((groupTeams, index) => ({
     name: String.fromCharCode("A".charCodeAt(0) + index),
@@ -165,7 +176,7 @@ export function createEuroQualifyingEdition(
     tournamentYear,
     hosts,
     groups: groupRecords,
-    seedRanks: Object.fromEntries(qualifyingTeams.map(code => [code, rankings[code] ?? Number.MAX_SAFE_INTEGER])),
+    seedRanks: Object.fromEntries(qualifyingTeams.map(code => [code, nlAggregateRanks[code] ?? Number.MAX_SAFE_INTEGER])),
     groupCount,
     roundsPlayed: 0,
     directQualifiers: [],
