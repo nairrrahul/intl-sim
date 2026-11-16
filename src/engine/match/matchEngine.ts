@@ -1,5 +1,7 @@
+import { randInt, uniform } from "../shared/random";
 import scoreProbsRaw from "./data/scoreline_info.json";
 import zscoresRaw from "./data/team_z_score.json";
+import { getMatchSkew } from "./matchSkew";
 import type { MatchResult, MatchTeam } from "./types";
 
 const score_probs = scoreProbsRaw as Record<string, number[]>;
@@ -45,21 +47,31 @@ function differenceFromPrevious(data: Record<string, number>): Record<string, nu
   );
 }
 
+function computeModifiedZScore(zscore: number, skewFactor: number, ratingRatio: number) : number {
+  const newZScore = ratingRatio < 1 ? -1*zscore : zscore;
+  const modifiedZScore = newZScore + skewFactor + Math.sign(newZScore) * Math.pow(Math.abs(newZScore),2);
+  return ratingRatio < 1 ? -1*modifiedZScore : modifiedZScore;
+}
+
 function computeProbTable(ovr1: number, ovr2: number, context: string): Record<string, number> {
-  const SKEW_POW = context == "LEAGUE" ? 1 : 2;
+  const initSkew = getMatchSkew(context);
+  const SKEW_VARIABILITY = 0.07;
+  const SKEW_POW = initSkew + uniform(-SKEW_VARIABILITY,SKEW_VARIABILITY);
+  const SKEW_MULT = 8;
   const initRatingRatio = Math.pow(ovr1 / ovr2, SKEW_POW);
-  const ratingRatio = initRatingRatio < 1 ? computeUnderdogRatio(initRatingRatio) : initRatingRatio;
+  const ratingRatio = initRatingRatio < 1 ? 1/initRatingRatio : initRatingRatio;
   const skewFactor = Math.max(
     -MAX_SCORELINE_SKEW,
-    Math.min(MAX_SCORELINE_SKEW, (1 - ratingRatio) * 4)
+    Math.min(MAX_SCORELINE_SKEW, (1 - ratingRatio) * SKEW_MULT)
   );
 
   const skewProbs = Object.fromEntries(Object.entries(zscores).map(([delta, zscore]) => {
     return [
       delta,
-      normSDist(zscore + skewFactor + Math.sign(zscore) * Math.pow(Math.abs(zscore), 2))
+      normSDist(computeModifiedZScore(zscore, skewFactor, initRatingRatio))
     ];
   }));
+
 
   return Object.fromEntries(Object.entries(differenceFromPrevious(skewProbs)).map(
     ([delta, netProb]) => {
@@ -70,9 +82,9 @@ function computeProbTable(ovr1: number, ovr2: number, context: string): Record<s
   ));
 }
 
-function computeUnderdogRatio(ratio: number): number {
-  return ratio * (0.0276842 * Math.pow(27.50952, ratio) + 0.0723158);
-}
+// function computeUnderdogRatio(ratio: number): number {
+//   return ratio * (0.0276842 * Math.pow(27.50952, ratio) + 0.0723158);
+// }
 
 function weightedRandom(weights: Record<string, number>): number {
   const total = Object.values(weights).reduce((sum, weight) => sum + weight, 0);

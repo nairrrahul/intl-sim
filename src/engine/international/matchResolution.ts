@@ -190,7 +190,7 @@ export function playMatch(state: InternationalState, match: InternationalMatch):
 
   const result = match.rigged
     ? createRiggedResult(match.rigged, homeTeam, awayTeam, isKnockoutMatch(match))
-    : simulateMatch(homeTeam, awayTeam, isKnockoutMatch(match), "LEAGUE");
+    : simulateMatch(homeTeam, awayTeam, isKnockoutMatch(match), match.kind);
   const homeGoals = result.homeGoalInfo.homeGoals;
   const awayGoals = result.awayGoalInfo.awayGoals;
   const tie = resolveSecondLeg(state, match, homeGoals, awayGoals);
