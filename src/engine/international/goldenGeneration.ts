@@ -14,7 +14,7 @@ function endGoldenGeneration(nation: NationTeam, currentRank: number): void {
 
 function startGoldenGeneration(nation: NationTeam, startingRank: number): void {
   const amount = uniform(0.4, 0.65) * (100 - exponentialNationOverallScore(nation.overall));
-  const updatedRating = Math.round(Math.max(0, Math.min(nation.youthRating*3.5, Math.min(200, nation.youthRating + amount))));
+  const updatedRating = Math.round(Math.max(0, Math.min(nation.youthRating*8, Math.min(200, nation.youthRating + amount))));
   nation.goldenGeneration = {
     startingNationalTeamRank: startingRank,
     yearsLeft: randInt(5, 9),

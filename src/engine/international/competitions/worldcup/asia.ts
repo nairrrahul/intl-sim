@@ -68,6 +68,19 @@ export function completeAsiaThirdRound(edition: WorldCupEdition): void {
   phase.completed = true;
 }
 
+export function getAsiaThirdRoundProgression(numAsianHosts: number) : Record<number, number> {
+  switch(numAsianHosts) {
+    case 1:
+      return {2: 3, 3: 1}
+    case 2:
+      return {2: 2}
+    case 3:
+      return {2: 1}
+    default:
+      return {3: 1}
+  }
+}
+
 export function createAsiaRegion(): WorldCupRegionalQualifying {
   return { confederation: "AFC", teams: [], phases: {}, qualified: [], intercontinental: [], playoffQualifiers: [], playoffBottomSeeds: [] };
 }

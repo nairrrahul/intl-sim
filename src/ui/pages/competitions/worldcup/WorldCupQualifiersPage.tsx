@@ -12,6 +12,8 @@ import { CupBracketTree, EuroTieCard } from "../../../components/brackets";
 import { Empty, NationLink, PageHeader, Panel, SeasonSelect, Tabs } from "../../../components/common";
 import { InternationalGroupMatchdays } from "../../../components/InternationalGroupMatchdays";
 import { InternationalGroupTable, InternationalNthPlacedTeamsTable } from "../../../components/tables";
+import { getAsiaThirdRoundProgression } from "../../../../engine/international/competitions/worldcup/asia";
+import { getConcacafThirdRoundProgression } from "../../../../engine/international/competitions/worldcup/concacaf";
 
 type PhaseConfig = { id: string; label: string };
 
@@ -168,13 +170,35 @@ function PhaseContent(props: { phase: WorldCupPhase | undefined; edition: WorldC
           </div>
         </Panel>
       ))}
-      {props.phaseName === "CAFWCQ" && edition.hosts.some(host => getConfederation(host) === "CAF") && (
+      {props.phaseName === "CAFWCQ" && (
         <InternationalNthPlacedTeamsTable
           place={2}
           advancingCount={4}
           seedRanks={edition.seedRanks}
           rows={rankGroupPlaces(phase.groups, 2, ranks, true)}
         />
+      )}
+      {props.phaseName === "AFCWCQ3" && 
+      Object.entries(getAsiaThirdRoundProgression(edition.hosts.filter(host => getConfederation(host) === "AFC").length)).
+        map(([place, num]) => (
+          <InternationalNthPlacedTeamsTable
+            place={Number(place)}
+            advancingCount={num}
+            seedRanks={edition.seedRanks}
+            rows={rankGroupPlaces(phase.groups, Number(place), ranks, true)}
+          />
+        )
+      )}
+      {props.phaseName === "CCWCQ3" && 
+      Object.entries(getConcacafThirdRoundProgression(edition.hosts.filter(host => getConfederation(host) === "CONCACAF").length)).
+        map(([place, num]) => (
+          <InternationalNthPlacedTeamsTable
+            place={Number(place)}
+            advancingCount={num}
+            seedRanks={edition.seedRanks}
+            rows={rankGroupPlaces(phase.groups, Number(place), ranks, true)}
+          />
+        )
       )}
       {!hasGroups && !hasKnockout && (
         <Panel><Empty>{props.phaseLabel} draw has not been made yet.</Empty></Panel>

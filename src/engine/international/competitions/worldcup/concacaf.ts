@@ -73,6 +73,19 @@ export function completeConcacafThirdRound(edition: WorldCupEdition): void {
   phase.completed = true;
 }
 
+export function getConcacafThirdRoundProgression(numConcacafHosts: number) : Record<number, number> {
+  switch(numConcacafHosts) {
+    case 1:
+      return {2: 2, 3: 1}
+    case 2:
+      return {2: 1}
+    case 3:
+      return {2: 2}
+    default:
+      return {3: 1}
+  }
+}
+
 export function createConcacafRegion(): WorldCupRegionalQualifying {
   return { confederation: "CONCACAF", teams: [], phases: {}, qualified: [], intercontinental: [], playoffQualifiers: [], playoffBottomSeeds: [] };
 }
