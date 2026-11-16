@@ -142,9 +142,10 @@ export function drawU20Groups(
 export function createU20WorldCupEdition(
   state: InternationalState,
   year: number,
-  windowId: string
+  windowId: string,
+  qualified: string[] | null = null
 ): U20WorldCupEdition | null {
-  const teams = selectU20WorldCupTeams(state, year);
+  const teams = qualified ?? selectU20WorldCupTeams(state, year);
   if (!teams) return null;
 
   const u20Overall = Object.fromEntries(teams.map(code => [code, state.nations[code].u20.overall]));

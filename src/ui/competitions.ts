@@ -53,7 +53,10 @@ export function getCompetitionSections(): CompetitionSection[] {
     {
       id: "u20-world-cup",
       title: "U20 World Cup",
-      links: [{ label: "U20 World Cup", to: "/u20-world-cup", keywords: "u20 world cup youth under 20" }]
+      links: [
+        { label: "U20 World Cup", to: "/u20-world-cup", keywords: "u20 world cup youth under 20" },
+        { label: "U20 World Cup Qualifiers", to: "/u20-world-cup-qualifiers", keywords: "u20 world cup qualifiers youth under 20 qualifying" }
+      ]
     },
     {
       id: "confederations-cup",
@@ -111,12 +114,13 @@ const COMPETITION_NAME_BY_KIND: Record<string, string> = {
   goldCupGroup: "Gold Cup", goldCupKnockout: "Gold Cup",
   copaAmericaGroup: "Copa América", copaAmericaKnockout: "Copa América",
   confedCupGroup: "Confederations Cup", confedCupKnockout: "Confederations Cup",
-  u20WorldCupGroup: "U20 World Cup", u20WorldCupKnockout: "U20 World Cup",
+  u20WorldCupGroup: "U20 World Cup", u20WorldCupKnockout: "U20 World Cup", u20Qualifier: "U20 World Cup Qualifiers",
   afconQualifier: "AFCON Qualifiers", afconGroup: "AFCON", afconKnockout: "AFCON",
   afcCupQualifier: "Asian Cup Qualifiers", afcCupGroup: "Asian Cup", afcCupKnockout: "Asian Cup",
   ofcCupQualifier: "OFC Cup Qualifiers", ofcCupGroup: "OFC Cup", ofcCupKnockout: "OFC Cup",
   euroQualifier: "EURO Qualifiers", euroGroup: "UEFA EURO", euroKnockout: "UEFA EURO",
   worldCupQualifier: "World Cup Qualifiers", worldCupGroup: "World Cup", worldCupKnockout: "World Cup"
+  
 };
 
 export function getCompetitionNameForKind(kind: string): string {

@@ -25,6 +25,7 @@ import OfcCupQualifiersPage from "./ui/pages/competitions/OfcCupQualifiersPage";
 import EuroPage from "./ui/pages/competitions/EuroPage";
 import EuroQualifiersPage from "./ui/pages/competitions/EuroQualifiersPage";
 import WorldCupQualifiersPage, { WorldCupPage } from "./ui/pages/competitions/worldcup/WorldCupQualifiersPage";
+import U20WorldCupQualifiersPage from "./ui/pages/competitions/U20WorldCupQualifiersPage";
 
 const WORLD_CUP_QUALIFYING_CONFEDERATIONS = ["UEFA", "CONCACAF", "CONMEBOL", "OFC", "AFC", "CAF"] as const;
 
@@ -66,6 +67,7 @@ export default function App() {
         <Route path="/copa-america" element={<CopaAmericaPage />} />
         <Route path="/confederations-cup" element={<ConfederationsCupPage />} />
         <Route path="/u20-world-cup" element={<U20WorldCupPage />} />
+        <Route path="/u20-world-cup-qualifiers" element={<U20WorldCupQualifiersPage />} />
         <Route path="/afcon" element={<AfconPage />} />
         <Route path="/afcon-qualifiers" element={<AfconQualifiersPage />} />
         <Route path="/afc-cup" element={<AfcCupPage />} />

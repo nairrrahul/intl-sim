@@ -12,6 +12,7 @@ import { createOfcCupState } from "./competitions/ofcCup";
 import { createWorldCupState } from "./competitions/worldcup/worldCup";
 import { createEmptySquadState } from "./squads";
 import type { InternationalState, NationTeam } from "./types";
+import { createU20QualifyingState } from "./competitions/u20Qualifying";
 
 interface NationInfoRow {
   threeLetterCode: string;
@@ -46,6 +47,7 @@ export function createInternationalState(): InternationalState {
     copaAmerica: createCopaAmericaState(),
     confedCup: createConfedCupState(),
     u20WorldCup: createU20WorldCupState(),
+    u20Qualifying: createU20QualifyingState(),
     afcon: createAfconState(),
     afcCup: createAfcCupState(),
     ofcCup: createOfcCupState(),

@@ -126,8 +126,17 @@ function playedStage(match: InternationalMatch): string | undefined {
     }
     case "worldCupGroup": return `World Cup Group Stage · Matchday ${match.worldCupRound ?? dash}`;
     case "worldCupKnockout": return `World Cup ${knockoutRoundName(match.worldCupKnockoutMatchId)}`;
+    case "u20Qualifier": return u20QualifierStage(match);
     default: return undefined;
   }
+}
+
+function u20QualifierStage(match: InternationalMatch): string {
+  const where = match.u20QualifierConfederation === "ICPO" ? "Intercontinental Playoff" : match.u20QualifierConfederation;
+  const detail = match.u20QualifierStage === "group" ? `Matchday ${match.u20QualifierRound}`
+    : match.u20QualifierStage === "tie" ? `Leg ${match.u20QualifierLeg}`
+    : knockoutRoundName(match.u20QualifierKnockoutMatchId);
+  return `U20 World Cup Qualifiers · ${where} · ${detail}`;
 }
 
 /** Stage label of a fixture that has not been played yet (shows raw knockout IDs). */
@@ -136,6 +145,7 @@ function scheduledStage(match: InternationalMatch): string | undefined {
   const kind = match.kind;
   const dash = "—";
 
+  if (kind === "u20Qualifier") return u20QualifierStage(match);
   if (kind === "nationsLeague") return `${match.nationsLeagueDivision ?? "Nations League"} · Matchday ${match.nationsLeagueRound ?? dash}`;
   if (kind === "goldCupPlayoff") return `Gold Cup Playoff · Leg ${match.goldCupLeg ?? dash}`;
   if (kind === "worldCupQualifier") {
@@ -174,6 +184,7 @@ function competitionLink(match: InternationalMatch, nationCode: string): string 
     euroQualifier: "/euro-qualifiers", euroGroup: "/euro", euroKnockout: "/euro",
     worldCupGroup: "/world-cup", worldCupKnockout: "/world-cup"
   };
+  if (kind === "u20Qualifier") return "/u20-world-cup-qualifiers";
   if (kind === "nationsLeague") return `/nations-league/${getNationConfederation(nationCode)}`;
   if (kind === "worldCupQualifier") {
     return match.worldCupPhase === "ICPO" || match.worldCupStage === "ICPO"
@@ -268,7 +279,7 @@ let unplayedCache: { state: InternationalState; version: number; value: Map<stri
 function findUnplayedMatches(state: InternationalState): Map<string, InternationalMatch> {
   const roots: unknown[] = [
     state.windows, state.nationsLeague, state.goldCup, state.copaAmerica, state.confedCup, state.u20WorldCup, state.afcon, state.afcCup,
-    state.ofcCup, state.euroQualifiers, state.euro, state.worldCup
+    state.ofcCup, state.euroQualifiers, state.euro, state.worldCup, state.u20Qualifying
   ];
   const seen = new WeakSet<object>();
   const candidates = new Map<string, InternationalMatch>();

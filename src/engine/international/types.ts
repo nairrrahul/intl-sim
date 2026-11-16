@@ -9,6 +9,7 @@ import type { GoldCupState } from "./competitions/goldCup";
 import type { NationsLeagueState } from "./competitions/nationsLeague";
 import type { OfcCupState } from "./competitions/ofcCup";
 import type { WorldCupState } from "./competitions/worldcup/types";
+import { U20QualifyingState } from "./competitions/u20Qualifying";
 
 /** A nation's formation, starting XI and substitutes for one of its teams. */
 export interface SquadState {
@@ -149,6 +150,15 @@ export interface InternationalMatch {
   u20WorldCupRound?: number;
   u20WorldCupKnockoutMatchId?: string;
   u20WorldCupWinner?: string;
+  u20QualifierEditionId?: string;
+  /** "CONCACAF" … "CAF", or "ICPO" for the intercontinental playoff. */
+  u20QualifierConfederation?: string;
+  u20QualifierStage?: "group" | "tie" | "playoff";
+  u20QualifierGroup?: string;
+  u20QualifierRound?: number;
+  u20QualifierTieId?: string;
+  u20QualifierLeg?: number;
+  u20QualifierKnockoutMatchId?: string;
   afconEditionId?: string;
   afconQualifierId?: string;
   afconTieId?: string;
@@ -204,7 +214,7 @@ export interface InternationalMatch {
 
 export interface InternationalRound {
   matches: InternationalMatch[];
-  kind?: "friendly" | "nationsLeague" | "goldCupPlayoff" | "goldCup" | "copaAmerica" | "confedCup" | "u20WorldCup" | "afconQualifier" | "afcon" | "afcCupQualifier" | "afcCup" | "ofcCupQualifier" | "ofcCup" | "euroQualifier" | "euro" | "worldCupQualifier" | "worldCup";
+  kind?: "friendly" | "nationsLeague" | "goldCupPlayoff" | "goldCup" | "copaAmerica" | "confedCup" | "u20WorldCup" | "u20Qualifier" | "afconQualifier" | "afcon" | "afcCupQualifier" | "afcCup" | "ofcCupQualifier" | "ofcCup" | "euroQualifier" | "euro" | "worldCupQualifier" | "worldCup";
   label?: string;
   afconQualifierId?: string;
   afconStage?: "preliminary" | "main" | "tournamentGroup" | "tournamentKnockout";
@@ -267,6 +277,7 @@ export interface InternationalState {
   copaAmerica: CopaAmericaState;
   confedCup: ConfedCupState;
   u20WorldCup: U20WorldCupState;
+  u20Qualifying: U20QualifyingState;
   afcon: AfconState;
   afcCup: AfcCupState;
   ofcCup: OfcCupState;

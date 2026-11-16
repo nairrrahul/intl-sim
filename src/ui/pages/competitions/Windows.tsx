@@ -45,6 +45,7 @@ const WINDOW_SECTIONS: { kind: string; title: string; splitByConfederation?: boo
   { kind: "goldCup", title: "Gold Cup" },
   { kind: "copaAmerica", title: "Copa América" },
   { kind: "confedCup", title: "Confederations Cup" },
+  { kind: "u20Qualifier", title: "U20 World Cup Qualifiers" },
   { kind: "u20WorldCup", title: "U20 World Cup" },
   { kind: "afconQualifier", title: "AFCON Qualifiers" },
   { kind: "afcon", title: "AFCON" },

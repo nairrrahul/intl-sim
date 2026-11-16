@@ -21,6 +21,7 @@ import { computeRankings, getWorldRanks } from "./rankings";
 import { drawWorldCupFinals } from "./worldCupWindow";
 import { freezeTournamentPredictions } from "./editionInsights";
 import type { InternationalState, WindowRecord } from "./types";
+import { getU20QualifiedTeams } from "./competitions/u20Qualifying";
 
 const CONFEDERATIONS = ["UEFA", "CONCACAF", "CONMEBOL", "OFC", "AFC", "CAF"] as const;
 
@@ -81,7 +82,7 @@ function drawU20WorldCupIfNext(state: InternationalState, window: WindowRecord):
   );
   if (!upcoming || upcoming.offset !== 1) return;
   if (findU20WorldCupEdition(state.u20WorldCup, upcoming.year, upcoming.def.id)) return;
-  createU20WorldCupEdition(state, upcoming.year, upcoming.def.id);
+  createU20WorldCupEdition(state, upcoming.year, upcoming.def.id, getU20QualifiedTeams(state, upcoming.year));
 }
 
 function worldCupQualifyingComplete(edition: WorldCupEdition): boolean {

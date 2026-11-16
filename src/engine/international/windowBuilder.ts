@@ -35,6 +35,10 @@ import { freezeTournamentPredictions } from "./editionInsights";
 import type { World } from "../world/world";
 import type { NationsLeagueEdition } from "./competitions/nationsLeague";
 import type { InternationalRound, InternationalState, ScheduledRound, WindowRecord } from "./types";
+import {
+  createU20Playoff, createU20QualifyingEdition, findU20QualifyingEdition, getU20QualifiedTeams,
+  getU20QualifyingPhase, getU20QualifyingRounds
+} from "./competitions/u20Qualifying";
 
 /** Everything gathered while a window's fixtures are assembled. */
 export interface WindowBuild {
@@ -173,6 +177,21 @@ function addConfedCupRounds(build: WindowBuild): void {
   build.rounds.push(...createCupGroupRounds(edition, "confedCup"));
 }
 
+/**
+ * U20 World Cup qualifying over the September, October and November windows. Like the finals it is played by U20
+ * squads, so it never keeps a senior team from playing. If it cannot be organised the finals pick their field directly.
+ */
+function addU20QualifyingRounds(build: WindowBuild): void {
+  const { state, year, windowId } = build;
+  const phase = getU20QualifyingPhase(year, windowId);
+  if (phase === null) return;
+
+  const edition = findU20QualifyingEdition(state.u20Qualifying, year) ?? (phase === 0 ? createU20QualifyingEdition(state, year) : null);
+  if (!edition) return;
+  if (phase === 2) createU20Playoff(state, edition);
+  build.rounds.push(...getU20QualifyingRounds(edition, phase));
+}
+
 /** The U20 World Cup is played by U20 squads, so it never keeps a nation's senior team from playing. */
 function addU20WorldCupRounds(build: WindowBuild): void {
   const { state, year, windowId } = build;
@@ -180,7 +199,7 @@ function addU20WorldCupRounds(build: WindowBuild): void {
 
   // Normally drawn after the previous window; drawn now if it was missed (e.g. a save from before it existed).
   const edition = findU20WorldCupEdition(state.u20WorldCup, year, windowId) ??
-    createU20WorldCupEdition(state, year, windowId);
+    createU20WorldCupEdition(state, year, windowId, getU20QualifiedTeams(state, year));
   if (edition) build.rounds.push(...createCupGroupRounds(edition, "u20WorldCup"));
 }
 
@@ -338,6 +357,7 @@ export function openNextWindow(world: World): WindowRecord {
   const worldCupFixtureTeams = addWorldCupRounds(build);
   addCopaAmericaRounds(build);
   addConfedCupRounds(build);
+  addU20QualifyingRounds(build);
   addU20WorldCupRounds(build);
   assertCompetitiveEligibility(build.rounds, year);
 

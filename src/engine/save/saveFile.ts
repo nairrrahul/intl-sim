@@ -7,6 +7,7 @@ import { initializeSavedTournamentInsights } from "../international/editionInsig
 import { getPlayersById } from "../players/lookup";
 import { compareGraphs, deserializeGraph, serializeGraph } from "./graphSerializer";
 import type { World } from "../world/world";
+import { createU20QualifyingState } from "../international/competitions/u20Qualifying";
 
 export const SAVE_FORMAT = "international-soccer-simulator-save";
 
@@ -120,6 +121,7 @@ export function gameFromSave(file: SaveFile): Game {
       season.assists ??= 0;
       season.cleanSheets ??= 0;
       season.trophies ??= [];
+      world.international.u20Qualifying ??= createU20QualifyingState();
     }
   }
   initializeSavedTournamentInsights(world.international, getPlayersById(world.players));
