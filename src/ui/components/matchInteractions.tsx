@@ -117,27 +117,31 @@ export function MatchInteractionsProvider(props: { godMode: boolean; children: R
     matchProps: target => {
       const matches = toList(target);
       const played = matches.filter(isPlayed);
+
+      // Only a tie can have both a played and an unplayed leg; this adds right-click rigging for the unplayed one.
+      const unplayedLeg = props.godMode ? matches.find(match => !isPlayed(match)) : undefined;
+      const rigMenu = unplayedLeg
+        ? (event: MouseEvent) => {
+            event.preventDefault();
+            setMenu({ match: unplayedLeg, x: event.clientX, y: event.clientY });
+          }
+        : undefined;
+
       if (played.length > 0) {
         return {
           // Links inside a fixture (nations, players) keep their own behaviour.
           onClick: event => {
-            if (!(event.target as HTMLElement).closest("a")) {
-              initializeGoalDisplayMinutes(played);
-              setDetailsMatches(played);
-            }
+            if (!(event.target as HTMLElement).closest("a")) setDetailsMatches(played);
           },
+          ...(rigMenu ? { onContextMenu: rigMenu } : {}),
           "data-tooltip": "Click for match details"
         };
       }
-      const unplayed = matches[0];
-      if (!props.godMode || !unplayed) return {};
+      if (!rigMenu || !unplayedLeg) return {};
       return {
-        onContextMenu: event => {
-          event.preventDefault();
-          setMenu({ match: unplayed, x: event.clientX, y: event.clientY });
-        },
-        "data-tooltip": unplayed.rigged
-          ? `Rigged ${unplayed.rigged.homeGoals}-${unplayed.rigged.awayGoals} (right-click to change)`
+        onContextMenu: rigMenu,
+        "data-tooltip": unplayedLeg.rigged
+          ? `Rigged ${unplayedLeg.rigged.homeGoals}-${unplayedLeg.rigged.awayGoals} (right-click to change)`
           : "Right-click to rig this match"
       };
     }
