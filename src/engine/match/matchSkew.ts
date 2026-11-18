@@ -11,9 +11,9 @@ export function getMatchSkew(matchKind: string) : number {
     case "euroQualifier":
     case "goldCupPlayoff":
     case "ofcCupQualifier":
-      return 1.3;
-    case "worldCupQualifier":
       return 1.25;
+    case "worldCupQualifier":
+      return 1.3;
     case "afconGroup":
     case "afcCupGroup":
     case "goldCupGroup":
