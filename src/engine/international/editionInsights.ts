@@ -8,6 +8,8 @@ import type { Player } from "../players/types";
 import type {
   InternationalMatch, InternationalRound, InternationalState, MatchSide, PredictedTier, StatLeader, StatLeaders
 } from "./types";
+import { getSeasonRow } from "../players/progression";
+import { goldenBootName } from "../players/trophies";
 
 /**
  * Predictions and stat leaders for the cup tournaments (not qualifiers or the Nations League).
@@ -18,6 +20,7 @@ export type CompetitionKey =
 
 /** What both cup edition shapes (a cup edition or a World Cup tournament) have in common. */
 export interface CupEditionLike {
+  year: number;
   teams: string[];
   seedRanks: Record<string, number>;
   groups: { name: string; teams: string[]; matches: InternationalMatch[][] }[];
@@ -33,21 +36,22 @@ export interface CupEditionLike {
 }
 
 interface CompetitionInfo {
+  name: string;
   /** U20 tournaments are played by the nations' U20 teams. */
   youth: boolean;
   editions: (state: InternationalState) => CupEditionLike[];
 }
 
 export const COMPETITIONS: Record<CompetitionKey, CompetitionInfo> = {
-  worldCup: { youth: false, editions: s => s.worldCup.editions.flatMap(edition => edition.tournament ? [edition.tournament as unknown as CupEditionLike] : []) },
-  euro: { youth: false, editions: s => s.euro.editions },
-  copaAmerica: { youth: false, editions: s => s.copaAmerica.editions },
-  goldCup: { youth: false, editions: s => s.goldCup.editions },
-  afcon: { youth: false, editions: s => s.afcon.editions },
-  afcCup: { youth: false, editions: s => s.afcCup.editions },
-  ofcCup: { youth: false, editions: s => s.ofcCup.editions },
-  confedCup: { youth: false, editions: s => s.confedCup.editions },
-  u20WorldCup: { youth: true, editions: s => s.u20WorldCup.editions }
+  worldCup: { name: "World Cup", youth: false, editions: s => s.worldCup.editions.flatMap(edition => edition.tournament ? [edition.tournament as unknown as CupEditionLike] : []) },
+  euro: { name: "EURO", youth: false, editions: s => s.euro.editions },
+  copaAmerica: { name: "Copa América", youth: false, editions: s => s.copaAmerica.editions },
+  goldCup: { name: "Gold Cup", youth: false, editions: s => s.goldCup.editions },
+  afcon: { name: "AFCON", youth: false, editions: s => s.afcon.editions },
+  afcCup: { name: "Asian Cup", youth: false, editions: s => s.afcCup.editions },
+  ofcCup: { name: "OFC Cup", youth: false, editions: s => s.ofcCup.editions },
+  confedCup: { name: "Confederations Cup", youth: false, editions: s => s.confedCup.editions },
+  u20WorldCup: { name: "U20 World Cup", youth: true, editions: s => s.u20WorldCup.editions }
 };
 
 /** Match kinds whose appearances and clean sheets are recorded, so competition stats can be built from them. */
@@ -390,6 +394,14 @@ export function freezeTournamentPredictions(state: InternationalState): void {
   }
 }
 
+function awardGoldenBoot(competitionName: string, edition: CupEditionLike, playersById: Map<string, Player>): void {
+  const topScorer = edition.statLeaders?.goals[0];
+  const player = topScorer && playersById.get(topScorer.playerId);
+  const season = player && getSeasonRow(player.progression, edition.year);
+  if (season) season.trophies.push(goldenBootName(competitionName));
+}
+
+
 /** Freezes predictions for drawn tournaments and actual results/stats for every completed edition. */
 export function freezeCompletedEditions(
   state: InternationalState,
@@ -403,6 +415,7 @@ export function freezeCompletedEditions(
       const strength = createTeamStrength(state, info.youth);
       edition.actualRanking ??= rankActualResults(edition, strength);
       edition.statLeaders ??= computeStatLeaders(edition, playersById, strength);
+      awardGoldenBoot(info.name, edition, playersById);
     }
   }
   if (applyYouthImpacts) applyYouthRatingImpacts(state);

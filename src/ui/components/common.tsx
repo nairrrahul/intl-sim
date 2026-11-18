@@ -5,6 +5,7 @@ import { getConfederation, getNationName } from "../../engine/nations/nations";
 import { FlagIcon } from "./FlagIcon";
 import { POSITION_GROUP } from "../format";
 import type { Position } from "../../engine/players/types";
+import { isGoldenBoot } from "../../engine/players/trophies";
 
 export function Panel(props: {
   title?: ReactNode;
@@ -309,13 +310,25 @@ export function RetirementIcon(props: { title?: string; className?: string }) {
   );
 }
 
-/** Trophy icon; hover shows the competition that was won. */
-export function TrophyIcon(props: { name: string }) {
+/** A golden football boot (side view, studs underneath); the gradient is shared by every boot on the page. */
+function GoldenBootIcon() {
   return (
-    <span data-tooltip={props.name} className="inline-block cursor-help text-accent-yellow" role="img" aria-label={`${props.name} winner`}>
-      <svg viewBox="0 0 24 24" style={{ width: "1.2em", height: "1.2em" }} className="inline-block align-[-0.2em]">
-        <path fill="currentColor" d="M7 3h10v2h3a1 1 0 0 1 1 1v2a4 4 0 0 1-4 4h-.35A5.01 5.01 0 0 1 13 14.9V17h3v2H8v-2h3v-2.1A5.01 5.01 0 0 1 7.35 12H7a4 4 0 0 1-4-4V6a1 1 0 0 1 1-1h3V3Zm-2 4v1a2 2 0 0 0 2 2V7H5Zm14 0h-2v3a2 2 0 0 0 2-2V7Z" />
-      </svg>
+    <span className="inline-block align-[-0.2em]">
+      🥾
+    </span>
+  );
+}
+
+/** Trophy icon (a cup for a tournament won, a golden boot for a Golden Boot); hover shows what it was won for. */
+export function TrophyIcon(props: { name: string }) {
+  const goldenBoot = isGoldenBoot(props.name);
+  return (
+    <span data-tooltip={props.name} className="inline-block cursor-help text-accent-yellow" role="img" aria-label={goldenBoot ? props.name : `${props.name} winner`}>
+      {goldenBoot ? <GoldenBootIcon /> : (
+        <span className="inline-block align-[-0.2em]">
+          🏆
+        </span>
+      )}
     </span>
   );
 }
