@@ -1,5 +1,6 @@
 import type { InternationalState } from "../international/types";
 import type { Player } from "../players/types";
+import type { YearlyAwards } from "../players/awards";
 
 /** The whole simulated world: the current season year, national teams and competitions, and the player pool. */
 export interface World {
@@ -11,4 +12,5 @@ export interface World {
   nextPlayerSeq: number;
   /** God Mode: unlocks editing (youth ratings, players, formations) and rigging matches. */
   godMode: boolean;
+  yearlyAwards: YearlyAwards;
 }

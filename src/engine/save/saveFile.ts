@@ -8,6 +8,8 @@ import { getPlayersById } from "../players/lookup";
 import { compareGraphs, deserializeGraph, serializeGraph } from "./graphSerializer";
 import type { World } from "../world/world";
 import { createU20QualifyingState } from "../international/competitions/u20Qualifying";
+import { createYearlyAwards } from "../players/awards";
+import { createUpsetHistory } from "../international/upsets";
 
 export const SAVE_FORMAT = "international-soccer-simulator-save";
 
@@ -120,6 +122,9 @@ export function gameFromSave(file: SaveFile): Game {
       season.goals ??= 0;
       season.assists ??= 0;
       season.cleanSheets ??= 0;
+      season.u20Caps ??= 0;
+      world.yearlyAwards ??= createYearlyAwards();
+      world.international.upsets ??= createUpsetHistory();
       season.trophies ??= [];
       world.international.u20Qualifying ??= createU20QualifyingState();
     }

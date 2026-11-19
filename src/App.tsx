@@ -26,6 +26,9 @@ import EuroPage from "./ui/pages/competitions/EuroPage";
 import EuroQualifiersPage from "./ui/pages/competitions/EuroQualifiersPage";
 import WorldCupQualifiersPage, { WorldCupPage } from "./ui/pages/competitions/worldcup/WorldCupQualifiersPage";
 import U20WorldCupQualifiersPage from "./ui/pages/competitions/U20WorldCupQualifiersPage";
+import Upsets from "./ui/pages/frivolities/Upsets";
+import Awards from "./ui/pages/frivolities/Awards";
+import Debuts from "./ui/pages/frivolities/Debuts";
 
 const WORLD_CUP_QUALIFYING_CONFEDERATIONS = ["UEFA", "CONCACAF", "CONMEBOL", "OFC", "AFC", "CAF"] as const;
 
@@ -76,6 +79,11 @@ export default function App() {
         <Route path="/gold-cup-playoff" element={<GoldCupPlayoffPage />} />
         <Route path="/ofc-cup" element={<OfcCupPage />} />
         <Route path="/ofc-cup-qualifiers" element={<OfcCupQualifiersPage />} />
+
+        {/* Frivolities */}
+        <Route path="/upsets" element={<Upsets />} />
+        <Route path="/awards" element={<Awards />} />
+        <Route path="/debuts" element={<Debuts />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

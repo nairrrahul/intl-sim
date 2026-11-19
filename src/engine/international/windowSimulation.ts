@@ -13,6 +13,8 @@ import { getSeasonRow } from "../players/progression";
 import type { World } from "../world/world";
 import type { Player } from "../players/types";
 import type { InternationalMatch, ScheduledRound, WindowRecord } from "./types";
+import { computeRankings } from "./rankings";
+import { updateTournamentUpsetHistory, updateUpsetHistory } from "./upsets";
 
 type PlayersById = Map<string, Player>;
 
@@ -59,7 +61,12 @@ function recordMatchDetails(match: InternationalMatch, window: WindowRecord, wor
 
   if (youth) {
     for (const side of ["home", "away"] as const) {
-      for (const player of details.appearances[side]) player.u20Caps += 1;
+      for (const player of details.appearances[side]) {
+        player.u20Caps += 1;
+
+        const row = getSeasonRow(player.progression, world.year);
+        if (row) row.u20Caps += 1;
+      }
     }
     return;
   }
@@ -100,6 +107,22 @@ function awardTrophy(
 
 function playRound(world: World, window: WindowRecord, round: ScheduledRound, playersById: PlayersById): void {
   for (const match of round.matches) {
+    if (!isYouthMatch(match)) {
+      const ranks = computeRankings(world.international);
+      const rankMap = new Map(
+        ranks.map(row => [row.code, row.rank])
+      );
+
+      match.homeRankBefore = rankMap.get(match.home);
+      match.awayRankBefore = rankMap.get(match.away);
+
+      match.homeOverallBefore =
+        world.international.nations[match.home].overall;
+
+      match.awayOverallBefore =
+        world.international.nations[match.away].overall;
+    }
+
     playMatch(world.international, match);
     recordMatchDetails(match, window, world, playersById);
   }
@@ -128,6 +151,8 @@ export function simulateMatchday(world: World): MatchdayOutcome | null {
   const playersById = getPlayersById(world.players);
   const roundsToPlay = window.rounds.filter(round => round.matchday === matchday);
   for (const round of roundsToPlay) playRound(world, window, round, playersById);
+  updateUpsetHistory(world.international.upsets, roundsToPlay.flatMap(round => round.matches), window, matchday);
+  updateTournamentUpsetHistory(world.international.upsets, world.international);
   window.matchdaysPlayed = matchday;
 
   const windowCompleted = matchday >= getWindowMatchdayCount(window);

@@ -157,7 +157,7 @@ function rankedFormedTeams(state: InternationalState, year: number): Record<stri
   const byConfederation: Record<string, string[]> = {};
   Object.values(state.nations)
     .filter(nation => nation.u20.formed && eligible.has(nation.code))
-    .sort((a, b) => b.u20.overall - a.u20.overall || b.overall - a.overall || a.code.localeCompare(b.code))
+    .sort((a, b) => b.u20.overall - a.u20.overall || b.overall - a.overall || Math.random() - 0.5 || a.code.localeCompare(b.code))
     .forEach(nation => (byConfederation[getConfederation(nation.code) ?? ""] ??= []).push(nation.code));
   return byConfederation;
 }

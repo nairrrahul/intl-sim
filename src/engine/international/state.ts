@@ -13,6 +13,7 @@ import { createWorldCupState } from "./competitions/worldcup/worldCup";
 import { createEmptySquadState } from "./squads";
 import type { InternationalState, NationTeam } from "./types";
 import { createU20QualifyingState } from "./competitions/u20Qualifying";
+import { createUpsetHistory } from "./upsets";
 
 interface NationInfoRow {
   threeLetterCode: string;
@@ -54,6 +55,7 @@ export function createInternationalState(): InternationalState {
     euroQualifiers: createEuroQualifiersState(),
     euro: createEuroState(),
     worldCup: createWorldCupState(),
+    upsets: createUpsetHistory(),
     lastLeftOut: null
   };
 }

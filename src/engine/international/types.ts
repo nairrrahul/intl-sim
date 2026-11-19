@@ -210,6 +210,10 @@ export interface InternationalMatch {
   worldCupKnockoutMatchId?: string;
   homePenalties?: string[];
   awayPenalties?: string[];
+  homeRankBefore?: number;
+  awayRankBefore?: number;
+  homeOverallBefore?: number;
+  awayOverallBefore?: number;
 }
 
 export interface InternationalRound {
@@ -288,4 +292,47 @@ export interface InternationalState {
   lastLeftOut: string | null;
   /** The season whose player ratings the nations' squads were last built from (squads only change at rollover). */
   squadsSeason?: number;
+  upsets: UpsetHistory;
+}
+
+export interface MatchUpsetRecord {
+  year: number;
+  windowId: string;
+  matchday: number;
+
+  home: string;
+  away: string;
+  winner: string;
+  loser: string;
+
+  homeGoals: number;
+  awayGoals: number;
+
+  homeRank: number;
+  awayRank: number;
+  homeOverall: number;
+  awayOverall: number;
+
+  rankingDifference: number;
+  rankingUnderdogRank: number;
+
+  ratingDifference: number;
+  ratingUnderdogOverall: number;
+}
+
+export interface UpsetHistory {
+  ranking: MatchUpsetRecord[];
+  rating: MatchUpsetRecord[];
+  tournamentWinners: TournamentUpsetRecord[];
+  tournamentPlacings: TournamentUpsetRecord[];
+}
+
+export interface TournamentUpsetRecord {
+  code: string;
+  competition: string;
+  year: number;
+  expected: number;
+  actual: number;
+  delta: number;
+  worldRank: number;
 }

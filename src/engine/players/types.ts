@@ -19,6 +19,7 @@ export interface ProgressionEntry {
   potential: number;
   /** Caps won during the season. Rows are only added while the player is active. */
   caps: number;
+  u20Caps: number; 
   goals: number;
   assists: number;
   /** Clean sheets kept (goalkeepers only). */

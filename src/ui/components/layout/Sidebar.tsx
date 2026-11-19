@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { useGame } from "../../../store/gameStore";
 import { getCompetitionSections } from "../../competitions";
 import { LoadGameButton, SaveGameButton } from "../SaveLoad";
+import { useState } from "react";
 
 function navClass({ isActive }: { isActive: boolean }): string {
   return `flex items-center gap-2 px-4 py-1.5 text-sm border-l-4 transition-colors ${
@@ -28,6 +29,29 @@ function CompetitionBlock(props: { title: string; children: ReactNode }) {
     <div className="mx-2 mt-2 rounded-md border border-navy-700 bg-navy-950/40 py-1">
       <div className="px-3 pt-1 pb-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-yellow">{props.title}</div>
       {props.children}
+    </div>
+  );
+}
+
+function CollapsibleNavGroup(props: {
+  title: string;
+  children: ReactNode;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="mt-4">
+      <button
+        type="button"
+        onClick={() => setExpanded(value => !value)}
+        aria-expanded={expanded}
+        className="w-full flex items-center justify-between px-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-navy-400 hover:text-white"
+      >
+        <span>{props.title}</span>
+        <span className="text-xs">{expanded ? "▾" : "▸"}</span>
+      </button>
+
+      {expanded && props.children}
     </div>
   );
 }
@@ -61,6 +85,18 @@ export function Sidebar() {
             </CompetitionBlock>
           ))}
         </NavGroup>
+
+        <CollapsibleNavGroup title="Frivolities">
+          <NavLink to="/upsets" className={navClass}>
+            Upsets
+          </NavLink>
+          <NavLink to="/awards" className={navClass}>
+            Awards
+          </NavLink>
+          <NavLink to="/debuts" className={navClass}>
+            Debuts
+          </NavLink>
+        </CollapsibleNavGroup>
 
         {game.world.godMode && (
           <NavGroup title="God Mode">

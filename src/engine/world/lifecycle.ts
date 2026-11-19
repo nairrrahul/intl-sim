@@ -13,6 +13,10 @@ import { applyNewgenAdjustments, applyWonderkids, generateNationNewgens } from "
 import { pruneRetiredPlayers, retireScheduledPlayers, schedulePlayerRetirements } from "../players/retirement";
 import type { World } from "./world";
 import { Player } from "../players/types";
+import {
+  createYearlyAwards,
+  finalizeYearlyAwards
+} from "../players/awards";
 
 /** A new world: players loaded from players.json, retirements scheduled, and the first window open. */
 export function createWorld(): World {
@@ -22,7 +26,8 @@ export function createWorld(): World {
     international: createInternationalState(),
     players,
     nextPlayerSeq: nextSequenceAfter(players),
-    godMode: false
+    godMode: false,
+    yearlyAwards: createYearlyAwards(),
   };
   schedulePlayerRetirements(world);
   openNextWindow(world);
@@ -68,6 +73,7 @@ function generateSeasonNewgens(world: World): void {
  * each nation receives its newgens.
  */
 export function advanceYear(world: World): void {
+  finalizeYearlyAwards(world);
   retireScheduledPlayers(world);
   pruneRetiredPlayers(world);
   world.year += 1;
