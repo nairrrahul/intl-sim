@@ -151,9 +151,23 @@ function recordKnockoutWinner(state: InternationalState, match: InternationalMat
   }
 
   if (match.u20QualifierStage === "playoff") {
-    const edition = state.u20Qualifying.editions.find(item => item.id === match.u20QualifierEditionId);
-    const playoffMatch = edition?.playoff?.flatMap(round => round.matches).find(item => item.id === match.u20QualifierKnockoutMatchId);
-    if (playoffMatch) playoffMatch.winner = winner;
+    const edition = state.u20Qualifying.editions.find(
+      item => item.id === match.u20QualifierEditionId
+    );
+
+    if (match.u20QualifierConfederation === "CONMEBOL") {
+      const knockoutMatch = edition?.confederations.CONMEBOL.knockout
+        .flatMap(round => round.matches)
+        .find(item => item.id === match.u20QualifierKnockoutMatchId);
+
+      if (knockoutMatch) knockoutMatch.winner = winner;
+    } else if (match.u20QualifierConfederation === "ICPO") {
+      const playoffMatch = edition?.playoff
+        ?.flatMap(round => round.matches)
+        .find(item => item.id === match.u20QualifierKnockoutMatchId);
+
+      if (playoffMatch) playoffMatch.winner = winner;
+    }
   }
 
   if (match.euroStage === "playoff" || match.euroStage === "knockout") {

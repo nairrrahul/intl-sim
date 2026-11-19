@@ -48,6 +48,7 @@ export interface U20QualifyingConfederation {
   /** The team sent to the intercontinental playoff, once known. */
   playoffTeam: string | null;
   completed: boolean;
+  knockout: { label: string; matches: U20PlayoffMatch[] }[];
 }
 
 export interface U20PlayoffMatch {
@@ -80,14 +81,14 @@ const PLAYOFF_CONFEDERATIONS = ["CONCACAF", "CONMEBOL", "AFC", "CAF"];
 
 /** Group-stage confederations: how many teams, how many groups, and whether they play home and away. */
 const GROUP_FORMATS: Record<string, { entrants: number; groups: number; homeAndAway: boolean; sendsRunnerUp: boolean }> = {
-  UEFA: { entrants: 15, groups: 5, homeAndAway: true, sendsRunnerUp: false },
-  CONCACAF: { entrants: 12, groups: 4, homeAndAway: true, sendsRunnerUp: true },
+  UEFA: { entrants: 20, groups: 5, homeAndAway: true, sendsRunnerUp: false },
+  CONCACAF: { entrants: 16, groups: 4, homeAndAway: true, sendsRunnerUp: true },
   AFC: { entrants: 16, groups: 4, homeAndAway: false, sendsRunnerUp: true },
   CAF: { entrants: 16, groups: 4, homeAndAway: false, sendsRunnerUp: true }
 };
 const OFC_ENTRANTS = 4;
 const CONMEBOL_AUTO_QUALIFIERS = 3;
-const CONMEBOL_ENTRANTS = 5;
+const CONMEBOL_ENTRANTS = 7;
 const GROUP_NAMES = ["A", "B", "C", "D", "E"];
 
 // ---------------------------------------------------------------------------
@@ -198,7 +199,7 @@ function createGroupConfederation(
       )))
     };
   });
-  return { confederation, teams, groups, ties: [], autoQualified: [], qualified: [], playoffTeam: null, completed: false };
+  return { confederation, teams, groups, ties: [], autoQualified: [], qualified: [], knockout: [], playoffTeam: null, completed: false };
 }
 
 /** A home-and-away series in the October window; `first` hosts the first leg. */
@@ -236,16 +237,28 @@ export function createU20QualifyingEdition(state: InternationalState, year: numb
 
   const ofc = ranked.OFC.slice(0, OFC_ENTRANTS);
   confederations.OFC = {
-    confederation: "OFC", teams: ofc, groups: [], autoQualified: [], qualified: [], playoffTeam: null, completed: false,
+    confederation: "OFC", teams: ofc, groups: [], autoQualified: [], qualified: [], knockout: [], playoffTeam: null, completed: false,
     // 1 v 4 and 2 v 3: the lower seed hosts the first leg.
     ties: [createTie("OFC", "OFC-1", ofc[3], ofc[0], year, id), createTie("OFC", "OFC-2", ofc[2], ofc[1], year, id)]
   };
 
   const conmebol = ranked.CONMEBOL.slice(0, CONMEBOL_ENTRANTS);
   confederations.CONMEBOL = {
-    confederation: "CONMEBOL", teams: conmebol, groups: [], completed: false, qualified: [...conmebol.slice(0, CONMEBOL_AUTO_QUALIFIERS)],
-    autoQualified: conmebol.slice(0, CONMEBOL_AUTO_QUALIFIERS), playoffTeam: null,
-    ties: [createTie("CONMEBOL", "CONMEBOL-1", conmebol[4], conmebol[3], year, id)]
+    confederation: "CONMEBOL",
+    teams: conmebol,
+    groups: [],
+    ties: [],
+    knockout: [{
+      label: "Semi-finals",
+      matches: [
+        conmebolKnockoutMatch(id, year, conmebol[3], conmebol[6], "SF1"),
+        conmebolKnockoutMatch(id, year, conmebol[4], conmebol[5], "SF2")
+      ]
+    }],
+    completed: false,
+    qualified: [...conmebol.slice(0, CONMEBOL_AUTO_QUALIFIERS)],
+    autoQualified: conmebol.slice(0, CONMEBOL_AUTO_QUALIFIERS),
+    playoffTeam: null
   };
 
   const edition: U20QualifyingEdition = { id, year, confederations, playoff: null, qualified: [], completed: false };
@@ -285,6 +298,16 @@ export function getU20QualifyingRounds(edition: U20QualifyingEdition, phase: U20
         });
       }
     }
+    if (phase === 1 && confederation.confederation === "CONMEBOL" && confederation.knockout) {
+      for (const knockoutRound of confederation.knockout) {
+        rounds.push({
+          kind: "u20Qualifier",
+          label: roundLabel("CONMEBOL", knockoutRound.label),
+          leftOut: null,
+          matches: knockoutRound.matches.map(match => match.fixture)
+        });
+      }
+    }
   }
   return rounds;
 }
@@ -307,6 +330,25 @@ function settleConfederation(confederation: U20QualifyingConfederation): void {
     if (format.sendsRunnerUp) {
       confederation.playoffTeam = tables.map(table => table[1]).sort(compareRows)[0].code;
     }
+  } else if (confederation.confederation === "CONMEBOL") {
+    const final = confederation.knockout.find(round => round.label === "Final");
+
+    if (!final || !final.matches[0]?.winner) return;
+
+    const finalMatch = final.matches[0];
+    const winner = finalMatch.winner;
+    if (!winner) return;
+
+    const runnerUp = winner === finalMatch.home
+      ? finalMatch.away
+      : finalMatch.home;
+
+    confederation.qualified = [
+      ...confederation.autoQualified,
+      winner
+    ];
+
+    confederation.playoffTeam = runnerUp;
   } else if (confederation.confederation === "OFC") {
     confederation.qualified = confederation.ties.map(tie => tie.winner as string);
   } else {
@@ -320,6 +362,27 @@ function settleConfederation(confederation: U20QualifyingConfederation): void {
 /** Re-checks every confederation after matches are played (call after each qualifying round). */
 export function settleU20Qualifying(edition: U20QualifyingEdition): void {
   Object.values(edition.confederations).forEach(settleConfederation);
+}
+
+function conmebolKnockoutMatch(
+  editionId: string,
+  year: number,
+  home: string,
+  away: string,
+  id: string
+): U20PlayoffMatch {
+  return {
+    id,
+    home,
+    away,
+    winner: null,
+    fixture: qualifierMatch(home, away, year, "IW2", {
+      u20QualifierEditionId: editionId,
+      u20QualifierConfederation: "CONMEBOL",
+      u20QualifierStage: "playoff",
+      u20QualifierKnockoutMatchId: id
+    })
+  };
 }
 
 function playoffMatch(
@@ -371,5 +434,42 @@ export function advanceU20Playoff(edition: U20QualifyingEdition, windowId: strin
     last.matches[0].winner as string
   ];
   edition.completed = true;
+  return null;
+}
+
+export function advanceU20ConmebolKnockout(
+  edition: U20QualifyingEdition
+): InternationalRound | null {
+  const rounds = edition.confederations.CONMEBOL.knockout;
+  const last = rounds[rounds.length - 1];
+
+  if (!last || last.matches.some(match => match.winner === null)) {
+    return null;
+  }
+
+  if (last.label === "Semi-finals") {
+    const [first, second] = last.matches.map(match => match.winner as string);
+
+    const final = conmebolKnockoutMatch(
+      edition.id,
+      edition.year,
+      first,
+      second,
+      "F"
+    );
+
+    rounds.push({
+      label: "Final",
+      matches: [final]
+    });
+
+    return {
+      kind: "u20Qualifier",
+      label: "U20 World Cup Qualifiers · CONMEBOL · Final",
+      leftOut: null,
+      matches: [final.fixture]
+    };
+  }
+
   return null;
 }

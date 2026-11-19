@@ -67,6 +67,67 @@ function TiesPanel(props: { title: string; ties: U20QualifyingTie[] }) {
   );
 }
 
+function ConmebolKnockoutView(props: { confederation: U20QualifyingConfederation }) {
+  const { confederation } = props;
+  const refs = new Map<string, TeamRef>();
+
+  const ref = (code: string): TeamRef => {
+    if (!refs.has(code)) {
+      refs.set(code, teamRef(code, refs.size + 1));
+    }
+    return refs.get(code)!;
+  };
+
+  const score = (match: InternationalMatch): ScoreSnap | null => {
+    if (!isPlayed(match)) return null;
+
+    return {
+      h: match.homeGoals!,
+      a: match.awayGoals!,
+      ...(match.homePenalties && match.awayPenalties
+        ? {
+            ph: scored(match.homePenalties),
+            pa: scored(match.awayPenalties)
+          }
+        : {})
+    };
+  };
+
+  const final = confederation.knockout.find(round => round.label === "Final")?.matches[0];
+  const winner = final?.winner ?? null;
+  const runnerUp = winner
+    ? winner === final!.home ? final!.away : final!.home
+    : null;
+
+  const cup: CupSnap = {
+    complete: Boolean(winner),
+    winner: winner ? ref(winner) : null,
+    runnerUp: runnerUp ? ref(runnerUp) : null,
+    rounds: confederation.knockout.map((round, index) => ({
+      round: index + 1,
+      label: round.label,
+      matchday: index + 1,
+      matches: round.matches.map((match): CupMatchSnap => ({
+        id: match.id,
+        home: ref(match.home),
+        away: ref(match.away),
+        score: score(match.fixture),
+        winner: match.winner ? ref(match.winner) : null,
+        bye: false,
+        fixture: match.fixture
+      }))
+    }))
+  };
+
+  return (
+    <Panel title="CONMEBOL knockout">
+      <div className="p-3">
+        <CupBracketTree cup={cup} />
+      </div>
+    </Panel>
+  );
+}
+
 function ConfederationView(props: { confederation: U20QualifyingConfederation }) {
   const { confederation } = props;
   const tables = confederation.groups.map(group => ({ group, rows: getU20QualifyingStandings(group) }));
@@ -83,6 +144,9 @@ function ConfederationView(props: { confederation: U20QualifyingConfederation })
             {confederation.autoQualified.map(code => <NationLink key={code} code={code} />)}
           </div>
         </Panel>
+      )}
+      {confederation.confederation === "CONMEBOL" && (
+        <ConmebolKnockoutView confederation={confederation} />
       )}
       {tables.length > 0 && (
         <div className="grid gap-5 lg:grid-cols-2">

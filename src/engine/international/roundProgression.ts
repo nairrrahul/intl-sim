@@ -40,7 +40,7 @@ import { getWorldCupPathRound, recordWorldCupPathRound } from "./competitions/wo
 import { addRoundToWindow } from "./lanes";
 import { getWorldRanks } from "./rankings";
 import type { InternationalRound, InternationalState, ScheduledRound, WindowRecord } from "./types";
-import { advanceU20Playoff, settleU20Qualifying } from "./competitions/u20Qualifying";
+import { advanceU20Playoff, advanceU20ConmebolKnockout, settleU20Qualifying } from "./competitions/u20Qualifying";
 
 /**
  * What happens once a round has been played: standings are completed, qualifying phases are
@@ -377,11 +377,24 @@ const worldCupFinals: Handler = (state, window, round, awardTrophy) => {
 
 /** After a U20 qualifying round: work out who has qualified, and run the intercontinental playoff. */
 const u20Qualifier: Handler = (state, window, round) => {
-  const editionId = round.matches[0]?.u20QualifierEditionId;
-  const edition = state.u20Qualifying.editions.find(item => item.id === editionId);
+  const match = round.matches[0];
+
+  const editionId = match?.u20QualifierEditionId;
+  const edition = state.u20Qualifying.editions.find(
+    item => item.id === editionId
+  );
+
   if (!edition) return;
+
+  if (match.u20QualifierStage === "playoff") {
+    if (match.u20QualifierConfederation === "CONMEBOL") {
+      addNext(window, advanceU20ConmebolKnockout(edition));
+    } else if (match.u20QualifierConfederation === "ICPO") {
+      addNext(window, advanceU20Playoff(edition, window.windowId));
+    }
+  }
+
   settleU20Qualifying(edition);
-  if (round.matches[0].u20QualifierStage === "playoff") addNext(window, advanceU20Playoff(edition, window.windowId));
 };
 
 const HANDLERS: Record<string, Handler> = {
