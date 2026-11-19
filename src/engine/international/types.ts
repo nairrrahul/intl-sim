@@ -333,6 +333,8 @@ export interface TournamentUpsetRecord {
   year: number;
   expected: number;
   actual: number;
+  expectedStage: string;
+  actualStage: string;
   delta: number;
   worldRank: number;
 }

@@ -14,6 +14,7 @@ import type {
   MatchUpsetRecord,
   TournamentUpsetRecord
 } from "../../../engine/international/types";
+import { ordinal } from "../../format";
 
 type Tab = "winners" | "placings" | "ranking" | "rating";
 
@@ -35,6 +36,7 @@ function TournamentTable(props: {
             <th>Tournament</th>
             <th className="num">Expected Position</th>
             {props.showActual && <th className="num">Actual Position</th>}
+            {props.showActual && <th className="num">Position Delta</th>}
             <th className="num">World Rank</th>
           </tr>
         </thead>
@@ -43,11 +45,28 @@ function TournamentTable(props: {
             <tr key={`${record.competition}-${record.year}-${record.code}`}>
               <td className="text-center tabular-nums">{index + 1}</td>
               <td><NationLink code={record.code} /></td>
-              <td>{record.competition} {record.year}</td>
-              <td className="num tabular-nums">{record.expected}</td>
-              {props.showActual && (
-                <td className="num tabular-nums font-semibold">{record.actual}</td>
-              )}
+              <td>{record.competition} {record.year + 1}</td>
+              <td className="num">
+                <span>{record.expectedStage}</span>
+                <span className="ml-1 text-xs text-navy-200">
+                  ({ordinal(record.expected)})
+                </span>
+              </td>
+              {props.showActual &&
+              <>
+                <td className="num">
+                  <span className="font-semibold">{record.actualStage}</span>
+                  <span className="ml-1 text-xs text-navy-200">
+                    ({ordinal(record.actual)})
+                  </span>
+                </td>
+                <td className="num">
+                  <span className={`font-semibold ${record.actual - record.expected > 0 ? "text-red-500" : "text-green-500"}`}>
+                    {record.actual - record.expected > 0 ? "▼" : "▲"} {Math.abs(record.actual - record.expected)}
+                  </span>
+                </td>
+                </>
+              }
               <td className="num tabular-nums">{record.worldRank}</td>
             </tr>
           ))}

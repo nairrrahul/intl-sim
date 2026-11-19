@@ -183,17 +183,20 @@ export function updateUpsetHistory(
 
 function flattenTournamentRanking(
   tiers: { label: string; teams: string[] }[]
-): Map<string, number> {
-  const positions = new Map<string, number>();
+): Map<string, { position: number; stage: string }> {
+  const placements = new Map<string, { position: number; stage: string }>();
   let position = 1;
 
   for (const tier of tiers) {
     for (const code of tier.teams) {
-      positions.set(code, position++);
+      placements.set(code, {
+        position: position++,
+        stage: tier.label
+      });
     }
   }
 
-  return positions;
+  return placements;
 }
 
 function getTournamentPlacements(
@@ -212,20 +215,22 @@ function getTournamentPlacements(
   const actual = flattenTournamentRanking(edition.actualRanking);
 
   return edition.teams.flatMap(code => {
-    const expectedPosition = expected.get(code);
-    const actualPosition = actual.get(code);
+    const expectedPlacement = expected.get(code);
+    const actualPlacement = actual.get(code);
 
-    if (expectedPosition === undefined || actualPosition === undefined) {
+    if (!expectedPlacement || !actualPlacement) {
       return [];
     }
 
     return [{
       code,
       competition,
-      year: edition.year + 1,
-      expected: expectedPosition,
-      actual: actualPosition,
-      delta: expectedPosition - actualPosition,
+      year: edition.year,
+      expected: expectedPlacement.position,
+      actual: actualPlacement.position,
+      expectedStage: expectedPlacement.stage,
+      actualStage: actualPlacement.stage,
+      delta: expectedPlacement.position - actualPlacement.position,
       worldRank: edition.seedRanks[code] ?? Number.MAX_SAFE_INTEGER
     }];
   });
@@ -266,6 +271,7 @@ export function updateTournamentUpsetHistory(
     .slice(0, 20);
 
   history.tournamentPlacings = [...placements]
+    .filter(record => record.expectedStage !== record.actualStage)
     .sort((a, b) =>
       Math.abs(b.delta) - Math.abs(a.delta) ||
       a.worldRank - b.worldRank ||
