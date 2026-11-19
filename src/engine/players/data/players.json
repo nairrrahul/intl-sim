@@ -61111,8 +61111,8 @@
                 "lastName": "Ferreira",
                 "commonName": "",
                 "age": 25,
-                "overall": 72,
-                "potential": 76,
+                "overall": 70,
+                "potential": 73,
                 "position": "ST"
             },
             {
@@ -61151,8 +61151,8 @@
                 "lastName": "Sargent",
                 "commonName": "",
                 "age": 25,
-                "overall": 75,
-                "potential": 78,
+                "overall": 70,
+                "potential": 74,
                 "position": "ST"
             },
             {
@@ -61822,7 +61822,7 @@
                 "commonName": "",
                 "age": 22,
                 "overall": 73,
-                "potential": 82,
+                "potential": 80,
                 "position": "LW"
             },
             {
@@ -62304,16 +62304,6 @@
                 "overall": 64,
                 "potential": 73,
                 "position": "CAM"
-            },
-            {
-                "playerid": 5754,
-                "firstName": "Kayden",
-                "lastName": "Pierre",
-                "commonName": "",
-                "age": 22,
-                "overall": 58,
-                "potential": 68,
-                "position": "RB"
             },
             {
                 "playerid": 5755,
@@ -63231,7 +63221,7 @@
                 "lastName": "Kochen",
                 "commonName": "",
                 "age": 19,
-                "overall": 61,
+                "overall": 69,
                 "potential": 84,
                 "position": "GK"
             },
@@ -63271,8 +63261,8 @@
                 "lastName": "Hall",
                 "commonName": "",
                 "age": 17,
-                "overall": 54,
-                "potential": 77,
+                "overall": 68,
+                "potential": 79,
                 "position": "LM"
             },
             {
@@ -63431,9 +63421,19 @@
                 "lastName": "Pierre",
                 "commonName": "",
                 "age": 18,
-                "overall": 66,
+                "overall": 69,
                 "potential": 77,
                 "position": "CB"
+            },
+            {
+                "playerid": 23739,
+                "firstName": "Adri",
+                "lastName": "Mehmeti",
+                "commonName": "",
+                "age": 17,
+                "overall": 69,
+                "potential": 83,
+                "position": "CM"
             }
         ]
     },
@@ -63575,8 +63575,8 @@
                 "lastName": "El Mala",
                 "commonName": "",
                 "age": 19,
-                "overall": 68,
-                "potential": 84,
+                "overall": 76,
+                "potential": 86,
                 "position": "LM"
             },
             {
@@ -76998,7 +76998,7 @@
                 "commonName": "",
                 "age": 19,
                 "overall": 75,
-                "potential": 85,
+                "potential": 87,
                 "position": "CM"
             },
             {
@@ -82608,7 +82608,7 @@
                 "commonName": "",
                 "age": 24,
                 "overall": 86,
-                "potential": 88,
+                "potential": 89,
                 "position": "RM"
             },
             {
@@ -84907,8 +84907,8 @@
                 "lastName": "Risser",
                 "commonName": "",
                 "age": 21,
-                "overall": 73,
-                "potential": 82,
+                "overall": 79,
+                "potential": 85,
                 "position": "GK"
             },
             {
@@ -85547,8 +85547,8 @@
                 "lastName": "Kroupi",
                 "commonName": "",
                 "age": 19,
-                "overall": 74,
-                "potential": 85,
+                "overall": 79,
+                "potential": 88,
                 "position": "ST"
             },
             {
@@ -88089,8 +88089,8 @@
                 "lastName": "Diomande",
                 "commonName": "",
                 "age": 19,
-                "overall": 69,
-                "potential": 81,
+                "overall": 79,
+                "potential": 90,
                 "position": "LM"
             },
             {
@@ -89079,7 +89079,7 @@
                 "lastName": "Diomande",
                 "commonName": "",
                 "age": 22,
-                "overall": 80,
+                "overall": 81,
                 "potential": 87,
                 "position": "CB"
             },
@@ -94097,8 +94097,8 @@
                 "lastName": "Froholdt",
                 "commonName": "",
                 "age": 19,
-                "overall": 74,
-                "potential": 85,
+                "overall": 77,
+                "potential": 86,
                 "position": "CM"
             },
             {
@@ -96381,7 +96381,7 @@
                 "lastName": "Güler",
                 "commonName": "",
                 "age": 20,
-                "overall": 81,
+                "overall": 83,
                 "potential": 89,
                 "position": "RM"
             },
@@ -97035,8 +97035,8 @@
                 "lastName": "Hadj-Moussa",
                 "commonName": "",
                 "age": 23,
-                "overall": 76,
-                "potential": 82,
+                "overall": 78,
+                "potential": 84,
                 "position": "RW"
             },
             {
@@ -97565,8 +97565,8 @@
                 "lastName": "Maza",
                 "commonName": "",
                 "age": 20,
-                "overall": 71,
-                "potential": 84,
+                "overall": 77,
+                "potential": 86,
                 "position": "CAM"
             },
             {
@@ -127252,16 +127252,6 @@
                 "position": "LB"
             },
             {
-                "playerid": 11912,
-                "firstName": "Lucas Luciano",
-                "lastName": "Mantela Patrício",
-                "commonName": "Lucas Mantela",
-                "age": 25,
-                "overall": 82,
-                "potential": 82,
-                "position": "GK"
-            },
-            {
                 "playerid": 11913,
                 "firstName": "Gérson Adriano",
                 "lastName": "Gutierres Serra",
@@ -127822,16 +127812,6 @@
                 "position": "CDM"
             },
             {
-                "playerid": 11969,
-                "firstName": "Rosival Jailson",
-                "lastName": "Dourado Santos",
-                "commonName": "Rosival Dourado",
-                "age": 25,
-                "overall": 81,
-                "potential": 81,
-                "position": "CDM"
-            },
-            {
                 "playerid": 11970,
                 "firstName": "Juliano Wagner",
                 "lastName": "Mascarinhas Concp.",
@@ -128372,16 +128352,6 @@
                 "position": "CDM"
             },
             {
-                "playerid": 12024,
-                "firstName": "Welington Kauê",
-                "lastName": "Dano Nascimento",
-                "commonName": "Welington Dano",
-                "age": 25,
-                "overall": 81,
-                "potential": 81,
-                "position": "LB"
-            },
-            {
                 "playerid": 12025,
                 "firstName": "Erick Sebastião",
                 "lastName": "Laforte Medeiros",
@@ -128510,16 +128480,6 @@
                 "overall": 74,
                 "potential": 74,
                 "position": "CAM"
-            },
-            {
-                "playerid": 12038,
-                "firstName": "Victorio Martin",
-                "lastName": "Maia Padilha Jabim",
-                "commonName": "Victorio Jabim",
-                "age": 29,
-                "overall": 77,
-                "potential": 77,
-                "position": "RB"
             },
             {
                 "playerid": 12039,
@@ -128992,16 +128952,6 @@
                 "position": "CDM"
             },
             {
-                "playerid": 12086,
-                "firstName": "Fred Claudinei",
-                "lastName": "Tófoli Vilela",
-                "commonName": "Fredditinho",
-                "age": 33,
-                "overall": 78,
-                "potential": 78,
-                "position": "ST"
-            },
-            {
                 "playerid": 12087,
                 "firstName": "Jason",
                 "lastName": "Bardeira Cunha",
@@ -129249,16 +129199,6 @@
                 "age": 25,
                 "overall": 71,
                 "potential": 71,
-                "position": "CAM"
-            },
-            {
-                "playerid": 12112,
-                "firstName": "Ronaldo Jailson",
-                "lastName": "Cabrais Petri",
-                "commonName": "Ronaldo Cabrais",
-                "age": 29,
-                "overall": 83,
-                "potential": 83,
                 "position": "CAM"
             },
             {
@@ -148973,8 +148913,8 @@
                 "lastName": "Manzambi",
                 "commonName": "",
                 "age": 20,
-                "overall": 67,
-                "potential": 84,
+                "overall": 74,
+                "potential": 86,
                 "position": "CAM"
             },
             {
@@ -149727,8 +149667,8 @@
                 "lastName": "Avdullahu",
                 "commonName": "",
                 "age": 21,
-                "overall": 70,
-                "potential": 79,
+                "overall": 75,
+                "potential": 81,
                 "position": "CDM"
             },
             {
@@ -154793,8 +154733,8 @@
                 "lastName": "Sangaré",
                 "commonName": "",
                 "age": 23,
-                "overall": 74,
-                "potential": 82,
+                "overall": 77,
+                "potential": 85,
                 "position": "CM"
             },
             {
@@ -156417,8 +156357,8 @@
                 "lastName": "Camara",
                 "commonName": "",
                 "age": 22,
-                "overall": 77,
-                "potential": 85,
+                "overall": 80,
+                "potential": 87,
                 "position": "CM"
             },
             {
@@ -157815,8 +157755,8 @@
                 "lastName": "Tzolis",
                 "commonName": "",
                 "age": 23,
-                "overall": 80,
-                "potential": 87,
+                "overall": 83,
+                "potential": 88,
                 "position": "LM"
             },
             {
@@ -191225,7 +191165,7 @@
                 "lastName": "Šeško",
                 "commonName": "",
                 "age": 22,
-                "overall": 80,
+                "overall": 81,
                 "potential": 88,
                 "position": "ST"
             },
@@ -203490,6 +203430,16 @@
     "Haiti": {
         "players": [
             {
+                "playerid": 5754,
+                "firstName": "Kayden",
+                "lastName": "Pierre",
+                "commonName": "",
+                "age": 22,
+                "overall": 61,
+                "potential": 71,
+                "position": "RB"
+            },
+            {
                 "playerid": 20203,
                 "firstName": "Belmar",
                 "lastName": "Joseph",
@@ -211331,8 +211281,8 @@
                 "lastName": "Khusanov",
                 "commonName": "",
                 "age": 21,
-                "overall": 77,
-                "potential": 85,
+                "overall": 80,
+                "potential": 87,
                 "position": "CB"
             },
             {
