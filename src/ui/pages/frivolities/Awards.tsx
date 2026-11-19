@@ -1,3 +1,5 @@
+
+import { useState } from "react";
 import { useGameStore } from "../../../store/gameStore";
 import {
   Empty,
@@ -6,7 +8,8 @@ import {
   PageHeader,
   Panel,
   PlayerLink,
-  PosBadge
+  PosBadge,
+  Tabs
 } from "../../components/common";
 
 import type { YearlyAwardRecord } from "../../../engine/players/awards";
@@ -20,7 +23,10 @@ function getPlayerName(player: {
     `${player.firstName} ${player.lastName}`;
 }
 
+type AwardTab = "goldenBoot" | "goldenGlove" | "youngTalent";
+
 export default function Awards() {
+  const [tab, setTab] = useState<AwardTab>("goldenBoot");
   const game = useGameStore(state => state.game);
   useGameStore(state => state.tick);
 
@@ -56,148 +62,164 @@ export default function Awards() {
   const youngTalent = getRows(yearlyAwards.youngTalent);
 
   return (
-    <div className="space-y-4">
+    <div>
       <PageHeader
         title="Awards"
         subtitle="Individual awards from each completed season."
       />
 
-      <Panel title="Yearly Golden Boot">
-        {goldenBoot.length === 0 ? (
-          <Empty>No awards have been recorded yet.</Empty>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="tbl">
-              <thead>
-                <tr>
-                  <th>Year</th>
-                  <th>Player</th>
-                  <th>Pos</th>
-                  <th className="num">OVR</th>
-                  <th>Nation</th>
-                  <th className="num">Goals</th>
-                </tr>
-              </thead>
-              <tbody>
-                {goldenBoot.map(({ year, player, season }) => (
-                  <tr key={year}>
-                    <td className="tabular-nums">{year}</td>
-                    <td>
-                      <PlayerLink
-                        id={player.id}
-                        name={getPlayerName(player)}
-                      />
-                    </td>
-                    <td><PosBadge position={player.position} /></td>
-                    <td className="num">
-                      <OvrBadge value={season.overall} />
-                    </td>
-                    <td>
-                      <NationTag
-                        code={player.primaryNationality}
-                        label="name"
-                      />
-                    </td>
-                    <td className="num font-bold">
-                      {season.goals}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Panel>
+      <Tabs
+        tabs={[
+          { id: "goldenBoot", label: "Golden Boot" },
+          { id: "goldenGlove", label: "Golden Glove" },
+          { id: "youngTalent", label: "Young Talent" }
+        ]}
+        value={tab}
+        onChange={setTab}
+      />
 
-      <Panel title="Yearly Golden Glove">
-        {goldenGlove.length === 0 ? (
-          <Empty>No awards have been recorded yet.</Empty>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="tbl">
-              <thead>
-                <tr>
-                  <th>Year</th>
-                  <th>Player</th>
-                  <th>Pos</th>
-                  <th className="num">OVR</th>
-                  <th>Nation</th>
-                  <th className="num">Clean Sheets</th>
-                </tr>
-              </thead>
-              <tbody>
-                {goldenGlove.map(({ year, player, season }) => (
-                  <tr key={year}>
-                    <td className="tabular-nums">{year}</td>
-                    <td>
-                      <PlayerLink
-                        id={player.id}
-                        name={getPlayerName(player)}
-                      />
-                    </td>
-                    <td><PosBadge position={player.position} /></td>
-                    <td className="num">
-                      <OvrBadge value={season.overall} />
-                    </td>
-                    <td>
-                      <NationTag
-                        code={player.primaryNationality}
-                        label="name"
-                      />
-                    </td>
-                    <td className="num font-bold">
-                      {season.cleanSheets}
-                    </td>
+      {tab === "goldenBoot" && (
+        <Panel title="Yearly Golden Boot">
+          {goldenBoot.length === 0 ? (
+            <Empty>No awards have been recorded yet.</Empty>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="tbl">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Player</th>
+                    <th>Pos</th>
+                    <th className="num">OVR</th>
+                    <th>Nation</th>
+                    <th className="num">Goals</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Panel>
+                </thead>
+                <tbody>
+                  {goldenBoot.map(({ year, player, season }) => (
+                    <tr key={year}>
+                      <td className="tabular-nums">{year}-{(year+1)%100}</td>
+                      <td>
+                        <PlayerLink
+                          id={player.id}
+                          name={getPlayerName(player)}
+                        />
+                      </td>
+                      <td><PosBadge position={player.position} /></td>
+                      <td className="num">
+                        <OvrBadge value={season.overall} />
+                      </td>
+                      <td>
+                        <NationTag
+                          code={player.primaryNationality}
+                          label="name"
+                        />
+                      </td>
+                      <td className="num font-bold">
+                        {season.goals}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Panel>
+      )}
 
-      <Panel title="Young Talent of the Year">
-        {youngTalent.length === 0 ? (
-          <Empty>No awards have been recorded yet.</Empty>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="tbl">
-              <thead>
-                <tr>
-                  <th>Year</th>
-                  <th>Player</th>
-                  <th>Pos</th>
-                  <th className="num">OVR</th>
-                  <th>Nation</th>
-                </tr>
-              </thead>
-              <tbody>
-                {youngTalent.map(({ year, player, season }) => (
-                  <tr key={year}>
-                    <td className="tabular-nums">{year}</td>
-                    <td>
-                      <PlayerLink
-                        id={player.id}
-                        name={getPlayerName(player)}
-                      />
-                    </td>
-                    <td><PosBadge position={player.position} /></td>
-                    <td className="num">
-                      <OvrBadge value={season.overall} />
-                    </td>
-                    <td>
-                      <NationTag
-                        code={player.primaryNationality}
-                        label="name"
-                      />
-                    </td>
+      {tab === "goldenGlove" && (
+        <Panel title="Yearly Golden Glove">
+          {goldenGlove.length === 0 ? (
+            <Empty>No awards have been recorded yet.</Empty>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="tbl">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Player</th>
+                    <th>Pos</th>
+                    <th className="num">OVR</th>
+                    <th>Nation</th>
+                    <th className="num">Clean Sheets</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Panel>
+                </thead>
+                <tbody>
+                  {goldenGlove.map(({ year, player, season }) => (
+                    <tr key={year}>
+                      <td className="tabular-nums">{year}-{(year+1)%100}</td>
+                      <td>
+                        <PlayerLink
+                          id={player.id}
+                          name={getPlayerName(player)}
+                        />
+                      </td>
+                      <td><PosBadge position={player.position} /></td>
+                      <td className="num">
+                        <OvrBadge value={season.overall} />
+                      </td>
+                      <td>
+                        <NationTag
+                          code={player.primaryNationality}
+                          label="name"
+                        />
+                      </td>
+                      <td className="num font-bold">
+                        {season.cleanSheets}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Panel>
+      )}
+
+      {tab === "youngTalent" && (
+        <Panel title="Young Talent of the Year">
+          {youngTalent.length === 0 ? (
+            <Empty>No awards have been recorded yet.</Empty>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="tbl">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Player</th>
+                    <th>Pos</th>
+                    <th className="num">OVR</th>
+                    <th>Nation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {youngTalent.map(({ year, player, season }) => (
+                    <tr key={year}>
+                      <td className="tabular-nums">{year}-{(year+1)%100}</td>
+                      <td>
+                        <PlayerLink
+                          id={player.id}
+                          name={getPlayerName(player)}
+                        />
+                      </td>
+                      <td><PosBadge position={player.position} /></td>
+                      <td className="num">
+                        <OvrBadge value={season.overall} />
+                      </td>
+                      <td>
+                        <NationTag
+                          code={player.primaryNationality}
+                          label="name"
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Panel>
+      )}
     </div>
   );
 }

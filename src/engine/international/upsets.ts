@@ -222,7 +222,7 @@ function getTournamentPlacements(
     return [{
       code,
       competition,
-      year: edition.year,
+      year: edition.year + 1,
       expected: expectedPosition,
       actual: actualPosition,
       delta: expectedPosition - actualPosition,

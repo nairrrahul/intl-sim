@@ -1,6 +1,8 @@
+
+import { useState } from "react";
 import { useGameStore } from "../../../store/gameStore";
 import historicalDebutsRaw from "../../../engine/international/data/debuts.json";
-import { NationTag, PageHeader, Panel, Empty } from "../../components/common";
+import { NationTag, PageHeader, Panel, Empty, Tabs } from "../../components/common";
 
 type HistoricalDebuts = Record<string, Record<string, number>>;
 
@@ -13,7 +15,6 @@ interface DebutRow {
 interface CompetitionDefinition {
   id: string;
   title: string;
-  historicalKey?: string;
   historical?: Record<string, number>;
   editions: {
     year: number;
@@ -45,23 +46,14 @@ function buildHistoricalRows(
     }));
 }
 
-/**
- * Finds the nations appearing in a simulated edition for the first time.
- * Historical debut years are used to prevent existing nations from being
- * incorrectly classified as new simulated debutants.
- */
 function buildSimulatedRows(
   editions: CompetitionDefinition["editions"],
   historical: Record<string, number> | undefined
 ): DebutRow[] {
   const ordered = [...editions].sort((a, b) => a.year - b.year);
-
-  const previouslySeen = new Set<string>();
-
-  // Historical debutants have already appeared in this competition.
-  for (const code of Object.keys(historical ?? {})) {
-    previouslySeen.add(code);
-  }
+  const previouslySeen = new Set<string>(
+    Object.keys(historical ?? {})
+  );
 
   const rows: DebutRow[] = [];
 
@@ -70,19 +62,18 @@ function buildSimulatedRows(
       .filter(code => !previouslySeen.has(code))
       .sort();
 
-    // Record every participant, including debutants, before the next edition.
     for (const code of edition.teams) {
       previouslySeen.add(code);
     }
 
     rows.push({
-      year: String(edition.year),
+      // Tournament takes place in the ending calendar year of its season.
+      year: String(edition.year + 1),
       nations: debutants,
       none: debutants.length === 0
     });
   }
 
-  // Merge consecutive editions without debutants into a single row.
   const merged: DebutRow[] = [];
 
   for (const row of rows) {
@@ -157,6 +148,7 @@ function DebutTable(props: {
 }
 
 export default function Debuts() {
+  const [activeCompetition, setActiveCompetition] = useState("worldCup");
   const game = useGameStore(state => state.game);
   useGameStore(state => state.tick);
 
@@ -217,23 +209,32 @@ export default function Debuts() {
     {
       id: "confedCup",
       title: "Confederations Cup",
+      historical: historicalDebuts.CONFED,
       editions: intl.confedCup.editions
     }
   ];
 
+  const selectedCompetition = competitions.find(
+    competition => competition.id === activeCompetition
+  ) ?? competitions[0];
+
   return (
-    <div className="space-y-4">
+    <div>
       <PageHeader
         title="Tournament Debuts"
         subtitle="Nations making their first appearance in each tournament."
       />
 
-      {competitions.map(competition => (
-        <DebutTable
-          key={competition.id}
-          competition={competition}
-        />
-      ))}
+      <Tabs
+        tabs={competitions.map(competition => ({
+          id: competition.id,
+          label: competition.title
+        }))}
+        value={activeCompetition}
+        onChange={setActiveCompetition}
+      />
+
+      <DebutTable competition={selectedCompetition} />
     </div>
   );
 }
