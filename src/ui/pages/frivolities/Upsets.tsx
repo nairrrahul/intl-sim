@@ -15,8 +15,13 @@ import type {
   TournamentUpsetRecord
 } from "../../../engine/international/types";
 import { ordinal } from "../../format";
+import { getCompetitionNameForKind } from "../../competitions";
+import { Link } from "react-router-dom";
+import { getLinkFromKind } from "../../../engine/international/nationViews";
+import { getNationConfederation } from "../../../engine/international/competitions/nationsLeague";
 
 type Tab = "winners" | "placings" | "ranking" | "rating";
+type PlacingsTab = "combined" | "nonWorldCup";
 
 function TournamentTable(props: {
   records: TournamentUpsetRecord[];
@@ -100,6 +105,7 @@ function MatchUpsetTable(props: {
               {ranking ? "Rank Difference" : "Rating Difference"}
             </th>
             <th>Window</th>
+            <th>Competition</th>
           </tr>
         </thead>
         <tbody>
@@ -116,20 +122,25 @@ function MatchUpsetTable(props: {
               <tr key={`${record.year}-${record.windowId}-${record.matchday}-${record.home}-${record.away}-${index}`}>
                 <td><NationLink code={record.winner} /></td>
                 <td className="num tabular-nums">
-                  {ranking ? `#${winnerRank}` : <OvrBadge value={winnerRating} />}
+                  {ranking ? `${winnerRank}` : <OvrBadge value={winnerRating} />}
                 </td>
                 <td className="num tabular-nums font-semibold">
                   {winnerGoals}–{loserGoals}
                 </td>
                 <td><NationLink code={record.loser} /></td>
                 <td className="num tabular-nums">
-                  {ranking ? `#${loserRank}` : <OvrBadge value={loserRating} />}
+                  {ranking ? `${loserRank}` : <OvrBadge value={loserRating} />}
                 </td>
                 <td className="num tabular-nums font-semibold">
                   {ranking ? record.rankingDifference : record.ratingDifference}
                 </td>
                 <td className="whitespace-nowrap">
                   {formatWindowLabel(record.year, record.windowId)}
+                </td>
+                <td className="whitespace-nowrap">
+                  <Link to={getLinkFromKind(record.kind, record.winner, record.worldCupPhase, record.worldCupStage)} className="link"> 
+                    {getFullCompetitionName(getCompetitionNameForKind(record.kind), record.winner)}
+                  </Link>
                 </td>
               </tr>
             );
@@ -140,9 +151,19 @@ function MatchUpsetTable(props: {
   );
 }
 
+function getFullCompetitionName(competitionName: string, nationCode: string) : string {
+  switch(true) {
+    case competitionName.includes("World Cup Qualifiers") || competitionName.includes("Nations League"):
+      return `${getNationConfederation(nationCode)} ${competitionName}`;
+    default: 
+      return competitionName;
+  }
+}
+
 export default function Upsets() {
   const game = useGame();
   const [tab, setTab] = useState<Tab>("winners");
+  const [placingsTab, setPlacingsTab] = useState<PlacingsTab>("combined");
   const history = game.world.international.upsets;
 
   return (
@@ -170,9 +191,32 @@ export default function Upsets() {
       )}
 
       {tab === "placings" && (
-        <Panel title="Most Unexpected Tournament Placings">
-          <TournamentTable records={history.tournamentPlacings} showActual />
-        </Panel>
+        <div>
+          <Tabs
+            tabs={[
+              { id: "combined", label: "Combined" },
+              { id: "nonWorldCup", label: "Non-World Cup" }
+            ]}
+            value={placingsTab}
+            onChange={setPlacingsTab}
+          />
+          <Panel title="Most Unexpected Tournament Placings">
+            {placingsTab === "combined" && (
+              <TournamentTable
+                records={history.tournamentPlacings}
+                showActual
+              />
+            )}
+
+            {placingsTab === "nonWorldCup" && (
+              <TournamentTable
+                records={history.nonWorldCupTournamentPlacings ?? []}
+                showActual
+              />
+            )}
+          </Panel>
+        </div>
+        
       )}
 
       {tab === "ranking" && (

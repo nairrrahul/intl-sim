@@ -18,7 +18,8 @@ export function createUpsetHistory(): UpsetHistory {
     ranking: [],
     rating: [],
     tournamentWinners: [],
-    tournamentPlacings: []
+    tournamentPlacings: [],
+    nonWorldCupTournamentPlacings: []
   };
 }
 
@@ -115,6 +116,7 @@ function createRecord(
     year: window.year,
     windowId: window.windowId,
     matchday,
+    kind: match.kind,
 
     home: match.home,
     away: match.away,
@@ -133,7 +135,10 @@ function createRecord(
     rankingUnderdogRank: Math.max(homeRank, awayRank),
 
     ratingDifference: Math.abs(homeOverall - awayOverall),
-    ratingUnderdogOverall: Math.min(homeOverall, awayOverall)
+    ratingUnderdogOverall: Math.min(homeOverall, awayOverall),
+    
+    worldCupPhase: match.worldCupPhase,
+    worldCupStage: match.worldCupStage
   };
 }
 
@@ -270,12 +275,15 @@ export function updateTournamentUpsetHistory(
     )
     .slice(0, 20);
 
-  history.tournamentPlacings = [...placements]
+  const netPlacements = [...placements]
     .filter(record => record.expectedStage !== record.actualStage)
     .sort((a, b) =>
       Math.abs(b.delta) - Math.abs(a.delta) ||
       a.worldRank - b.worldRank ||
       alphabetical(a, b)
     )
-    .slice(0, 20);
+    
+
+    history.tournamentPlacings = netPlacements.slice(0, 20);
+    history.nonWorldCupTournamentPlacings = netPlacements.filter(record => record.competition !== "World Cup").slice(0, 20);
 }

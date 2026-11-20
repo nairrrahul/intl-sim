@@ -127392,16 +127392,6 @@
                 "position": "RB"
             },
             {
-                "playerid": 11927,
-                "firstName": "Maikel Renan",
-                "lastName": "Catarino Fagundes",
-                "commonName": "Maikel Catarino",
-                "age": 29,
-                "overall": 80,
-                "potential": 80,
-                "position": "RB"
-            },
-            {
                 "playerid": 11928,
                 "firstName": "Jailson Michel",
                 "lastName": "Caeiro Meireles",
@@ -128877,8 +128867,8 @@
                 "lastName": "Barbosa Almeida",
                 "commonName": "Gabigol",
                 "age": 29,
-                "overall": 81,
-                "potential": 81,
+                "overall": 80,
+                "potential": 80,
                 "position": "ST"
             },
             {
@@ -131917,8 +131907,8 @@
                 "lastName": "Rodrigues",
                 "commonName": "Igor Thiago",
                 "age": 24,
-                "overall": 75,
-                "potential": 79,
+                "overall": 79,
+                "potential": 82,
                 "position": "ST"
             },
             {

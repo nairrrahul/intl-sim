@@ -299,6 +299,7 @@ export interface MatchUpsetRecord {
   year: number;
   windowId: string;
   matchday: number;
+  kind: string;
 
   home: string;
   away: string;
@@ -318,6 +319,9 @@ export interface MatchUpsetRecord {
 
   ratingDifference: number;
   ratingUnderdogOverall: number;
+
+  worldCupPhase?: string;
+  worldCupStage?: string;
 }
 
 export interface UpsetHistory {
@@ -325,6 +329,7 @@ export interface UpsetHistory {
   rating: MatchUpsetRecord[];
   tournamentWinners: TournamentUpsetRecord[];
   tournamentPlacings: TournamentUpsetRecord[];
+  nonWorldCupTournamentPlacings: TournamentUpsetRecord[];
 }
 
 export interface TournamentUpsetRecord {

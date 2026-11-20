@@ -172,6 +172,10 @@ function scheduledStage(match: InternationalMatch): string | undefined {
 /** Page of the competition a match belongs to. */
 function competitionLink(match: InternationalMatch, nationCode: string): string | undefined {
   const kind = match.kind;
+  return getLinkFromKind(kind, nationCode, match.worldCupPhase, match.worldCupStage);
+}
+
+export function getLinkFromKind(competitionKind: string, nationCode: string, worldCupPhase?: string, worldCupStage?: string) : string {
   const links: Record<string, string> = {
     goldCupPlayoff: "/gold-cup-playoff",
     goldCupGroup: "/gold-cup", goldCupKnockout: "/gold-cup",
@@ -184,16 +188,15 @@ function competitionLink(match: InternationalMatch, nationCode: string): string 
     euroQualifier: "/euro-qualifiers", euroGroup: "/euro", euroKnockout: "/euro",
     worldCupGroup: "/world-cup", worldCupKnockout: "/world-cup"
   };
-  if (kind === "u20Qualifier") return "/u20-world-cup-qualifiers";
-  if (kind === "nationsLeague") return `/nations-league/${getNationConfederation(nationCode)}`;
-  if (kind === "worldCupQualifier") {
-    return match.worldCupPhase === "ICPO" || match.worldCupStage === "ICPO"
+  if (competitionKind === "u20Qualifier") return "/u20-world-cup-qualifiers";
+  if (competitionKind === "nationsLeague") return `/nations-league/${getNationConfederation(nationCode)}`;
+  if (competitionKind === "worldCupQualifier") {
+    return worldCupPhase === "ICPO" || worldCupStage === "ICPO"
       ? "/world-cup-intercontinental-playoff"
       : `/world-cup-qualifiers/${getNationConfederation(nationCode)}`;
   }
-  return links[kind];
+  return links[competitionKind];
 }
-
 // ---------------------------------------------------------------------------
 // Played matches
 // ---------------------------------------------------------------------------

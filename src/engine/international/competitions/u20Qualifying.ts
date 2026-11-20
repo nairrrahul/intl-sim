@@ -1,5 +1,5 @@
 import { getConfederation } from "../../nations/nations";
-import { shuffledCopy } from "../../shared/random";
+import { randInt, shuffledCopy } from "../../shared/random";
 import type { InternationalMatch, InternationalRound, InternationalState } from "../types";
 import { createMatch } from "./cupCommon";
 import { getCompetitivelyEligibleTeams } from "./eligibility";
@@ -152,13 +152,13 @@ export function getU20QualifyingStandings(group: U20QualifyingGroup): U20Qualify
 // Creating the edition
 // ---------------------------------------------------------------------------
 
-/** Every nation's U20 teams ranked best first: U20 overall, then senior overall, then code (as for the finals). */
+/** Every nation's U20 teams ranked best first: U20 overall, then random choice, then senior overall, then code (as for the finals). */
 function rankedFormedTeams(state: InternationalState, year: number): Record<string, string[]> {
   const eligible = new Set(getCompetitivelyEligibleTeams(Object.keys(state.nations), year));
   const byConfederation: Record<string, string[]> = {};
   Object.values(state.nations)
     .filter(nation => nation.u20.formed && eligible.has(nation.code))
-    .sort((a, b) => b.u20.overall - a.u20.overall || b.overall - a.overall || Math.random() - 0.5 || a.code.localeCompare(b.code))
+    .sort((a, b) => b.u20.overall - a.u20.overall ||  randInt(0,100)/100 - 0.5 || b.overall - a.overall  || a.code.localeCompare(b.code))
     .forEach(nation => (byConfederation[getConfederation(nation.code) ?? ""] ??= []).push(nation.code));
   return byConfederation;
 }
