@@ -10,6 +10,7 @@ import {
 interface SearchFilters {
   name: string;
   nationality: string;
+  secondaryNationality: string;
   position: string;
   overallMin: string;
   overallMax: string;
@@ -22,6 +23,7 @@ interface SearchFilters {
 const EMPTY_FILTERS: SearchFilters = {
   name: "",
   nationality: "",
+  secondaryNationality: "",
   position: "",
   overallMin: "",
   overallMax: "",
@@ -65,8 +67,10 @@ export default function PlayerSearch() {
       const matchesName = !query || fullName.includes(query) || reverseName.includes(query);
       const matchesNationality = !filters.nationality ||
         player.primaryNationality === filters.nationality;
+      const matchesSecondNationality = !filters.secondaryNationality ||
+        player.secondaryNationality === filters.secondaryNationality;
       const matchesPosition = !filters.position || player.position === filters.position;
-      return matchesName && matchesNationality && matchesPosition &&
+      return matchesName && matchesNationality && matchesSecondNationality && matchesPosition &&
         withinRange(player.overall, filters.overallMin, filters.overallMax) &&
         withinRange(player.potential, filters.potentialMin, filters.potentialMax) &&
         withinRange(player.age, filters.ageMin, filters.ageMax);
@@ -138,6 +142,13 @@ export default function PlayerSearch() {
             Nationality
             <select className="input mt-1 w-full" value={filters.nationality} onChange={event => updateFilter("nationality", event.target.value)}>
               <option value="">All nationalities</option>
+              {nationalityOptions.map(code => <option key={code} value={code}>{getNationName(code)}</option>)}
+            </select>
+          </label>
+          <label className="text-xs text-navy-300">
+            Second Nationality
+            <select className="input mt-1 w-full" value={filters.secondaryNationality} onChange={event => updateFilter("secondaryNationality", event.target.value)}>
+              <option value="">All Secondary Nationalities</option>
               {nationalityOptions.map(code => <option key={code} value={code}>{getNationName(code)}</option>)}
             </select>
           </label>
