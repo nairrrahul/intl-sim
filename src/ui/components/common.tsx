@@ -71,7 +71,7 @@ export function PlayerLink(props: { id: string; name: string; className?: string
   );
 }
 
-export function OvrBadge(props: { value: number; size?: "sm" | "lg" | "xl" }) {
+export function OvrBadge(props: { value: number; size?: "sm" | "lg" | "xl" | "m"}) {
   const v = props.value;
   // <=50 red, 51-60 orange, 61-70 yellow, 71-80 light green, 81-90 green, 91+ dark green
   const tone =
@@ -82,8 +82,9 @@ export function OvrBadge(props: { value: number; size?: "sm" | "lg" | "xl" }) {
     : v >= 51 ? "bg-orange-500 text-white"
     : "bg-red-600 text-white";
   const size =
-    props.size === "xl" ? "w-20 h-20 text-4xl rounded-xl"
+    props.size === "xl" ? "w-16 h-16 text-4xl rounded-xl"
     : props.size === "lg" ? "w-12 h-12 text-xl rounded-lg"
+    : props.size === "m" ? "w-9 h-9 text-md rounded-md"
     : "w-8 h-6 text-xs rounded";
   return (
     <span className={`inline-flex items-center justify-center font-bold tabular-nums ${tone} ${size}`}>

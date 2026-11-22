@@ -23,6 +23,7 @@ import {
   getFullCompetitionName
 } from "../../competitions";
 import NationKits from "./NationKits";
+import { getFormationRequirements } from "../../../engine/players/formations";
 
 type Props = {
   code: string;
@@ -252,50 +253,129 @@ export default function OverviewTab({ code }: Props) {
     )
     .slice(0, 6);
 
+  const playersById = new Map(game.world.players.map(player => [player.id, player]));
+  const startingXI = nation.startingXI
+    .map(id => id ? playersById.get(id) ?? null : null);
+
+  const formationPositions = getFormationRequirements(nation.formation);
+
+  const getPositionOverall = (positions: string[]) => {
+    const players = startingXI.filter(
+      (player, index) =>
+        player !== null && positions.includes(formationPositions[index])
+    );
+
+    if (players.length === 0) return "—";
+
+    return Math.round(
+      players.reduce((total, player) => total + (player ? player.overall : 0), 0) / players.length
+    );
+  };
+
+  const attackOverall = getPositionOverall(["ST", "RW", "LW"]);
+  const midfieldOverall = getPositionOverall(["CDM", "CM", "CAM", "RM", "LM"]);
+  const defenseOverall = getPositionOverall(["RB", "CB", "LB"]);
+
   return (
     <div className="space-y-5">
 
       {/* ROW 1: NATIONAL STATISTICS */}
-      <Panel>
-        <div className="grid grid-cols-2 md:grid-cols-5 divide-x divide-y md:divide-y-0 divide-navy-700">
-
-          <div className="p-5">
-            <Stat
-              label="World ranking"
-              value={`#${rank}`}
-              sub={`of ${points.length}`}
-            />
-          </div>
-
-          <div className="p-5">
-            <Stat
-              label="Ranking points"
-              value={nation.points.toFixed(2)}
-            />
-          </div>
-
-          <div className="p-5">
-            <Stat
-              label="Squad overall"
-              value={<OvrBadge value={nation.overall} size="lg" />}
-              sub={`${nation.formation} · #${overallRank} by overall`}
-            />
-          </div>
-
-          <div className="p-5">
-            <Stat
-              label="Confederation"
-              value={confederation}
-              sub={`${nationPlayers.length} players in the game`}
-            />
-          </div>
-
-          <div className="p-5">
-            <YouthRatingStat code={code} />
-          </div>
-
+<Panel>
+  <div className="grid grid-cols-2 md:grid-cols-[1fr_1fr_2fr_1fr_1fr]">
+    {/* World Ranking */}
+      <div className="p-4 md:px-5">
+        <div className="text-[11px] font-semibold uppercase tracking-widest text-navy-300">
+          World Ranking
         </div>
-      </Panel>
+        <div className="mt-1.5 text-2xl font-bold text-white">
+          #{rank}
+          <span className="ml-1.5 text-xs font-medium text-navy-300">
+            of 211
+          </span>
+        </div>
+      </div>
+
+      {/* Ranking Points */}
+      <div className="border-l border-navy-700 p-4 md:px-5">
+        <div className="text-[11px] font-semibold uppercase tracking-widest text-navy-300">
+          Ranking Points
+        </div>
+        <div className="mt-1.5 text-2xl font-bold text-white">
+          {nation.points.toFixed(2)}
+        </div>
+      </div>
+
+      {/* Squad Overall + positional breakdown */}
+      <div className="col-span-2 flex items-center gap-3 border-t border-navy-700 p-4 md:col-span-1 md:border-l md:border-t-0 md:px-5">
+        <OvrBadge value={nation.overall} size="lg" />
+
+        <div className="min-w-0">
+          <div className="text-[11px] font-semibold uppercase tracking-widest text-navy-300">
+            Squad Overall
+          </div>
+          <div className="mt-1 text-lg font-bold text-white">
+            {nation.formation}
+          </div>
+          <div className="mt-0.5 text-xs text-navy-300">
+            #{overallRank} by overall
+          </div>
+        </div>
+
+        <div className="m-auto flex shrink-0 gap-2.5 border-l border-navy-700 pl-3">
+          {[
+            { label: "ATK", value: attackOverall },
+            { label: "MID", value: midfieldOverall },
+            { label: "DEF", value: defenseOverall },
+          ].map(item => (
+            <div key={item.label}>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-navy-300">
+                {item.label}
+              </div>
+              <div className="mt-1.5">
+                {typeof item.value === "number" ? (
+                  <OvrBadge value={item.value} size="m" />
+                ) : (
+                  <span className="flex h-8 w-8 items-center justify-center rounded-md bg-navy-700 text-sm font-bold text-navy-300">
+                    —
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Confederation */}
+      <div className="border-t border-navy-700 p-4 md:border-l md:border-t-0 md:px-5">
+        <div className="text-[11px] font-semibold uppercase tracking-widest text-navy-300">
+          Confederation
+        </div>
+        <div className="mt-1.5 text-2xl font-bold text-white">
+          {confederation}
+        </div>
+        <div className="mt-1 text-xs text-navy-300">
+          {nationPlayers.length} players in the game
+        </div>
+      </div>
+
+      {/* Youth Rating */}
+      <div className="border-l border-t border-navy-700 p-4 md:border-t-0 md:px-5">
+        <div className="text-[11px] font-semibold uppercase tracking-widest text-navy-300">
+          Youth Rating
+        </div>
+        <div className="mt-1.5 text-2xl font-bold text-white">
+          <YouthRatingInput code={code} />
+          <span className="ml-1 text-xs font-medium text-navy-300">/200</span>
+        </div>
+        <div className="mt-1 text-xs text-navy-300">
+          Drives Newgen Quality
+        </div>
+      </div>
+
+    </div>
+  </Panel>
+
+
 
       {/* ROW 2: KITS AND NEXT MATCH */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">

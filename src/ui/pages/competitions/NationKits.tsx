@@ -49,7 +49,7 @@ function JerseyPreview({ config }: { config: JerseyConfig }) {
   if (!imageUrl) return null;
 
   return (
-    <div className="relative w-[120px] aspect-[55.4532/69.7485] rounded-lg overflow-hidden border border-navy-700">
+    <div className="relative w-[125px] aspect-[55.4532/69.7485] rounded-lg overflow-hidden border border-navy-700">
       <img
         src={imageUrl}
         alt="Jersey"
@@ -99,7 +99,7 @@ export default function NationKits({ code }: { code: string }) {
   ];
 
   return (
-    <div className="flex flex-wrap justify-center items-center gap-5 p-5">
+    <div className="flex flex-nowrap justify-center items-center overflow-x-auto min-w-0 gap-6 p-8">
       {availableKits.map(({ label, config }) => (
         <div key={label} className="flex flex-col items-center gap-2">
           <JerseyPreview config={config} />
