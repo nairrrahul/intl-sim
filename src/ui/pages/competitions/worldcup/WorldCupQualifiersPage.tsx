@@ -326,7 +326,7 @@ export function WorldCupPage() {
       resolveEngineEdition={edition => tournamentsById.get(edition.id) as unknown as CupEditionLike}
       editions={editions}
       groupHighlights={{ 1: ROW_HIGHLIGHT.GREEN, 2: ROW_HIGHLIGHT.GREEN, 3: ROW_HIGHLIGHT.YELLOW }}
-      nthPlaceAdvancement={{ place: 3, advancingCount: 8, tieBreakers: ["goalsFor", "goalDifference"] }}
+      nthPlaceAdvancement={{ place: 3, advancingCount: 8, tieBreakers: ["goalDifference", "goalsFor"] }}
       groupQualifiedByConfederation
     />
   );
