@@ -1,6 +1,6 @@
 const ENG_AFR = 
 {
-"NGA": 0.23,
+"NGA": 0.20,
 "GHA": 0.15,
 "COD": 0.09,
 "SOM": 0.07,
@@ -12,17 +12,17 @@ const ENG_AFR =
 "KEN": 0.03,
 "LBR": 0.02,
 "ETH": 0.02,
-"ZIM": 0.02,
+"ZIM": 0.04,
 "UGA": 0.02,
 "SLE": 0.02,
-"GAM": 0.02,
+"GAM": 0.03,
 "ANG": 0.01,
 "MLI": 0.01,
 "LES": 0.01,
 "MRI": 0.01,
 "ERI": 0.01,
 "TAN": 0.01,
-"ZAM": 0.01,
+"ZAM": 0.02,
 "BFA": 0.01,
 "BOT": 0.01,
 "BDI": 0.01,
@@ -33,14 +33,14 @@ const ENG_AFR =
 
 const ENG_ASI = 
 {
-"IND": 0.25,
-"PAK": 0.20,
+"IND": 0.23,
+"PAK": 0.19,
 "BAN": 0.15,
-"SRI": 0.05,
-"NEP": 0.05,
-"AFG": 0.04,
-"IRQ": 0.04,
-"IRN": 0.04,
+"SRI": 0.06,
+"NEP": 0.06,
+"AFG": 0.06,
+"IRQ": 0.06,
+"IRN": 0.03,
 "CHN": 0.03,
 "PHI": 0.03,
 "JPN": 0.02,
@@ -149,12 +149,12 @@ const FRA_AFR =
 
 const FRA_ASI = 
 {
-"VIE": 0.20,
+"VIE": 0.18,
 "CAM": 0.12,
 "TUR": 0.12,
-"CHN": 0.12,
+"CHN": 0.11,
 "IND": 0.08,
-"LBN": 0.06,
+"LBN": 0.09,
 "ARM": 0.05,
 "SYR": 0.05,
 "IRN": 0.03,
@@ -250,10 +250,10 @@ const NED_AFR =
 {
 "MAR": 0.21,
 "ALG": 0.10,
-"TUN": 0.07,
+"TUN": 0.06,
 "EGY": 0.05,
-"NGA": 0.12,
-"GHA": 0.10,
+"NGA": 0.10,
+"GHA": 0.09,
 "CMR": 0.08,
 "COD": 0.07,
 "NAM": 0.05,
@@ -264,7 +264,8 @@ const NED_AFR =
 "SUD": 0.01,
 "RSA": 0.01,
 "SEN": 0.01,
-"ANG": 0.01
+"ANG": 0.01,
+"CPV": 0.04
 }
 
 const BEL_AFR = 
@@ -307,11 +308,11 @@ const ESP_AFR =
 
 const GER_ASI =
 {
-  "IRN": 0.21,
-  "IRQ": 0.15,
-  "VIE": 0.15,
+  "IRN": 0.20,
+  "IRQ": 0.12,
+  "VIE": 0.12,
   "AFG": 0.10,
-  "SYR": 0.05,
+  "SYR": 0.08,
   "CHN": 0.05,
   "THA": 0.05,
   "KOR": 0.05,
@@ -320,8 +321,8 @@ const GER_ASI =
   "UZB": 0.02,
   "KGZ": 0.02,
   "LAO": 0.02,
-  "JPN": 0.03,
-  "SRI": 0.04
+  "KAZ": 0.02,
+  "SRI": 0.07
 }
 
 const NED_NAM =
