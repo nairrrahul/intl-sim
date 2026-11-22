@@ -298,10 +298,10 @@ export default function OverviewTab({ code }: Props) {
       </Panel>
 
       {/* ROW 2: KITS AND NEXT MATCH */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
 
         <div className="lg:col-span-5">
-          <Panel title="Kits">
+          <Panel title="Kits" className="h-full">
             <NationKits code={code} />
           </Panel>
         </div>

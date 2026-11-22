@@ -49,7 +49,7 @@ function JerseyPreview({ config }: { config: JerseyConfig }) {
   if (!imageUrl) return null;
 
   return (
-    <div className="relative w-[140px] aspect-[55.4532/69.7485] rounded-lg overflow-hidden border border-navy-700">
+    <div className="relative w-[120px] aspect-[55.4532/69.7485] rounded-lg overflow-hidden border border-navy-700">
       <img
         src={imageUrl}
         alt="Jersey"
