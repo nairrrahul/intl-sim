@@ -133,7 +133,7 @@ function CupMatchCardBody(props: { match: CupMatchSnap; highlightID?: number; sh
   );
 }
 
-const THIRD_PLACE_ID = "3P";
+const THIRD_PLACE_ID = "Third Place";
 
 /** Full single-elimination tree: one column per round, matches vertically centred. */
 export function CupBracketTree(props: { cup: CupSnap; highlightID?: number; showFlag?: boolean }) {

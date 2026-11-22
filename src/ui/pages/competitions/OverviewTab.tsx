@@ -80,6 +80,18 @@ function UpcomingMatch({ code }: { code: string }) {
     code
   );
 
+  const stage = match.stage;
+
+  const stageSeparator = stage?.indexOf("·") ?? -1;
+
+  const stageTitle = stageSeparator >= 0
+    ? stage!.slice(0, stageSeparator).trim()
+    : stage;
+
+  const stageDetail = stageSeparator >= 0
+    ? stage!.slice(stageSeparator + 1).trim()
+    : null;
+
   return (
     <div className="flex items-center justify-around gap-4 px-5 py-8 min-h-[250px]">
 
@@ -97,9 +109,25 @@ function UpcomingMatch({ code }: { code: string }) {
           V
         </span>
 
-        <span className="text-sm font-semibold mt-2">
-          {competitionName}
-        </span>
+        <div className="flex flex-col items-center text-center mt-2">
+          {stage ? (
+            <>
+              <span className="text-sm font-semibold">
+                {stageTitle}
+              </span>
+
+              {stageDetail && (
+                <span className="text-xs text-navy-300">
+                  {stageDetail}
+                </span>
+              )}
+            </>
+          ) : (
+            <span className="text-sm font-semibold">
+              {competitionName}
+            </span>
+          )}
+        </div>
 
         <span className="text-xs uppercase tracking-wider text-navy-300">
           {match.windowLabel}

@@ -245,7 +245,7 @@ function getSemifinalLosers(edition: InternationalCompetitionEdition): string[] 
 
 /** The third-place match of an edition, if it had one: who won it and who finished fourth. */
 function getThirdAndFourth(edition: InternationalCompetitionEdition): { third: string; fourth: string } | null {
-  const match = edition.knockout?.at(-1)?.matches.find(candidate => candidate.id === "3P");
+  const match = edition.knockout?.at(-1)?.matches.find(candidate => candidate.id === "Third Place");
   if (!match?.winner) return null;
   return { third: match.winner, fourth: match.winner === match.home ? match.away : match.home };
 }

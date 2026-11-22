@@ -9,7 +9,7 @@ export type KnockoutFixtureCup = "goldCup" | "copaAmerica" | "confedCup";
 /** Cups that play a third-place match alongside the final. */
 const THIRD_PLACE_CUPS: readonly InternationalCup[] = ["goldCup", "confedCup"];
 
-export const THIRD_PLACE_MATCH_ID = "3P";
+export const THIRD_PLACE_MATCH_ID = "Third Place";
 
 /** The losing sides of a played knockout round, in match order. */
 export function getKnockoutLosers(matches: { home: string; away: string; winner: string | null }[]): string[] {

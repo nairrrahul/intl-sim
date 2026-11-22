@@ -146,7 +146,7 @@ export function predictRanking(competition: CompetitionKey, source: CupEditionLi
   const finalRound = rounds.at(-1);
   if (finalRound) {
     const final = finalRound.matches.find(match => match.id === "F") ?? finalRound.matches[0];
-    const thirdPlaceMatch = finalRound.matches.find(match => match.id === "3P");
+    const thirdPlaceMatch = finalRound.matches.find(match => match.id === "Third Place");
     addTier("Winner", [final.winner as string]);
     addTier("Runner-Up", losersOf({ label: "", matches: [final] }));
     if (thirdPlaceMatch) {
@@ -205,7 +205,7 @@ export function rankActualResults(source: CupEditionLike, strength: TeamStrength
     if (!final) throw new Error("Completed tournament has no final match.");
     addTier("Winner", [winnerOf(final)], knockoutOrder);
     addTier("Runner-Up", losersOf({ label: "", matches: [final] }), knockoutOrder);
-    const thirdPlaceMatch = finalRound.matches.find(match => match.id === "3P");
+    const thirdPlaceMatch = finalRound.matches.find(match => match.id === "Third Place");
     if (thirdPlaceMatch) {
       addTier("Third Place", [winnerOf(thirdPlaceMatch)], knockoutOrder);
       addTier("Fourth Place", losersOf({ label: "", matches: [thirdPlaceMatch] }), knockoutOrder);
