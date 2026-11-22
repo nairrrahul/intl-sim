@@ -52,7 +52,7 @@ export interface WorldCupTournament {
   seedRanks: Record<string, number>;
   groups: InternationalCompetitionGroup[];
   knockout: {
-    label: "Round of 32" | "Round of 16" | "Quarter-finals" | "Semi-finals" | "Final";
+    label: "Round of 32" | "Round of 16" | "Quarter-Finals" | "Semi-Finals" | "Final";
     matches: { id: string; home: string; away: string; fixture: InternationalMatch; winner: string | null }[];
   }[] | null;
   completed: boolean;

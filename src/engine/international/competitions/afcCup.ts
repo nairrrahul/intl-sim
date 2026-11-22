@@ -414,7 +414,7 @@ export function advanceAfcCupKnockoutRound(
     edition.winner = final.winner;
     edition.runnerUp = final.winner === final.home ? final.away : final.home;
     edition.completed = true;
-    const semifinals = edition.knockout?.find(item => item.label === "Semi-finals");
+    const semifinals = edition.knockout?.find(item => item.label === "Semi-Finals");
     edition.semifinalists = semifinals?.matches.flatMap(match =>
       match.winner ? [match.winner === match.home ? match.away : match.home] : []
     ) ?? [];
@@ -422,11 +422,11 @@ export function advanceAfcCupKnockoutRound(
   }
   const pairings = pairKnockoutWinners(round.matches.map(match => match.winner as string));
   const nextLabel: InternationalCompetitionKnockoutRound["label"] = pairings.length === 4
-    ? "Quarter-finals"
-    : pairings.length === 2 ? "Semi-finals" : "Final";
+    ? "Quarter-Finals"
+    : pairings.length === 2 ? "Semi-Finals" : "Final";
   const matches = pairings.map((pair, index) =>
     makeKnockoutMatch(edition,
-      `${nextLabel === "Quarter-finals" ? "QF" : nextLabel === "Semi-finals" ? "SF" : "F"}${nextLabel === "Final" ? "" : `-${index + 1}`}`,
+      `${nextLabel === "Quarter-Finals" ? "QF" : nextLabel === "Semi-Finals" ? "SF" : "F"}${nextLabel === "Final" ? "" : `-${index + 1}`}`,
       pair.home,
       pair.away
     )

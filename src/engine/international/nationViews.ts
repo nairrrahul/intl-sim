@@ -49,9 +49,9 @@ function copyFixture(original: InternationalMatch, overrides: Partial<Internatio
 // ---------------------------------------------------------------------------
 
 const KNOCKOUT_ROUND_NAMES: [string, string][] = [
-  ["R32", "Round of 32"], ["R16", "Round of 16"], ["QF", "Quarter-finals"], ["SF", "Semi-finals"], ["3P", "Third place"]
+  ["R32", "Round of 32"], ["R16", "Round of 16"], ["QF", "Quarter-Finals"], ["SF", "Semi-Finals"], ["3P", "Third Place"]
 ];
-const SHORT_KNOCKOUT_ROUND_NAMES: [string, string][] = [["QF", "QF"], ["SF", "SF"], ["3P", "Third place"]];
+const SHORT_KNOCKOUT_ROUND_NAMES: [string, string][] = [["QF", "QF"], ["SF", "SF"], ["3P", "Third Place"]];
 
 /** Round name from a knockout match ID such as "QF2" or "F". */
 function knockoutRoundName(matchId: string | undefined, short = false): string {

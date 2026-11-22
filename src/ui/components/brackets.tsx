@@ -160,7 +160,7 @@ export function CupBracketTree(props: { cup: CupSnap; highlightID?: number; show
                     <div className="translate-y-1/2">{mainMatches.map(card)}</div>
                   </div>
                   <div className="flex-1 pt-10">
-                    <div className="text-center text-[11px] font-semibold uppercase tracking-wider text-navy-300 mb-1">Third place</div>
+                    <div className="text-center text-[11px] font-semibold uppercase tracking-wider text-navy-300 mb-1">Third Place</div>
                     {card(thirdPlace)}
                   </div>
                 </div>

@@ -76,9 +76,9 @@ function bracketSnapshot(phase: WorldCupPhase, pathIndex: number): CupSnap {
   const path = phase.paths[pathIndex];
   const roundLabels: Record<number, string[]> = {
     1: ["Final"],
-    2: ["Semi-finals", "Final"],
-    3: ["Quarter-finals", "Semi-finals", "Final"],
-    4: ["Round of 16", "Quarter-finals", "Semi-finals", "Final"]
+    2: ["Semi-Finals", "Final"],
+    3: ["Quarter-Finals", "Semi-Finals", "Final"],
+    4: ["Round of 16", "Quarter-Finals", "Semi-Finals", "Final"]
   };
   const labels = roundLabels[path.bracket.rounds.length];
   return {

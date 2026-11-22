@@ -235,7 +235,7 @@ function toCupSnap(edition: InternationalCompetitionEdition): CupSnap {
 }
 
 function getSemifinalLosers(edition: InternationalCompetitionEdition): string[] {
-  const semiFinals = edition.knockout?.find(round => round.label === "Semi-finals");
+  const semiFinals = edition.knockout?.find(round => round.label === "Semi-Finals");
   if (!semiFinals) return edition.semifinalists;
   return semiFinals.matches.flatMap(match => {
     if (!match.winner) return [];
@@ -268,7 +268,7 @@ function HistoryTable(props: {
           <thead>
             <tr>
               <th>Year</th><th>Hosts</th><th>Winner</th><th>Runner-up</th>
-              {hasThirdPlace ? <><th>Third place</th><th>Fourth place</th></> : <th>Semi-finalists</th>}
+              {hasThirdPlace ? <><th>Third Place</th><th>Fourth place</th></> : <th>Semi-finalists</th>}
               <th>Golden boot</th><th></th>
             </tr>
           </thead>

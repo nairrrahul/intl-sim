@@ -33,7 +33,7 @@ export function createCopaAmericaEdition(
   if (!previousGoldCup) {
     throw new Error("A completed Gold Cup edition is required for Copa América qualification.");
   }
-  const semiFinals = previousGoldCup.knockout?.find(round => round.label === "Semi-finals");
+  const semiFinals = previousGoldCup.knockout?.find(round => round.label === "Semi-Finals");
   const goldCupSemiFinalists = [...new Set(semiFinals?.matches.flatMap(match => [match.home, match.away]) ?? [])];
   if (goldCupSemiFinalists.length !== 4) {
     throw new Error(`Gold Cup edition "${previousGoldCup.id}" does not have four semi-finalists.`);

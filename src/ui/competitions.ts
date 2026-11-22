@@ -1,4 +1,4 @@
-import { getNationsLeagueConfederations } from "../engine/international/competitions/nationsLeague";
+import { getNationConfederation, getNationsLeagueConfederations } from "../engine/international/competitions/nationsLeague";
 
 /** A page in the sidebar's international-competitions group. */
 export interface CompetitionLink {
@@ -126,4 +126,18 @@ const COMPETITION_NAME_BY_KIND: Record<string, string> = {
 export function getCompetitionNameForKind(kind: string): string {
   if (kind === "friendly") return "Friendly";
   return COMPETITION_NAME_BY_KIND[kind] ?? kind;
+}
+
+export function getFullCompetitionName(
+  competitionName: string,
+  nationCode: string
+): string {
+  switch (true) {
+    case competitionName.includes("World Cup Qualifiers") ||
+      competitionName.includes("Nations League"):
+      return `${getNationConfederation(nationCode)} ${competitionName}`;
+
+    default:
+      return competitionName;
+  }
 }

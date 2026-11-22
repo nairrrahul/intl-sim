@@ -151,8 +151,8 @@ export function advanceConfedCupRound(edition: ConfedCupEdition, roundIndex: num
       makeKnockoutMatch(edition, "SF1", placed.A[0], placed.B[1], "confedCup"),
       makeKnockoutMatch(edition, "SF2", placed.B[0], placed.A[1], "confedCup")
     ];
-    edition.knockout = [{ label: "Semi-finals", matches: semiFinals }];
-    return roundOf("Semi-finals", semiFinals);
+    edition.knockout = [{ label: "Semi-Finals", matches: semiFinals }];
+    return roundOf("Semi-Finals", semiFinals);
   }
 
   const round = edition.knockout?.[roundIndex];

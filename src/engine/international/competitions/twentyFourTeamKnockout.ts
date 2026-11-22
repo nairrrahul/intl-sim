@@ -64,8 +64,8 @@ export function startTwentyFourTeamRoundOf16(
 }
 
 const NEXT_ROUND: Record<number, { label: InternationalCompetitionKnockoutRound["label"]; idPrefix: string }> = {
-  4: { label: "Quarter-finals", idPrefix: "QF" },
-  2: { label: "Semi-finals", idPrefix: "SF" },
+  4: { label: "Quarter-Finals", idPrefix: "QF" },
+  2: { label: "Semi-Finals", idPrefix: "SF" },
   1: { label: "Final", idPrefix: "F" }
 };
 
@@ -85,7 +85,7 @@ export function advanceTwentyFourTeamKnockout(
     edition.runnerUp = final.winner === final.home ? final.away : final.home;
     edition.thirdPlace = round.matches.find(match => match.id === THIRD_PLACE_MATCH_ID)?.winner ?? null;
     edition.completed = true;
-    const semifinals = edition.knockout?.find(item => item.label === "Semi-finals");
+    const semifinals = edition.knockout?.find(item => item.label === "Semi-Finals");
     edition.semifinalists = semifinals?.matches.flatMap(match =>
       match.winner ? [match.winner === match.home ? match.away : match.home] : []
     ) ?? [];

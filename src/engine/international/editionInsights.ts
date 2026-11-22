@@ -92,8 +92,8 @@ function advance(competition: CompetitionKey, edition: CupEditionLike): { afterG
 const TIER_LABELS: Record<string, string> = {
   "Round of 32": "Round of 32",
   "Round of 16": "Round of 16",
-  "Quarter-finals": "Quarter-Finalists",
-  "Semi-finals": "Semi-Finalists"
+  "Quarter-Finals": "Quarter-Finalists",
+  "Semi-Finals": "Semi-Finalists"
 };
 
 /**

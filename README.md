@@ -34,8 +34,8 @@ previous round finishes and join their lane on the next free matchday:
 MD1  Friendlies · Set 1  | Copa América · Group MD1
 MD2  Friendlies · Set 2  | Copa América · Group MD2
 MD3                      | Copa América · Group MD3
-MD4                      | Copa América · Quarter-finals
-MD5                      | Copa América · Semi-finals
+MD4                      | Copa América · Quarter-Finals
+MD5                      | Copa América · Semi-Finals
 MD6                      | Copa América · Final
 ```
 

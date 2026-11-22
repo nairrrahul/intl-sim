@@ -302,8 +302,8 @@ export function startOfcCupSemiFinals(edition: InternationalCompetitionEdition):
     makeKnockoutMatch(edition, "SF-1", groupA[0], groupB[1]),
     makeKnockoutMatch(edition, "SF-2", groupB[0], groupA[1])
   ];
-  edition.knockout = [{ label: "Semi-finals", matches }];
-  return { kind: "ofcCup", label: "OFC Cup · Semi-finals", leftOut: null, matches: matches.map(match => match.fixture) };
+  edition.knockout = [{ label: "Semi-Finals", matches }];
+  return { kind: "ofcCup", label: "OFC Cup · Semi-Finals", leftOut: null, matches: matches.map(match => match.fixture) };
 }
 
 export function advanceOfcCupKnockoutRound(
@@ -318,7 +318,7 @@ export function advanceOfcCupKnockoutRound(
     edition.runnerUp = final.winner === final.home ? final.away : final.home;
     edition.thirdPlace = round.matches.find(match => match.id === THIRD_PLACE_MATCH_ID)?.winner ?? null;
     edition.completed = true;
-    const semifinals = edition.knockout?.find(item => item.label === "Semi-finals");
+    const semifinals = edition.knockout?.find(item => item.label === "Semi-Finals");
     edition.semifinalists = semifinals?.matches.flatMap(match =>
       match.winner ? [match.winner === match.home ? match.away : match.home] : []
     ) ?? [];

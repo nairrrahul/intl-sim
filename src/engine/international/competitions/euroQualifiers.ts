@@ -352,7 +352,7 @@ export function getEuroPlayoffRounds(
   if (matches.length === 0) throw new Error(`EURO playoff "${edition.id}" has no fixtures for its next round.`);
   return [{
     kind: "euroQualifier",
-    label: `EURO Qualifying Play-offs · ${edition.playoffRoundsPlayed === 0 ? "Semi-finals" : "Finals"}`,
+    label: `EURO Qualifying Play-offs · ${edition.playoffRoundsPlayed === 0 ? "Semi-Finals" : "Finals"}`,
     leftOut: null,
     euroQualifierId: edition.id,
     euroStage: "playoff",

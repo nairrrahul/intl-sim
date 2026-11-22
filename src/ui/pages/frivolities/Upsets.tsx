@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { formatWindowLabel } from "../../../engine/international/calendar/windows";
 import { useGame } from "../../../store/gameStore";
@@ -15,10 +14,9 @@ import type {
   TournamentUpsetRecord
 } from "../../../engine/international/types";
 import { ordinal } from "../../format";
-import { getCompetitionNameForKind } from "../../competitions";
+import { getCompetitionNameForKind, getFullCompetitionName } from "../../competitions";
 import { Link } from "react-router-dom";
 import { getLinkFromKind } from "../../../engine/international/nationViews";
-import { getNationConfederation } from "../../../engine/international/competitions/nationsLeague";
 
 type Tab = "winners" | "placings" | "ranking" | "rating";
 type PlacingsTab = "combined" | "nonWorldCup";
@@ -149,15 +147,6 @@ function MatchUpsetTable(props: {
       </table>
     </div>
   );
-}
-
-function getFullCompetitionName(competitionName: string, nationCode: string) : string {
-  switch(true) {
-    case competitionName.includes("World Cup Qualifiers") || competitionName.includes("Nations League"):
-      return `${getNationConfederation(nationCode)} ${competitionName}`;
-    default: 
-      return competitionName;
-  }
 }
 
 export default function Upsets() {

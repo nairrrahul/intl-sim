@@ -48,7 +48,7 @@ export interface InternationalCompetitionKnockoutMatch {
 }
 
 export interface InternationalCompetitionKnockoutRound {
-  label: "Round of 32" | "Round of 16" | "Quarter-finals" | "Semi-finals" | "Final";
+  label: "Round of 32" | "Round of 16" | "Quarter-Finals" | "Semi-Finals" | "Final";
   matches: InternationalCompetitionKnockoutMatch[];
 }
 
@@ -279,8 +279,8 @@ export function advanceInternationalCupRound(
     const matches = quarterFinals.map(([group1, place1, group2, place2], index) =>
       makeKnockoutMatch(edition, `QF${index + 1}`, topTwo[group1][place1], topTwo[group2][place2], competition)
     );
-    edition.knockout = [{ label: "Quarter-finals", matches }];
-    return { kind: competition, label: `${competitionLabel} · Quarter-finals`, leftOut: null, matches: matches.map(match => match.fixture) };
+    edition.knockout = [{ label: "Quarter-Finals", matches }];
+    return { kind: competition, label: `${competitionLabel} · Quarter-Finals`, leftOut: null, matches: matches.map(match => match.fixture) };
   }
 
   const knockout = edition.knockout;
@@ -292,7 +292,7 @@ export function advanceInternationalCupRound(
       makeKnockoutMatch(edition, roundIndex === 0 ? `SF${index + 1}` : "F",
         winners[index * 2], winners[index * 2 + 1], competition)
     );
-    const label = roundIndex === 0 ? "Semi-finals" : "Final";
+    const label = roundIndex === 0 ? "Semi-Finals" : "Final";
     if (roundIndex === 1 && THIRD_PLACE_CUPS.includes(competition)) {
       const [first, second] = getKnockoutLosers(round.matches);
       nextMatches.push(makeKnockoutMatch(edition, THIRD_PLACE_MATCH_ID, first, second, competition));

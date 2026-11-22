@@ -72,7 +72,7 @@ function Playoffs(props: {
     const bracket: CupSnap = {
       rounds: path.bracket.rounds.map((round, roundIndex) => ({
         round: roundIndex + 1,
-        label: roundIndex === 0 ? "Semi-finals" : "Final",
+        label: roundIndex === 0 ? "Semi-Finals" : "Final",
         matchday: roundIndex + 1,
         matches: round.map((bracketMatch, matchIndex) => {
           const fixture = matches.find(match =>

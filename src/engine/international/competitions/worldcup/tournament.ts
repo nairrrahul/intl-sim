@@ -214,25 +214,25 @@ export function advanceWorldCupKnockout(tournament: WorldCupTournament, roundInd
     tournament.winner = final.winner;
     tournament.runnerUp = final.winner === final.home ? final.away : final.home;
     tournament.thirdPlace = round.matches.find(match => match.id === THIRD_PLACE_MATCH_ID)?.winner ?? null;
-    tournament.semifinalists = tournament.knockout?.find(item => item.label === "Semi-finals")?.matches
+    tournament.semifinalists = tournament.knockout?.find(item => item.label === "Semi-Finals")?.matches
       .flatMap(match => match.winner ? [match.winner === match.home ? match.away : match.home] : []) ?? [];
     tournament.completed = true;
     return null;
   }
   const pairings = pairKnockoutWinners(round.matches.map(match => match.winner!));
-  const labels: ("Round of 16" | "Quarter-finals" | "Semi-finals" | "Final")[] = [
-    "Round of 16", "Quarter-finals", "Semi-finals", "Final"
+  const labels: ("Round of 16" | "Quarter-Finals" | "Semi-Finals" | "Final")[] = [
+    "Round of 16", "Quarter-Finals", "Semi-Finals", "Final"
   ];
   const label = labels[roundIndex];
   const next = {
     label,
     matches: pairings.map((pair, index) => ({
-      id: `${label === "Round of 16" ? "R16" : label === "Quarter-finals" ? "QF" : label === "Semi-finals" ? "SF" : "F"}${label === "Final" ? "" : `-${index + 1}`}`,
+      id: `${label === "Round of 16" ? "R16" : label === "Quarter-Finals" ? "QF" : label === "Semi-Finals" ? "SF" : "F"}${label === "Final" ? "" : `-${index + 1}`}`,
       home: pair.home,
       away: pair.away,
       fixture: fixture(
         tournament,
-        `${label === "Round of 16" ? "R16" : label === "Quarter-finals" ? "QF" : label === "Semi-finals" ? "SF" : "F"}${label === "Final" ? "" : `-${index + 1}`}`,
+        `${label === "Round of 16" ? "R16" : label === "Quarter-Finals" ? "QF" : label === "Semi-Finals" ? "SF" : "F"}${label === "Final" ? "" : `-${index + 1}`}`,
         pair.home,
         pair.away
       ),

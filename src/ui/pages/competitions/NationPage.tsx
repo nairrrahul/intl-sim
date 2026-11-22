@@ -4,7 +4,7 @@ import { YouthRatingInput } from "../../components/YouthRatingInput";
 import { NationMatches } from "./NationMatches";
 import NationU20Team from "./NationU20Team";
 import { getPlayerName } from "../../../engine/players/display";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import { useGame } from "../../../store/gameStore";
 import { getWorldRankings } from "../../../engine/queries";
@@ -15,6 +15,9 @@ import { seasonDisplay } from "../../../engine/config";
 import {
   Empty, OvrBadge, PageHeader, Panel, PlayerLink, PosBadge, ShortlistButton, Stat, Tabs, RetiringMark } from "../../components/common";
 import { FlagIcon } from "../../components/FlagIcon";
+import { getNationMatches, type NationMatchRow } from "../../../engine/international/nationViews";
+import OverviewTab from "./OverviewTab";
+import type { Player } from "../../../engine/players/types";
 
 type Tab = "overview" | "squad" | "u20" | "players" | "ranking" | "matches" | "history";
 
@@ -161,18 +164,6 @@ function RankingTab(props: { code: string }) {
   );
 }
 
-/** The nation's youth rating; editable in God Mode. */
-function YouthRatingStat(props: { code: string }) {
-  const game = useGame();
-  return (
-    <Stat
-      label="Youth rating"
-      value={<YouthRatingInput code={props.code} />}
-      sub={game.world.godMode ? "0-200 · God Mode" : "Drives newgen quality"}
-    />
-  );
-}
-
 function NationHistoryTab(props: { code: string }) {
   const game = useGame();
   const trophies = getNationTrophies(game.world.international, props.code);
@@ -204,6 +195,66 @@ function NationHistoryTab(props: { code: string }) {
   );
 }
 
+
+function OverviewPlayerTable(props: {
+  title: string;
+  players: Player[];
+  seasonYear: number;
+}) {
+  const { players, seasonYear } = props;
+
+  return (
+    <Panel title={props.title}>
+      {players.length === 0 ? (
+        <Empty>No players available.</Empty>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th>OVR</th>
+                <th>Name</th>
+                <th className="num">Age</th>
+                <th className="num">Pos</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {players.map(player => (
+                <tr key={player.id}>
+                  <td>
+                    <OvrBadge value={player.overall} />
+                  </td>
+
+                  <td className="font-medium">
+                    <PlayerLink
+                      id={player.id}
+                      name={getPlayerName(player)}
+                    />
+                    <RetiringMark
+                      player={player}
+                      seasonYear={seasonYear}
+                    />
+                  </td>
+
+                  <td className="num">
+                    {player.age}
+                  </td>
+
+                  <td className="num">
+                    <PosBadge position={player.position} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </Panel>
+  );
+}
+
+
 export default function NationPage() {
   const game = useGame();
   const params = useParams();
@@ -212,17 +263,6 @@ export default function NationPage() {
 
   const confederation = getConfederation(code);
   if (!confederation) return <Navigate to="/rankings" replace />;
-
-  const state = game.world.international;
-  const nation = state.nations[code];
-  const { points, overall } = getWorldRankings(game);
-  const rank = points.find(row => row.code === code)?.rank ?? 0;
-  const overallRank = overall.find(row => row.code === code)?.rank ?? 0;
-  const nationPlayers = game.world.players
-    .filter(player => !player.isRetired && player.primaryNationality === code)
-    .sort((a, b) => b.overall - a.overall || b.potential - a.potential);
-  const playerCount = nationPlayers.length;
-  const bestPlayers = nationPlayers.slice(0, 6);
 
   return (
     <div>
@@ -252,38 +292,7 @@ export default function NationPage() {
       {tab === "squad" && <NationSquad code={code} />}
       {tab === "u20" && <NationU20Team code={code} />}
 
-      {tab === "overview" && (
-        <div className="space-y-6">
-        <Panel title="National team">
-          <div className="p-5 grid grid-cols-2 md:grid-cols-5 gap-6">
-            <Stat label="World ranking" value={`#${rank}`} sub={`of ${points.length}`} />
-            <Stat label="Ranking points" value={nation.points.toFixed(2)} />
-            <Stat
-              label="Squad overall"
-              value={<OvrBadge value={nation.overall} size="lg" />}
-              sub={`${nation.formation} · #${overallRank} by overall`}
-            />
-            <Stat label="Confederation" value={confederation} sub={`${playerCount} player${playerCount === 1 ? "" : "s"} in the game`} />
-            <YouthRatingStat code={code} />
-          </div>
-        </Panel>
-        {bestPlayers.length > 0 && (
-          <Panel title="Best players">
-            <table className="tbl">
-              <tbody>
-                {bestPlayers.map(player => (
-                  <tr key={player.id}>
-                    <td className="w-10"><OvrBadge value={player.overall} /></td>
-                    <td><PlayerLink id={player.id} name={getPlayerName(player)} /><RetiringMark player={player} seasonYear={game.world.year} /></td>
-                    <td><PosBadge position={player.position} /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Panel>
-        )}
-        </div>
-      )}
+      {tab === "overview" && <OverviewTab code={code} />}
       {tab === "players" && <PlayersTab code={code} />}
       {tab === "ranking" && <RankingTab code={code} />}
       {tab === "matches" && <NationMatches code={code} />}

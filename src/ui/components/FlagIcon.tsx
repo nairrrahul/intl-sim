@@ -24,7 +24,7 @@ export function FlagIcon(props: {
       style={{
         width: `${size * (4 / 3)}em`,
         height: `${size}em`,
-        borderRadius: "0.18em",
+        borderRadius: `${0.18 * size}em`,
         verticalAlign: "-0.15em"
       }}
       aria-hidden="true"
