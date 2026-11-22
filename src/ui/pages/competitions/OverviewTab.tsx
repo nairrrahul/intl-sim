@@ -2,7 +2,7 @@
 import { useMemo } from "react";
 import { useGame } from "../../../store/gameStore";
 import { getWorldRankings } from "../../../engine/queries";
-import { getConfederation, getNationName } from "../../../engine/nations/nations";
+import { getConfederation, getNationCodeByName, getNationName } from "../../../engine/nations/nations";
 import { getNationMatches } from "../../../engine/international/nationViews";
 import { getPlayerName } from "../../../engine/players/display";
 import type { Player } from "../../../engine/players/types";
@@ -71,7 +71,9 @@ function UpcomingMatch({ code }: { code: string }) {
   }
 
   const homeCode = match.home ? code : match.opponent;
+  const homeCountryName = getNationName(homeCode);
   const awayCode = match.home ? match.opponent : code;
+  const awayCountryName = getNationName(awayCode);
 
   const competitionName = getFullCompetitionName(
     getCompetitionNameForKind(match.kind),
@@ -85,7 +87,7 @@ function UpcomingMatch({ code }: { code: string }) {
       <div className="flex flex-1 flex-col items-center gap-3 min-w-0">
         <FlagIcon code={homeCode} size={7} />
         <span className="text-lg font-bold text-center">
-          <NationLink code={getNationName(homeCode)} hasFlag={false} />
+          <NationLink code={getNationCodeByName(homeCountryName) ?? homeCountryName} hasFlag={false} />
         </span>
       </div>
 
@@ -108,7 +110,7 @@ function UpcomingMatch({ code }: { code: string }) {
       <div className="flex flex-1 flex-col items-center gap-3 min-w-0">
         <FlagIcon code={awayCode} size={7} />
         <span className="text-lg font-bold text-center">
-          <NationLink code={getNationName(awayCode)} hasFlag={false} />
+          <NationLink code={getNationCodeByName(awayCountryName) ?? awayCountryName} hasFlag={false} />
         </span>
       </div>
 

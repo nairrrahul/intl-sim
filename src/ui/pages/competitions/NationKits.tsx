@@ -49,7 +49,7 @@ function JerseyPreview({ config }: { config: JerseyConfig }) {
   if (!imageUrl) return null;
 
   return (
-    <div className="relative w-[140px] aspect-[55.4532/69.7485]">
+    <div className="relative w-[140px] aspect-[55.4532/69.7485] rounded-lg overflow-hidden border border-navy-700">
       <img
         src={imageUrl}
         alt="Jersey"
@@ -63,14 +63,14 @@ function JerseyPreview({ config }: { config: JerseyConfig }) {
       >
         <text
           x="27.73"
-          y="46"
+          y="50"
           textAnchor="middle"
-          fontFamily="Arial, Helvetica, sans-serif"
-          fontSize="30"
+          fontFamily="VarsityBold, sans-serif"
+          fontSize="40"
           fontWeight="500"
           fill={config.text}
           stroke={config.primary}
-          strokeWidth="0.8"
+          strokeWidth="2"
           strokeLinejoin="round"
           paintOrder="stroke fill"
         >

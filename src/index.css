@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "VarsityBold";
+  src: url("/fonts/VarsityTeam-Bold.otf") format("opentype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   html, body, #root { height: 100%; }
   body { @apply bg-navy-950 text-white font-sans antialiased; }
