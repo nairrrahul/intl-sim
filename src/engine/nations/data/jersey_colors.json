@@ -1,0 +1,3166 @@
+{
+  "RSA": {
+    "home": {
+      "primary": "#fbd81e",
+      "secondary": "#fbd81e",
+      "text": "#0a8149",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#014f42",
+      "secondary": "#1a644d",
+      "text": "#ffffff",
+      "style": "stripes"
+    }
+  },
+  "GER": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#000000",
+      "text": "#000000",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#0e1833",
+      "secondary": "#6fa59b",
+      "text": "#ffffff",
+      "style": "pinstripe"
+    }
+  },
+  "KSA": {
+    "home": {
+      "primary": "#1d4640",
+      "secondary": "#57629a",
+      "text": "#ffffff",
+      "style": "pinstripe"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#bc9b5c",
+      "style": "plain"
+    }
+  },
+  "ALG": {
+    "home": {
+      "primary": "#f7f7f7",
+      "secondary": "#ebebd7",
+      "text": "#198c7b",
+      "style": "stripes"
+    },
+    "away": {
+      "primary": "#13a07e",
+      "secondary": "#137f6f",
+      "text": "#ffffff",
+      "style": "stripes"
+    }
+  },
+  "ARG": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#83cdf4",
+      "text": "#000000",
+      "style": "stripes"
+    },
+    "away": {
+      "primary": "#151611",
+      "secondary": "#374874",
+      "text": "#ffffff",
+      "style": "pinstripe"
+    }
+  },
+  "AUS": {
+    "home": {
+      "primary": "#faab44",
+      "secondary": "#faab44",
+      "text": "#074844",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#005c67",
+      "secondary": "#f2786b",
+      "text": "#ffffff",
+      "style": "top-gradient"
+    }
+  },
+  "AUT": {
+    "home": {
+      "primary": "#d70e21",
+      "secondary": "#090000",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#f3fff8",
+      "secondary": "#e6efdc",
+      "text": "#000000",
+      "style": "pinstripe"
+    }
+  },
+  "BEL": {
+    "home": {
+      "primary": "#bc1121",
+      "secondary": "#d82915",
+      "text": "#f9ce57",
+      "style": "gradient"
+    },
+    "away": {
+      "primary": "#c3e6f3",
+      "secondary": "#f7cdd3",
+      "text": "#000000",
+      "style": "gradient"
+    }
+  },
+  "BIH": {
+    "home": {
+      "primary": "#001f58",
+      "secondary": "#2c4774",
+      "text": "#ffffff",
+      "style": "pinstripe"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#001f5c",
+      "text": "#001f5c",
+      "style": "sleeves"
+    }
+  },
+  "BRA": {
+    "home": {
+      "primary": "#ffdc48",
+      "secondary": "#ffdc48",
+      "text": "#10504f",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#12172a",
+      "secondary": "#1b2b4f",
+      "text": "#f4dd60",
+      "style": "sleeves"
+    }
+  },
+  "CPV": {
+    "home": {
+      "primary": "#041f66",
+      "secondary": "#0f43a8",
+      "text": "#ffffff",
+      "style": "gradient"
+    },
+    "away": {
+      "primary": "#f7f7f7",
+      "secondary": "#e2e4ea",
+      "text": "#05255e",
+      "style": "gradient"
+    }
+  },
+  "CAN": {
+    "home": {
+      "primary": "#e80000",
+      "secondary": "#c00202",
+      "text": "#ffffff",
+      "style": "half"
+    },
+    "away": {
+      "primary": "#1b1b1b",
+      "secondary": "#545456",
+      "text": "#ffffff",
+      "style": "gradient"
+    },
+    "third": {
+      "primary": "#ffffff",
+      "secondary": "#f0f0f0",
+      "text": "#000000",
+      "style": "half"
+    }
+  },
+  "QAT": {
+    "home": {
+      "primary": "#82272e",
+      "secondary": "#4d191d",
+      "text": "#ffffff",
+      "style": "bar"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#6b0d28",
+      "style": "plain"
+    }
+  },
+  "CZE": {
+    "home": {
+      "primary": "#b40c26",
+      "secondary": "#182b4b",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#d8a866",
+      "style": "plain"
+    }
+  },
+  "COL": {
+    "home": {
+      "primary": "#fbd603",
+      "secondary": "#fbd603",
+      "text": "#124e84",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#032a53",
+      "secondary": "#25a2b8",
+      "text": "#e7fd16",
+      "style": "stripes"
+    }
+  },
+  "CIV": {
+    "home": {
+      "primary": "#ed6500",
+      "secondary": "#ff891b",
+      "text": "#ffffff",
+      "style": "gradient"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#fbdcbd",
+      "text": "#9f6412",
+      "style": "gradient"
+    }
+  },
+  "CRO": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#e00a08",
+      "text": "#1039a3",
+      "style": "checker"
+    },
+    "away": {
+      "primary": "#0058c0",
+      "secondary": "#082d62",
+      "text": "#ffffff",
+      "style": "checker"
+    }
+  },
+  "CUW": {
+    "home": {
+      "primary": "#1b53a8",
+      "secondary": "#1b53a8",
+      "text": "#fcdc5e",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffe9b7",
+      "secondary": "#ffe9b7",
+      "text": "#144065",
+      "style": "plain"
+    }
+  },
+  "EGY": {
+    "home": {
+      "primary": "#cf2228",
+      "secondary": "#991717",
+      "text": "#ffda8f",
+      "style": "top-gradient"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "plain"
+    }
+  },
+  "ECU": {
+    "home": {
+      "primary": "#ffcb25",
+      "secondary": "#ffcb25",
+      "text": "#0f303f",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#05152f",
+      "secondary": "#05152f",
+      "text": "#cead73",
+      "style": "plain"
+    }
+  },
+  "SCO": {
+    "home": {
+      "primary": "#1a213d",
+      "secondary": "#1b2755",
+      "text": "#ffffff",
+      "style": "hoops"
+    },
+    "away": {
+      "primary": "#f07963",
+      "secondary": "#3a2d65",
+      "text": "#ffffff",
+      "style": "pinstripe"
+    }
+  },
+  "ESP": {
+    "home": {
+      "primary": "#d92a2f",
+      "secondary": "#35304e",
+      "text": "#fec820",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#faf9f4",
+      "secondary": "#faf9f4",
+      "text": "#760523",
+      "style": "plain"
+    }
+  },
+  "USA": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#b91627",
+      "text": "#051f42",
+      "style": "hoops"
+    },
+    "away": {
+      "primary": "#27233a",
+      "secondary": "#2d2843",
+      "text": "#ffffff",
+      "style": "stripes"
+    }
+  },
+  "FRA": {
+    "home": {
+      "primary": "#1f2849",
+      "secondary": "#2755ad",
+      "text": "#ffffff",
+      "style": "pinstripe"
+    },
+    "away": {
+      "primary": "#d2eee0",
+      "secondary": "#d2eee0",
+      "text": "#af6d33",
+      "style": "plain"
+    }
+  },
+  "GHA": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#fad350",
+      "secondary": "#e8b935",
+      "text": "#000000",
+      "style": "stripes"
+    }
+  },
+  "HAI": {
+    "home": {
+      "primary": "#002fb7",
+      "secondary": "#012d96",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#dee6e9",
+      "text": "#bd0507",
+      "style": "sleeves"
+    }
+  },
+  "ENG": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#a50521",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#c91c33",
+      "secondary": "#140b1c",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "IRN": {
+    "home": {
+      "primary": "#fefefe",
+      "secondary": "#f0f0f0",
+      "text": "#ac1628",
+      "style": "gradient"
+    },
+    "away": {
+      "primary": "#d41a28",
+      "secondary": "#b61622",
+      "text": "#ffffff",
+      "style": "gradient"
+    }
+  },
+  "IRQ": {
+    "home": {
+      "primary": "#fefefe",
+      "secondary": "#f0f0f0",
+      "text": "#000000",
+      "style": "gradient"
+    },
+    "away": {
+      "primary": "#035d37",
+      "secondary": "#026841",
+      "text": "#ffffff",
+      "style": "gradient"
+    }
+  },
+  "JPN": {
+    "home": {
+      "primary": "#302581",
+      "secondary": "#302581",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#f9f5ea",
+      "secondary": "#dde1e9",
+      "text": "#000000",
+      "style": "pinstripe"
+    }
+  },
+  "JOR": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#b51433",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#cd000f",
+      "secondary": "#cd000f",
+      "text": "#ffffff",
+      "style": "pinstripe"
+    }
+  },
+  "MAR": {
+    "home": {
+      "primary": "#be0121",
+      "secondary": "#226e47",
+      "text": "#ffdea3",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#faebd1",
+      "text": "#ae844c",
+      "style": "bar"
+    }
+  },
+  "MEX": {
+    "home": {
+      "primary": "#366865",
+      "secondary": "#224948",
+      "text": "#ffffff",
+      "style": "checker"
+    },
+    "away": {
+      "primary": "#fcfbf9",
+      "secondary": "#fcfbf9",
+      "text": "#0e2c24",
+      "style": "plain"
+    },
+    "third": {
+      "primary": "#000000",
+      "secondary": "#000000",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "NZL": {
+    "home": {
+      "primary": "#f6f6f6",
+      "secondary": "#e7e7e7",
+      "text": "#000000",
+      "style": "hoops"
+    },
+    "away": {
+      "primary": "#05090a",
+      "secondary": "#272b2c",
+      "text": "#ffffff",
+      "style": "gradient"
+    }
+  },
+  "NOR": {
+    "home": {
+      "primary": "#de0c31",
+      "secondary": "#15243b",
+      "text": "#fbfeff",
+      "style": "cross"
+    },
+    "away": {
+      "primary": "#191919",
+      "secondary": "#191919",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "NED": {
+    "home": {
+      "primary": "#fb642f",
+      "secondary": "#fb642f",
+      "text": "#000000",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#e8612c",
+      "text": "#000000",
+      "style": "horiz-bar"
+    }
+  },
+  "PAN": {
+    "home": {
+      "primary": "#e50021",
+      "secondary": "#e50021",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#352736",
+      "style": "plain"
+    },
+    "third": {
+      "primary": "#22252e",
+      "secondary": "#22252e",
+      "text": "#f7a544",
+      "style": "plain"
+    }
+  },
+  "PAR": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#cd2026",
+      "text": "#196bad",
+      "style": "stripes"
+    },
+    "away": {
+      "primary": "#041e35",
+      "secondary": "#2f6a83",
+      "text": "#ffffff",
+      "style": "half"
+    }
+  },
+  "POR": {
+    "home": {
+      "primary": "#c90023",
+      "secondary": "#c90023",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#f5f9fa",
+      "secondary": "#9bd8d9",
+      "text": "#993345",
+      "style": "top-gradient"
+    }
+  },
+  "DRC": {
+    "home": {
+      "primary": "#0196e8",
+      "secondary": "#9bd6fe",
+      "text": "#ffffff",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#a4dcea",
+      "text": "#0fb4e1",
+      "style": "gradient"
+    }
+  },
+  "KOR": {
+    "home": {
+      "primary": "#e30030",
+      "secondary": "#b0001c",
+      "text": "#ffffff",
+      "style": "hoops"
+    },
+    "away": {
+      "primary": "#ccaaf7",
+      "secondary": "#eddcfc",
+      "text": "#dfeaa5",
+      "style": "gradient"
+    }
+  },
+  "SEN": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#eaefe9",
+      "text": "#318468",
+      "style": "bar"
+    },
+    "away": {
+      "primary": "#056d48",
+      "secondary": "#00573d",
+      "text": "#e8c545",
+      "style": "bar"
+    }
+  },
+  "SWE": {
+    "home": {
+      "primary": "#ffd72a",
+      "secondary": "#1e3f9c",
+      "text": "#1e3f9c",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#0c306c",
+      "secondary": "#164789",
+      "text": "#f9eda1",
+      "style": "stripes"
+    }
+  },
+  "SUI": {
+    "home": {
+      "primary": "#d72022",
+      "secondary": "#d72022",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ccf8d7",
+      "secondary": "#abf4a2",
+      "text": "#264863",
+      "style": "hoops"
+    }
+  },
+  "TUN": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#e9e9e9",
+      "text": "#b00a1e",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#da0b27",
+      "secondary": "#91162a",
+      "text": "#ffffff",
+      "style": "sleeves"
+    }
+  },
+  "TUR": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#b92728",
+      "text": "#b00a1e",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#8d0507",
+      "secondary": "#ca0000",
+      "text": "#ffffff",
+      "style": "horiz-bar"
+    }
+  },
+  "URU": {
+    "home": {
+      "primary": "#a3cbee",
+      "secondary": "#a3cbee",
+      "text": "#000000",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#111723",
+      "secondary": "#2c57c0",
+      "text": "#b7c3e1",
+      "style": "top-gradient"
+    }
+  },
+  "UZB": {
+    "home": {
+      "primary": "#033ca5",
+      "secondary": "#033ca5",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ececec",
+      "text": "#374da0",
+      "style": "gradient"
+    }
+  },
+  "PER": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#ae3232",
+      "text": "#000001",
+      "style": "sash"
+    },
+    "away": {
+      "primary": "#000000",
+      "secondary": "#000000",
+      "text": "#d0dd46",
+      "style": "sash"
+    }
+  },
+  "VEN": {
+    "home": {
+      "primary": "#6e1c33",
+      "secondary": "#5b1b2a",
+      "text": "#f0e0b9",
+      "style": "hoops"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#c8ab5e",
+      "style": "plain"
+    }
+  },
+  "CHI": {
+    "home": {
+      "primary": "#dc1529",
+      "secondary": "#dc1529",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ede4da",
+      "secondary": "#e396b8",
+      "text": "#443835",
+      "style": "pinstripe"
+    }
+  },
+  "BOL": {
+    "home": {
+      "primary": "#014c4d",
+      "secondary": "#0a1f26",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#066e58",
+      "style": "plain"
+    }
+  },
+  "JAM": {
+    "home": {
+      "primary": "#ffd049",
+      "secondary": "#eab457",
+      "text": "#000000",
+      "style": "hoops"
+    },
+    "away": {
+      "primary": "#000000",
+      "secondary": "#3d946b",
+      "text": "#ffd21f",
+      "style": "gradient"
+    }
+  },
+  "SUR": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#dc1e21",
+      "style": "gradient"
+    },
+    "away": {
+      "primary": "#308d6b",
+      "secondary": "#3ea37d",
+      "text": "#ffffff",
+      "style": "hoops"
+    }
+  },
+  "UAE": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#ebebeb",
+      "text": "#b01212",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#b90834",
+      "secondary": "#d1113a",
+      "text": "#ffffff",
+      "style": "gradient"
+    }
+  },
+  "GUA": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#3ea8d4",
+      "text": "#000000",
+      "style": "sash"
+    },
+    "away": {
+      "primary": "#000000",
+      "secondary": "#3ea8d4",
+      "text": "#ffffff",
+      "style": "sash"
+    }
+  },
+  "CRC": {
+    "home": {
+      "primary": "#e73143",
+      "secondary": "#c02239",
+      "text": "#ffffff",
+      "style": "checker"
+    },
+    "away": {
+      "primary": "#cbdeea",
+      "secondary": "#bbc3e4",
+      "text": "#124176",
+      "style": "checker"
+    }
+  },
+  "HON": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#0ac1e5",
+      "text": "#023277",
+      "style": "bar"
+    },
+    "away": {
+      "primary": "#0ab7d3",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "pinstripe"
+    }
+  },
+  "CHN": {
+    "home": {
+      "primary": "#ff4d3a",
+      "secondary": "#ff4d3a",
+      "text": "#ffb32d",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#f6c748",
+      "secondary": "#fab947",
+      "text": "#e60001",
+      "style": "stripes"
+    }
+  },
+  "IDN": {
+    "home": {
+      "primary": "#d22033",
+      "secondary": "#d22033",
+      "text": "#ffffff",
+      "style": "stripes"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#d22033",
+      "style": "plain"
+    }
+  },
+  "ITA": {
+    "home": {
+      "primary": "#3297f1",
+      "secondary": "#0866d9",
+      "text": "#f0e8bc",
+      "style": "stripes"
+    },
+    "away": {
+      "primary": "#dadded",
+      "secondary": "#dadded",
+      "text": "#2c426c",
+      "style": "plain"
+    }
+  },
+  "DEN": {
+    "home": {
+      "primary": "#c3132d",
+      "secondary": "#c3132d",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#db5166",
+      "text": "#d12942",
+      "style": "pinstripe"
+    }
+  },
+  "IRL": {
+    "home": {
+      "primary": "#00562d",
+      "secondary": "#00562d",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#96da94",
+      "text": "#344159",
+      "style": "top-gradient"
+    }
+  },
+  "POL": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#d9041d",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#000000",
+      "secondary": "#7d0211",
+      "text": "#ffffff",
+      "style": "gradient"
+    }
+  },
+  "ALB": {
+    "home": {
+      "primary": "#d30d1b",
+      "secondary": "#b90419",
+      "text": "#000000",
+      "style": "pinstripe"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#f2e5ce",
+      "text": "#cc0036",
+      "style": "pinstripe"
+    }
+  },
+  "UKR": {
+    "home": {
+      "primary": "#f4d248",
+      "secondary": "#f4d248",
+      "text": "#0354b4",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#048fe8",
+      "secondary": "#245bc5",
+      "text": "#ffd224",
+      "style": "top-gradient"
+    }
+  },
+  "FIN": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#006ab9",
+      "text": "#006ab9",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#2570e9",
+      "secondary": "#2570e9",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "ISL": {
+    "home": {
+      "primary": "#0188d4",
+      "secondary": "#0188d4",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ece9ec",
+      "secondary": "#e1dfdf",
+      "text": "#716c74",
+      "style": "bar"
+    }
+  },
+  "WAL": {
+    "home": {
+      "primary": "#eb2c30",
+      "secondary": "#eb2c30",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#f7bb3b",
+      "secondary": "#f7b01d",
+      "text": "#10361c",
+      "style": "checker"
+    }
+  },
+  "GRE": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#2259a9",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#326692",
+      "secondary": "#1e3b5c",
+      "text": "#ffffff",
+      "style": "stripes"
+    }
+  },
+  "NGA": {
+    "home": {
+      "primary": "#0da849",
+      "secondary": "#14433a",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#a8ebb0",
+      "text": "#14433a",
+      "style": "gradient"
+    }
+  },
+  "CMR": {
+    "home": {
+      "primary": "#214639",
+      "secondary": "#326347",
+      "text": "#f6de06",
+      "style": "gradient"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#07755c",
+      "text": "#07755c",
+      "style": "sleeves"
+    }
+  },
+  "ROU": {
+    "home": {
+      "primary": "#fed602",
+      "secondary": "#fed602",
+      "text": "#252aaa",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#be062e",
+      "secondary": "#be062e",
+      "text": "#ffd40a",
+      "style": "plain"
+    }
+  },
+  "HUN": {
+    "home": {
+      "primary": "#a60520",
+      "secondary": "#a60520",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#207359",
+      "style": "plain"
+    }
+  },
+  "SVK": {
+    "home": {
+      "primary": "#02397b",
+      "secondary": "#0393d9",
+      "text": "#ffffff",
+      "style": "gradient"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#02397b",
+      "style": "plain"
+    }
+  },
+  "GAB": {
+    "home": {
+      "primary": "#fdc50b",
+      "secondary": "#f8b602",
+      "text": "#0168c2",
+      "style": "gradient"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#f5f5f5",
+      "text": "#0168c2",
+      "style": "gradient"
+    }
+  },
+  "MLI": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#217e54",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#fbe309",
+      "secondary": "#fbe309",
+      "text": "#217e54",
+      "style": "plain"
+    }
+  },
+  "BOT": {
+    "home": {
+      "primary": "#b6e1fc",
+      "secondary": "#000000",
+      "text": "#000000",
+      "style": "bar"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#b6e8fc",
+      "text": "#000000",
+      "style": "bar"
+    }
+  },
+  "SRB": {
+    "home": {
+      "primary": "#0248b2",
+      "secondary": "#023b92",
+      "text": "#ffffff",
+      "style": "cross"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#023b92",
+      "style": "plain"
+    }
+  },
+  "ANG": {
+    "home": {
+      "primary": "#e22b12",
+      "secondary": "#000000",
+      "text": "#f9dd4b",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#000000",
+      "secondary": "#000000",
+      "text": "#f8372d",
+      "style": "plain"
+    },
+    "third": {
+      "primary": "#f9dd4b",
+      "secondary": "#e22b12",
+      "text": "#000000",
+      "style": "horiz-bar"
+    }
+  },
+  "SYR": {
+    "home": {
+      "primary": "#199c62",
+      "secondary": "#199c62",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#126e45",
+      "style": "plain"
+    }
+  },
+  "LUX": {
+    "home": {
+      "primary": "#e11723",
+      "secondary": "#860910",
+      "text": "#ffffff",
+      "style": "diag"
+    },
+    "away": {
+      "primary": "#5ea9e6",
+      "secondary": "#4198df",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "TAN": {
+    "home": {
+      "primary": "#0433d9",
+      "secondary": "#0433d9",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffd814",
+      "secondary": "#ffd814",
+      "text": "#1033ad",
+      "style": "plain"
+    }
+  },
+  "KEN": {
+    "home": {
+      "primary": "#cc3031",
+      "secondary": "#000000",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "plain"
+    }
+  },
+  "UGA": {
+    "home": {
+      "primary": "#bc2020",
+      "secondary": "#000000",
+      "text": "#ffffff",
+      "style": "top-gradient"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#000000",
+      "text": "#000000",
+      "style": "top-gradient"
+    }
+  },
+  "BUL": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#b3001c",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#bc051d",
+      "secondary": "#bc051d",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "SLV": {
+    "home": {
+      "primary": "#1a63c9",
+      "secondary": "#021232",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#1a63c9",
+      "text": "#021232",
+      "style": "plain"
+    }
+  },
+  "BHR": {
+    "home": {
+      "primary": "#ba0011",
+      "secondary": "#ba0011",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#ba0011",
+      "style": "plain"
+    }
+  },
+  "VIE": {
+    "home": {
+      "primary": "#f2381f",
+      "secondary": "#f2381f",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#f2381f",
+      "style": "plain"
+    }
+  },
+  "THA": {
+    "home": {
+      "primary": "#2844de",
+      "secondary": "#2844de",
+      "text": "#fbcf9d",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#cf3238",
+      "secondary": "#cf3238",
+      "text": "#fbcf9d",
+      "style": "plain"
+    },
+    "third": {
+      "primary": "#ffffff",
+      "secondary": "#3440a8",
+      "text": "#1e287b",
+      "style": "pinstripe"
+    }
+  },
+  "AND": {
+    "home": {
+      "primary": "#e20727",
+      "secondary": "#e20727",
+      "text": "#ffe028",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffe028",
+      "text": "#e20727",
+      "style": "bar"
+    }
+  },
+  "ARM": {
+    "home": {
+      "primary": "#b42c3b",
+      "secondary": "#b42c3b",
+      "text": "#f1ebe5",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#f4af82",
+      "text": "#b42c3b",
+      "style": "bar"
+    }
+  },
+  "AZE": {
+    "home": {
+      "primary": "#32789c",
+      "secondary": "#2b4666",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "plain"
+    }
+  },
+  "BLR": {
+    "home": {
+      "primary": "#dd3244",
+      "secondary": "#76050c",
+      "text": "#d2ff4e",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ebebeb",
+      "text": "#bdea39",
+      "style": "sash"
+    }
+  },
+  "CYP": {
+    "home": {
+      "primary": "#04388e",
+      "secondary": "#06143d",
+      "text": "#ffffff",
+      "style": "hoops"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ededed",
+      "text": "#000000",
+      "style": "hoops"
+    }
+  },
+  "EST": {
+    "home": {
+      "primary": "#3c59a1",
+      "secondary": "#1b4795",
+      "text": "#ffffff",
+      "style": "hoops"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#f5f5f5",
+      "text": "#000000",
+      "style": "hoops"
+    }
+  },
+  "FRO": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#3274a7",
+      "text": "#0943a0",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#001127",
+      "secondary": "#023994",
+      "text": "#ffffff",
+      "style": "gradient"
+    }
+  },
+  "GEO": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#d30034",
+      "text": "#000000",
+      "style": "bar"
+    },
+    "third": {
+      "primary": "#d30034",
+      "secondary": "#d30034",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#000000",
+      "secondary": "#000000",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "GIB": {
+    "home": {
+      "primary": "#ed030f",
+      "secondary": "#a20108",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#a20108",
+      "style": "plain"
+    }
+  },
+  "ISR": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#263c86",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#1b80e9",
+      "secondary": "#1b80e9",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "KAZ": {
+    "home": {
+      "primary": "#f9da03",
+      "secondary": "#f9da03",
+      "text": "#0058c9",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#073ea1",
+      "secondary": "#021a66",
+      "text": "#f9d003",
+      "style": "checker"
+    }
+  },
+  "KVX": {
+    "home": {
+      "primary": "#003c97",
+      "secondary": "#4583cc",
+      "text": "#ffffff",
+      "style": "sash"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#f0f0f0",
+      "text": "#003c97",
+      "style": "sash"
+    }
+  },
+  "LVA": {
+    "home": {
+      "primary": "#65181e",
+      "secondary": "#ffffff",
+      "text": "#ffffff",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#3d3d3d",
+      "style": "plain"
+    }
+  },
+  "LIE": {
+    "home": {
+      "primary": "#233186",
+      "secondary": "#3f4c9d",
+      "text": "#ffffff",
+      "style": "pinstripe"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#233186",
+      "style": "pinstripe"
+    }
+  },
+  "LTU": {
+    "home": {
+      "primary": "#fce321",
+      "secondary": "#fce321",
+      "text": "#016c53",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#016c53",
+      "secondary": "#016c53",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "MLT": {
+    "home": {
+      "primary": "#fb1f35",
+      "secondary": "#fb1f35",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#f6041c",
+      "style": "plain"
+    }
+  },
+  "MDA": {
+    "home": {
+      "primary": "#1d4294",
+      "secondary": "#18377c",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#f7bb3b",
+      "secondary": "#ffffff",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "third": {
+      "primary": "#f4283d",
+      "secondary": "#cc0a1e",
+      "text": "#ffffff",
+      "style": "sleeves"
+    }
+  },
+  "MNE": {
+    "home": {
+      "primary": "#c92021",
+      "secondary": "#f9d02c",
+      "text": "#f9d02c",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#c92021",
+      "text": "#c92021",
+      "style": "bar"
+    }
+  },
+  "NIR": {
+    "home": {
+      "primary": "#06a8a9",
+      "secondary": "#036687",
+      "text": "#ffffff",
+      "style": "half"
+    },
+    "away": {
+      "primary": "#f9f5eb",
+      "secondary": "#e2ead6",
+      "text": "#237368",
+      "style": "pinstripe"
+    }
+  },
+  "MKD": {
+    "home": {
+      "primary": "#e60c22",
+      "secondary": "#fbe00f",
+      "text": "#ffffff",
+      "style": "hoops"
+    },
+    "away": {
+      "primary": "#f2ece8",
+      "secondary": "#f2ece8",
+      "text": "#e60c22",
+      "style": "plain"
+    }
+  },
+  "RUS": {
+    "home": {
+      "primary": "#e4182b",
+      "secondary": "#e4182b",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#28263c",
+      "style": "plain"
+    }
+  },
+  "SMR": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#8fbfdc",
+      "text": "#122955",
+      "style": "pinstripe"
+    },
+    "away": {
+      "primary": "#001c34",
+      "secondary": "#3a76bb",
+      "text": "#ffffff",
+      "style": "horiz-bar"
+    }
+  },
+  "SVN": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#1c5aa4",
+      "text": "#1c5aa4",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#4b7dc1",
+      "secondary": "#195194",
+      "text": "#ffffff",
+      "style": "horiz-bar"
+    }
+  },
+  "ASA": {
+    "home": {
+      "primary": "#2d4382",
+      "secondary": "#2d4382",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#e00336",
+      "secondary": "#ffffff",
+      "text": "#ffffff",
+      "style": "horiz-bar"
+    }
+  },
+  "COK": {
+    "home": {
+      "primary": "#136d56",
+      "secondary": "#136d56",
+      "text": "#ffffff",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#136d56",
+      "style": "horiz-bar"
+    },
+    "third": {
+      "primary": "#f7d540",
+      "secondary": "#f7d540",
+      "text": "#000000",
+      "style": "horiz-bar"
+    }
+  },
+  "FIJ": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#000000",
+      "text": "#000000",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#0061d0",
+      "secondary": "#0061d0",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "NCL": {
+    "home": {
+      "primary": "#48494e",
+      "secondary": "#bb3936",
+      "text": "#ffffff",
+      "style": "hoops"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "hoops"
+    }
+  },
+  "PNG": {
+    "home": {
+      "primary": "#c52526",
+      "secondary": "#000000",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#e3b42a",
+      "secondary": "#000000",
+      "text": "#ffffff",
+      "style": "sleeves"
+    }
+  },
+  "SAM": {
+    "home": {
+      "primary": "#144d9d",
+      "secondary": "#144d9d",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "plain"
+    }
+  },
+  "SOL": {
+    "home": {
+      "primary": "#f7e240",
+      "secondary": "#f7e240",
+      "text": "#2552e9",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#2b8264",
+      "secondary": "#2b8264",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "TAH": {
+    "home": {
+      "primary": "#ef0022",
+      "secondary": "#ef0022",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "plain"
+    }
+  },
+  "TGA": {
+    "home": {
+      "primary": "#000000",
+      "secondary": "#d81635",
+      "text": "#ffffff",
+      "style": "checker"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#d81635",
+      "text": "#000000",
+      "style": "cross"
+    }
+  },
+  "VAN": {
+    "home": {
+      "primary": "#fee046",
+      "secondary": "#01a25a",
+      "text": "#000000",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#019352",
+      "secondary": "#fee046",
+      "text": "#fee046",
+      "style": "horiz-bar"
+    }
+  },
+  "AIA": {
+    "home": {
+      "primary": "#fdbb64",
+      "secondary": "#f6a44a",
+      "text": "#ffffff",
+      "style": "top-gradient"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#fdbb64",
+      "text": "#000000",
+      "style": "gradient"
+    },
+    "third": {
+      "primary": "#468ed3",
+      "secondary": "#95c3e9",
+      "text": "#000000",
+      "style": "top-gradient"
+    }
+  },
+  "ATG": {
+    "home": {
+      "primary": "#ede854",
+      "secondary": "#000000",
+      "text": "#000000",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "sleeves"
+    },
+    "third": {
+      "primary": "#000000",
+      "secondary": "#811225",
+      "text": "#ffffff",
+      "style": "checker"
+    }
+  },
+  "ARU": {
+    "home": {
+      "primary": "#fad646",
+      "secondary": "#fad646",
+      "text": "#04a5e2",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#04a5e2",
+      "secondary": "#04a5e2",
+      "text": "#fad646",
+      "style": "plain"
+    }
+  },
+  "BAH": {
+    "home": {
+      "primary": "#f9c367",
+      "secondary": "#019fb7",
+      "text": "#000000",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#019fb7",
+      "secondary": "#00090a",
+      "text": "#f9c367",
+      "style": "sleeves"
+    }
+  },
+  "BRB": {
+    "home": {
+      "primary": "#efb41a",
+      "secondary": "#1f2a79",
+      "text": "#140d01",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#1f2a79",
+      "secondary": "#efb41a",
+      "text": "#efb41a",
+      "style": "pinstripe"
+    }
+  },
+  "BLZ": {
+    "home": {
+      "primary": "#0255cd",
+      "secondary": "#e14341",
+      "text": "#ffffff",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#0255cd",
+      "text": "#e14341",
+      "style": "sleeves"
+    }
+  },
+  "BER": {
+    "home": {
+      "primary": "#232c46",
+      "secondary": "#232c46",
+      "text": "#eea5e5",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#f0b2e9",
+      "secondary": "#e4a0cd",
+      "text": "#232c46",
+      "style": "checker"
+    }
+  },
+  "VGB": {
+    "home": {
+      "primary": "#f4c81f",
+      "secondary": "#f4c81f",
+      "text": "#1c864b",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#1c864b",
+      "secondary": "#3c9f81",
+      "text": "#ffffff",
+      "style": "gradient"
+    }
+  },
+  "CAY": {
+    "home": {
+      "primary": "#d32c30",
+      "secondary": "#243a74",
+      "text": "#ffffff",
+      "style": "sash"
+    },
+    "away": {
+      "primary": "#243a74",
+      "secondary": "#d32c30",
+      "text": "#ffffff",
+      "style": "sash"
+    }
+  },
+  "CUB": {
+    "home": {
+      "primary": "#a81c1a",
+      "secondary": "#1b202b",
+      "text": "#ffffff",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#e7091d",
+      "text": "#0b2664",
+      "style": "diag"
+    }
+  },
+  "DMA": {
+    "home": {
+      "primary": "#2c7952",
+      "secondary": "#2c7952",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#2c7952",
+      "style": "plain"
+    }
+  },
+  "DOM": {
+    "home": {
+      "primary": "#000000",
+      "secondary": "#000000",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#3241ae",
+      "style": "plain"
+    }
+  },
+  "GRN": {
+    "home": {
+      "primary": "#146b35",
+      "secondary": "#f6c718",
+      "text": "#ffffff",
+      "style": "hoops"
+    },
+    "away": {
+      "primary": "#e01e37",
+      "secondary": "#e01e37",
+      "text": "#f6c718",
+      "style": "hoops"
+    }
+  },
+  "GUY": {
+    "home": {
+      "primary": "#f3c942",
+      "secondary": "#e01e37",
+      "text": "#000000",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#1dae71",
+      "secondary": "#1dae71",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "third": {
+      "primary": "#ffffff",
+      "secondary": "#1dae71",
+      "text": "#000000",
+      "style": "gradient"
+    }
+  },
+  "MSR": {
+    "home": {
+      "primary": "#cb0b0b",
+      "secondary": "#ffffff",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#1a7053",
+      "secondary": "#1a7053",
+      "text": "#ffffff",
+      "style": "sleeves"
+    }
+  },
+  "NCA": {
+    "home": {
+      "primary": "#0c2747",
+      "secondary": "#0c2747",
+      "text": "#d8a750",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#0e316d",
+      "text": "#00a4e6",
+      "style": "sleeves"
+    }
+  },
+  "PUR": {
+    "home": {
+      "primary": "#1e2024",
+      "secondary": "#01439a",
+      "text": "#ffffff",
+      "style": "checker"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#6acfdf",
+      "style": "plain"
+    },
+    "third": {
+      "primary": "#c80c19",
+      "secondary": "#f12b3a",
+      "text": "#ffffff",
+      "style": "checker"
+    }
+  },
+  "SKN": {
+    "home": {
+      "primary": "#058346",
+      "secondary": "#df9c4a",
+      "text": "#ffffff",
+      "style": "pinstripe"
+    },
+    "away": {
+      "primary": "#d80037",
+      "secondary": "#df9c4a",
+      "text": "#ffffff",
+      "style": "pinstripe"
+    },
+    "third": {
+      "primary": "#000000",
+      "secondary": "#333333",
+      "text": "#e3b25f",
+      "style": "checker"
+    }
+  },
+  "LCA": {
+    "home": {
+      "primary": "#f7cf31",
+      "secondary": "#f7cf31",
+      "text": "#2363e7",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#3778e1",
+      "secondary": "#568de6",
+      "text": "#f6cc22",
+      "style": "hoops"
+    }
+  },
+  "VIN": {
+    "home": {
+      "primary": "#fdca07",
+      "secondary": "#fdca07",
+      "text": "#023b80",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#023b80",
+      "secondary": "#023b80",
+      "text": "#fdca07",
+      "style": "plain"
+    },
+    "third": {
+      "primary": "#1c4e2d",
+      "secondary": "#1c4e2d",
+      "text": "#fdca07",
+      "style": "plain"
+    }
+  },
+  "TRI": {
+    "home": {
+      "primary": "#bf0f37",
+      "secondary": "#000000",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#e28888",
+      "text": "#bf0f37",
+      "style": "gradient"
+    },
+    "third": {
+      "primary": "#000000",
+      "secondary": "#c6b180",
+      "text": "#c6b180",
+      "style": "pinstripe"
+    }
+  },
+  "TCA": {
+    "home": {
+      "primary": "#365587",
+      "secondary": "#365587",
+      "text": "#f9dd4d",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#f9dd4d",
+      "secondary": "#f9dd4d",
+      "text": "#365587",
+      "style": "plain"
+    }
+  },
+  "VIR": {
+    "home": {
+      "primary": "#f9e54d",
+      "secondary": "#000000",
+      "text": "#000000",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#112241",
+      "secondary": "#112241",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "BEN": {
+    "home": {
+      "primary": "#ecd24e",
+      "secondary": "#ecd24e",
+      "text": "#32884a",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#555555",
+      "style": "plain"
+    }
+  },
+  "BFA": {
+    "home": {
+      "primary": "#006951",
+      "secondary": "#da1b34",
+      "text": "#ffffff",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#da1b34",
+      "text": "#078c52",
+      "style": "horiz-bar"
+    },
+    "third": {
+      "primary": "#ffef16",
+      "secondary": "#da1b34",
+      "text": "#000000",
+      "style": "horiz-bar"
+    }
+  },
+  "BDI": {
+    "home": {
+      "primary": "#429227",
+      "secondary": "#31751b",
+      "text": "#ffffff",
+      "style": "hoops"
+    },
+    "away": {
+      "primary": "#a91c23",
+      "secondary": "#31751b",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "third": {
+      "primary": "#ffffff",
+      "secondary": "#5eba40",
+      "text": "#000000",
+      "style": "pinstripe"
+    }
+  },
+  "CAR": {
+    "home": {
+      "primary": "#1e36a3",
+      "secondary": "#1e36a3",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#1e36a3",
+      "style": "plain"
+    }
+  },
+  "CHA": {
+    "home": {
+      "primary": "#f9d80e",
+      "secondary": "#de2b2b",
+      "text": "#17297d",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#1d40af",
+      "secondary": "#de2b2b",
+      "text": "#f9d80e",
+      "style": "sleeves"
+    }
+  },
+  "COM": {
+    "home": {
+      "primary": "#0b9156",
+      "secondary": "#006c39",
+      "text": "#ffffff",
+      "style": "stripes"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#f0f0f0",
+      "text": "#0b9156",
+      "style": "stripes"
+    }
+  },
+  "CGO": {
+    "home": {
+      "primary": "#f1d150",
+      "secondary": "#e2bf4b",
+      "text": "#0c9c3e",
+      "style": "pinstripe"
+    },
+    "away": {
+      "primary": "#048549",
+      "secondary": "#ce2227",
+      "text": "#f3d663",
+      "style": "diag"
+    }
+  },
+  "DJI": {
+    "home": {
+      "primary": "#c0e8fc",
+      "secondary": "#26a66a",
+      "text": "#000000",
+      "style": "bar"
+    },
+    "away": {
+      "primary": "#4cc27d",
+      "secondary": "#2e9472",
+      "text": "#ffffff",
+      "style": "hoops"
+    }
+  },
+  "EQG": {
+    "home": {
+      "primary": "#f00023",
+      "secondary": "#f00023",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ebebeb",
+      "text": "#0e47ab",
+      "style": "pinstripe"
+    }
+  },
+  "ERI": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#e5345d",
+      "text": "#000000",
+      "style": "bar"
+    },
+    "away": {
+      "primary": "#5f9eed",
+      "secondary": "#5f9eed",
+      "text": "#000000",
+      "style": "bar"
+    }
+  },
+  "SWZ": {
+    "home": {
+      "primary": "#fce321",
+      "secondary": "#fe6f52",
+      "text": "#000000",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#eef1ec",
+      "text": "#000000",
+      "style": "checker"
+    },
+    "third": {
+      "primary": "#2f5d9d",
+      "secondary": "#244e89",
+      "text": "#ffffff",
+      "style": "checker"
+    }
+  },
+  "ETH": {
+    "home": {
+      "primary": "#13968b",
+      "secondary": "#13968b",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#f2de03",
+      "secondary": "#f2de03",
+      "text": "#ad2600",
+      "style": "plain"
+    },
+    "third": {
+      "primary": "#ff3a3a",
+      "secondary": "#fba01e",
+      "text": "#ffffff",
+      "style": "pinstripe"
+    }
+  },
+  "GAM": {
+    "home": {
+      "primary": "#b7152d",
+      "secondary": "#1d1886",
+      "text": "#ffffff",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#3946a7",
+      "text": "#a5172c",
+      "style": "horiz-bar"
+    },
+    "third": {
+      "primary": "#0158a4",
+      "secondary": "#cf0202",
+      "text": "#ffffff",
+      "style": "horiz-bar"
+    }
+  },
+  "GUI": {
+    "home": {
+      "primary": "#cc161f",
+      "secondary": "#7e0a26",
+      "text": "#fcd417",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#388a61",
+      "text": "#000000",
+      "style": "pinstripe"
+    }
+  },
+  "GNB": {
+    "home": {
+      "primary": "#e82036",
+      "secondary": "#269c61",
+      "text": "#ffffff",
+      "style": "pinstripe"
+    },
+    "away": {
+      "primary": "#469b4d",
+      "secondary": "#469b4d",
+      "text": "#ffffff",
+      "style": "pinstripe"
+    },
+    "third": {
+      "primary": "#fee80b",
+      "secondary": "#dd3848",
+      "text": "#000000",
+      "style": "pinstripe"
+    }
+  },
+  "LES": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#3f69d8",
+      "text": "#000000",
+      "style": "hoops"
+    },
+    "away": {
+      "primary": "#375bb9",
+      "secondary": "#20ac5b",
+      "text": "#ffffff",
+      "style": "hoops"
+    },
+    "third": {
+      "primary": "#03aa4a",
+      "secondary": "#3f69d8",
+      "text": "#ffffff",
+      "style": "hoops"
+    }
+  },
+  "LBR": {
+    "home": {
+      "primary": "#d80000",
+      "secondary": "#d80000",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#014ab5",
+      "secondary": "#014ab5",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "third": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "plain"
+    }
+  },
+  "LBY": {
+    "home": {
+      "primary": "#e5383e",
+      "secondary": "#e5383e",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "plain"
+    }
+  },
+  "MAD": {
+    "home": {
+      "primary": "#49ca64",
+      "secondary": "#007e49",
+      "text": "#ffffff",
+      "style": "half"
+    },
+    "away": {
+      "primary": "#d9232f",
+      "secondary": "#b2292d",
+      "text": "#ffffff",
+      "style": "half"
+    }
+  },
+  "MWI": {
+    "home": {
+      "primary": "#ea2330",
+      "secondary": "#1e8b74",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#1e8b74",
+      "secondary": "#ea2330",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "third": {
+      "primary": "#000000",
+      "secondary": "#ea2330",
+      "text": "#ffffff",
+      "style": "sleeves"
+    }
+  },
+  "MTN": {
+    "home": {
+      "primary": "#389f56",
+      "secondary": "#389f56",
+      "text": "#f6df32",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#389f56",
+      "style": "plain"
+    }
+  },
+  "MRI": {
+    "home": {
+      "primary": "#b41012",
+      "secondary": "#ce151a",
+      "text": "#ffffff",
+      "style": "checker"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#f0f0f0",
+      "text": "#000000",
+      "style": "hoops"
+    }
+  },
+  "MOZ": {
+    "home": {
+      "primary": "#fb262f",
+      "secondary": "#030303",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#e7131c",
+      "text": "#e7131c",
+      "style": "sleeves"
+    },
+    "third": {
+      "primary": "#000000",
+      "secondary": "#e7131c",
+      "text": "#ffffff",
+      "style": "sleeves"
+    }
+  },
+  "NAM": {
+    "home": {
+      "primary": "#1f2b93",
+      "secondary": "#cb1119",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#cb1119",
+      "text": "#1f2b93",
+      "style": "sleeves"
+    }
+  },
+  "NIG": {
+    "home": {
+      "primary": "#ea7b24",
+      "secondary": "#ea7b24",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ed8f45",
+      "text": "#049472",
+      "style": "bar"
+    }
+  },
+  "RWA": {
+    "home": {
+      "primary": "#ffdc13",
+      "secondary": "#ffdc13",
+      "text": "#114be1",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#1abc4f",
+      "secondary": "#1abc4f",
+      "text": "#ffdc13",
+      "style": "plain"
+    },
+    "third": {
+      "primary": "#114be1",
+      "secondary": "#114be1",
+      "text": "#ffdc13",
+      "style": "plain"
+    }
+  },
+  "STP": {
+    "home": {
+      "primary": "#fff611",
+      "secondary": "#ed230d",
+      "text": "#000000",
+      "style": "gradient"
+    },
+    "away": {
+      "primary": "#12b56a",
+      "secondary": "#d22828",
+      "text": "#000000",
+      "style": "pinstripe"
+    }
+  },
+  "SEY": {
+    "home": {
+      "primary": "#164bad",
+      "secondary": "#164bad",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#40a793",
+      "text": "#164bad",
+      "style": "horiz-bar"
+    },
+    "third": {
+      "primary": "#922738",
+      "secondary": "#922738",
+      "text": "#ffbf19",
+      "style": "plain"
+    }
+  },
+  "SLE": {
+    "home": {
+      "primary": "#149543",
+      "secondary": "#149543",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#c5ecd3",
+      "text": "#000000",
+      "style": "pinstripe"
+    },
+    "third": {
+      "primary": "#1334c9",
+      "secondary": "#7588db",
+      "text": "#ffffff",
+      "style": "pinstripe"
+    }
+  },
+  "SOM": {
+    "home": {
+      "primary": "#32c1d2",
+      "secondary": "#32c1d2",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#32c1d2",
+      "style": "plain"
+    },
+    "third": {
+      "primary": "#375e84",
+      "secondary": "#375e84",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "SSD": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#cc171c",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#198036",
+      "secondary": "#68d94e",
+      "text": "#dfe42f",
+      "style": "bar"
+    },
+    "third": {
+      "primary": "#a31618",
+      "secondary": "#d03435",
+      "text": "#ffffff",
+      "style": "gradient"
+    }
+  },
+  "SUD": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#d21219",
+      "secondary": "#000000",
+      "text": "#ffffff",
+      "style": "horiz-bar"
+    }
+  },
+  "TOG": {
+    "home": {
+      "primary": "#fce338",
+      "secondary": "#fce338",
+      "text": "#0a8c0e",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#e3e3e3",
+      "text": "#000000",
+      "style": "pinstripe"
+    }
+  },
+  "ZAM": {
+    "home": {
+      "primary": "#226641",
+      "secondary": "#226641",
+      "text": "#eea658",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#eea658",
+      "secondary": "#eea658",
+      "text": "#000000",
+      "style": "plain"
+    },
+    "third": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#226641",
+      "style": "plain"
+    }
+  },
+  "ZIM": {
+    "home": {
+      "primary": "#f7e64a",
+      "secondary": "#f7e64a",
+      "text": "#194d31",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#335f1c",
+      "secondary": "#335f1c",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "third": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#335f1c",
+      "style": "plain"
+    }
+  },
+  "AFG": {
+    "home": {
+      "primary": "#c11718",
+      "secondary": "#a40508",
+      "text": "#ffffff",
+      "style": "checker"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ebebeb",
+      "text": "#c11718",
+      "style": "checker"
+    }
+  },
+  "BAN": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#c90d3f",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#21787c",
+      "secondary": "#e94139",
+      "text": "#ffffff",
+      "style": "sleeves"
+    }
+  },
+  "BHU": {
+    "home": {
+      "primary": "#f3762c",
+      "secondary": "#f3762c",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#000000",
+      "secondary": "#ee3354",
+      "text": "#ffffff",
+      "style": "top-gradient"
+    },
+    "third": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "top-gradient"
+    }
+  },
+  "BRU": {
+    "home": {
+      "primary": "#f4cc20",
+      "secondary": "#000000",
+      "text": "#000000",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#153637",
+      "secondary": "#5e6c28",
+      "text": "#ffffff",
+      "style": "sleeves"
+    }
+  },
+  "CAM": {
+    "home": {
+      "primary": "#171e6b",
+      "secondary": "#171e6b",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#951b38",
+      "secondary": "#951b38",
+      "text": "#f0d2b2",
+      "style": "plain"
+    }
+  },
+  "TPE": {
+    "home": {
+      "primary": "#142e86",
+      "secondary": "#142e86",
+      "text": "#2ba7d9",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#cceaf9",
+      "text": "#000000",
+      "style": "gradient"
+    }
+  },
+  "GUM": {
+    "home": {
+      "primary": "#378dd9",
+      "secondary": "#378dd9",
+      "text": "#efcf4d",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#000000",
+      "secondary": "#000000",
+      "text": "#efb74d",
+      "style": "plain"
+    }
+  },
+  "HKG": {
+    "home": {
+      "primary": "#f3060b",
+      "secondary": "#bc050a",
+      "text": "#ffffff",
+      "style": "half"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "plain"
+    }
+  },
+  "IND": {
+    "home": {
+      "primary": "#01a4e5",
+      "secondary": "#f0721a",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#ff813b",
+      "secondary": "#ff813b",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "PRK": {
+    "home": {
+      "primary": "#d21010",
+      "secondary": "#d21010",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#d21010",
+      "style": "plain"
+    }
+  },
+  "KUW": {
+    "home": {
+      "primary": "#1f54e6",
+      "secondary": "#1f54e6",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#e80c27",
+      "secondary": "#e80c27",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "KGZ": {
+    "home": {
+      "primary": "#de0023",
+      "secondary": "#a30b22",
+      "text": "#fcd827",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#f0f0f0",
+      "text": "#000000",
+      "style": "gradient"
+    }
+  },
+  "LAO": {
+    "home": {
+      "primary": "#db0004",
+      "secondary": "#db0004",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#db0004",
+      "text": "#000000",
+      "style": "sleeves"
+    }
+  },
+  "LBN": {
+    "home": {
+      "primary": "#f0151b",
+      "secondary": "#f0151b",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#f0151b",
+      "style": "plain"
+    }
+  },
+  "MAC": {
+    "home": {
+      "primary": "#03805c",
+      "secondary": "#48af03",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#03805c",
+      "style": "plain"
+    }
+  },
+  "MAS": {
+    "home": {
+      "primary": "#f9be00",
+      "secondary": "#000000",
+      "text": "#000000",
+      "style": "pinstripe"
+    },
+    "away": {
+      "primary": "#041534",
+      "secondary": "#154665",
+      "text": "#ffffff",
+      "style": "checker"
+    }
+  },
+  "MDV": {
+    "home": {
+      "primary": "#ae2624",
+      "secondary": "#d22323",
+      "text": "#ffffff",
+      "style": "horiz-bar"
+    },
+    "away": {
+      "primary": "#2546a7",
+      "secondary": "#2546a7",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "MNG": {
+    "home": {
+      "primary": "#0e53bd",
+      "secondary": "#136ac4",
+      "text": "#ffffff",
+      "style": "hoops"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#d8d4d5",
+      "text": "#000000",
+      "style": "hoops"
+    }
+  },
+  "MYA": {
+    "home": {
+      "primary": "#a51012",
+      "secondary": "#a51012",
+      "text": "#ecae51",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#c81316",
+      "style": "plain"
+    },
+    "third": {
+      "primary": "#0e2977",
+      "secondary": "#0e2977",
+      "text": "#e13d3f",
+      "style": "plain"
+    }
+  },
+  "NEP": {
+    "home": {
+      "primary": "#d81923",
+      "secondary": "#e81928",
+      "text": "#ffffff",
+      "style": "gradient"
+    },
+    "away": {
+      "primary": "#153fae",
+      "secondary": "#153fae",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "OMA": {
+    "home": {
+      "primary": "#cc1013",
+      "secondary": "#cc1013",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#cc1013",
+      "style": "plain"
+    }
+  },
+  "PAK": {
+    "home": {
+      "primary": "#1c6f52",
+      "secondary": "#4d9378",
+      "text": "#ffffff",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#1c6f52",
+      "style": "plain"
+    }
+  },
+  "PLE": {
+    "home": {
+      "primary": "#d71820",
+      "secondary": "#c5161d",
+      "text": "#ffffff",
+      "style": "checker"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#f5f5f5",
+      "text": "#d71820",
+      "style": "checker"
+    }
+  },
+  "PHI": {
+    "home": {
+      "primary": "#028cdc",
+      "secondary": "#3263bd",
+      "text": "#fadc57",
+      "style": "hoops"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#bde0ff",
+      "text": "#383c7a",
+      "style": "pinstripe"
+    },
+    "third": {
+      "primary": "#f8d8dd",
+      "secondary": "#fecea4",
+      "text": "#824493",
+      "style": "hoops"
+    }
+  },
+  "SIN": {
+    "home": {
+      "primary": "#e84044",
+      "secondary": "#e84044",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#84c2e7",
+      "secondary": "#ffffff",
+      "text": "#ffffff",
+      "style": "sleeves"
+    }
+  },
+  "SRI": {
+    "home": {
+      "primary": "#ffffff",
+      "secondary": "#f4d890",
+      "text": "#0547b4",
+      "style": "gradient"
+    },
+    "away": {
+      "primary": "#0547b4",
+      "secondary": "#0547b4",
+      "text": "#ffffff",
+      "style": "plain"
+    }
+  },
+  "TJK": {
+    "home": {
+      "primary": "#c40d15",
+      "secondary": "#c40d15",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#c40d15",
+      "style": "plain"
+    }
+  },
+  "TLS": {
+    "home": {
+      "primary": "#e21d1e",
+      "secondary": "#000000",
+      "text": "#f5bd4d",
+      "style": "sleeves"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#e21d1e",
+      "text": "#000000",
+      "style": "sleeves"
+    }
+  },
+  "TKM": {
+    "home": {
+      "primary": "#02884b",
+      "secondary": "#02884b",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "plain"
+    }
+  },
+  "YEM": {
+    "home": {
+      "primary": "#a60817",
+      "secondary": "#a60817",
+      "text": "#ffffff",
+      "style": "plain"
+    },
+    "away": {
+      "primary": "#ffffff",
+      "secondary": "#dad7d8",
+      "text": "#000000",
+      "style": "stripes"
+    }
+  }
+}
