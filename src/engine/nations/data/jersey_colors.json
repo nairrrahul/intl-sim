@@ -67,6 +67,12 @@
       "secondary": "#374874",
       "text": "#ffffff",
       "style": "pinstripe"
+    },
+    "third": {
+      "primary": "#6ecff2",
+      "secondary": "#ffffff",
+      "text": "#000000",
+      "style": "bar"
     }
   },
   "AUS": {
@@ -883,6 +889,12 @@
       "secondary": "#db5166",
       "text": "#d12942",
       "style": "pinstripe"
+    },
+    "third": {
+      "primary": "#000000",
+      "secondary": "#990000",
+      "text": "#ffffff",
+      "style": "gradient"
     }
   },
   "IRL": {
