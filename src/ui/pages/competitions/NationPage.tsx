@@ -1,13 +1,11 @@
 import { signed } from "../../format";
 import NationSquad from "./NationSquad";
-import { YouthRatingInput } from "../../components/YouthRatingInput";
 import { NationMatches } from "./NationMatches";
 import NationU20Team from "./NationU20Team";
 import { getPlayerName } from "../../../engine/players/display";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import { useGame } from "../../../store/gameStore";
-import { getWorldRankings } from "../../../engine/queries";
 import { getConfederation, getNationName } from "../../../engine/nations/nations";
 import { getNationTrophies } from "../../../engine/international/trophies";
 import { getNationRankingHistory } from "../../../engine/international/rankings";
@@ -15,7 +13,6 @@ import { seasonDisplay } from "../../../engine/config";
 import {
   Empty, OvrBadge, PageHeader, Panel, PlayerLink, PosBadge, ShortlistButton, Stat, Tabs, RetiringMark } from "../../components/common";
 import { FlagIcon } from "../../components/FlagIcon";
-import { getNationMatches, type NationMatchRow } from "../../../engine/international/nationViews";
 import OverviewTab from "./OverviewTab";
 import type { Player } from "../../../engine/players/types";
 

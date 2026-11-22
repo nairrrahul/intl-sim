@@ -1,9 +1,16 @@
 import type { World } from "../world/world";
-import type { Player } from "./types";
+import type { Player, ProgressionEntry } from "./types";
 
 export interface YearlyAwardRecord {
   year: number;
   playerId: string;
+}
+
+export interface BallonDorRecord {
+  year: number;
+  firstPlayerId: string;
+  secondPlayerId: string;
+  thirdPlayerId: string;
 }
 
 export interface YearlyAwards {
@@ -11,6 +18,7 @@ export interface YearlyAwards {
   goldenBoot: YearlyAwardRecord[];
   goldenGlove: YearlyAwardRecord[];
   youngTalent: YearlyAwardRecord[];
+  ballonDor: BallonDorRecord[];
 }
 
 export function createYearlyAwards(): YearlyAwards {
@@ -18,7 +26,8 @@ export function createYearlyAwards(): YearlyAwards {
     finalizedYears: [],
     goldenBoot: [],
     goldenGlove: [],
-    youngTalent: []
+    youngTalent: [],
+    ballonDor: []
   };
 }
 
@@ -39,6 +48,14 @@ function getYearlyNationRanks(world: World, year: number): Map<string, number> {
   });
 
   return ranks;
+}
+
+function ballonDorCalc(playerInfo: {player: Player, season: ProgressionEntry, nationRating: number, nationRank: number}) {
+  return playerInfo.player.overall * 0.7 + 0.3 * (
+    playerInfo.player.position === "GK" ?
+    playerInfo.season.cleanSheets * 1.5 :
+    playerInfo.season.goals * 1.5 + playerInfo.season.assists
+  ) + playerInfo.season.trophies.length * 1.2;
 }
 
 function finalizeYear(world: World, year: number): void {
@@ -78,6 +95,20 @@ function finalizeYear(world: World, year: number): void {
       playerId: goldenBoot.player.id
     });
   }
+
+  const ballonDOr = [...candidates]
+    .sort((a,b) => ballonDorCalc(b) - ballonDorCalc(a) || b.nationRank - a.nationRank || alphabetical(b,a));
+
+  if (ballonDOr) {
+    awards.ballonDor.push({
+      year,
+      firstPlayerId: ballonDOr[0].player.id,
+      secondPlayerId: ballonDOr[1].player.id,
+      thirdPlayerId: ballonDOr[2].player.id
+    })
+  }
+
+  //console.log(ballonDOr.map(candidate => [candidate.player, ballonDorCalc(candidate)]).slice(0, 10));
 
   // Golden Glove: clean sheets, player overall, national ranking, alphabetical.
   const goldenGlove = candidates

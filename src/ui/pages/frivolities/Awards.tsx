@@ -12,7 +12,7 @@ import {
   Tabs
 } from "../../components/common";
 
-import type { YearlyAwardRecord } from "../../../engine/players/awards";
+import type { BallonDorRecord, YearlyAwardRecord } from "../../../engine/players/awards";
 
 function getPlayerName(player: {
   commonName: string | null;
@@ -23,7 +23,7 @@ function getPlayerName(player: {
     `${player.firstName} ${player.lastName}`;
 }
 
-type AwardTab = "goldenBoot" | "goldenGlove" | "youngTalent";
+type AwardTab = "goldenBoot" | "goldenGlove" | "youngTalent" | "ballonDor";
 
 export default function Awards() {
   const [tab, setTab] = useState<AwardTab>("goldenBoot");
@@ -57,9 +57,54 @@ export default function Awards() {
         }];
       });
 
+  const getBallonDorRanks = (records: BallonDorRecord[]) => 
+    [...records]
+      .sort((a,b) => a.year - b.year)
+      .flatMap(record => {
+        const winner = game.world.players.find(
+          candidate => candidate.id === record.firstPlayerId
+        );
+
+        const runnerUp = game.world.players.find(
+          candidate => candidate.id === record.secondPlayerId
+        );
+
+        const thirdPlace = game.world.players.find(
+          candidate => candidate.id === record.thirdPlayerId
+        );
+
+        if (!(winner && runnerUp && thirdPlace)) return [];
+
+        const winnerSeason = winner.progression.find(
+          row => row.year === record.year
+        );
+
+        const ruSeason = runnerUp.progression.find(
+          row => row.year === record.year
+        );
+
+        const p3Season = thirdPlace.progression.find(
+          row => row.year === record.year
+        );
+
+        if (!(winnerSeason && ruSeason && p3Season)) return [];
+
+        return [{
+          year: record.year,
+          winner,
+          winnerSeason,
+          runnerUp,
+          ruSeason,
+          thirdPlace,
+          p3Season
+        }];
+
+      })
+
   const goldenBoot = getRows(yearlyAwards.goldenBoot);
   const goldenGlove = getRows(yearlyAwards.goldenGlove);
   const youngTalent = getRows(yearlyAwards.youngTalent);
+  const ballonDOr = getBallonDorRanks(yearlyAwards.ballonDor);
 
   return (
     <div>
@@ -72,7 +117,8 @@ export default function Awards() {
         tabs={[
           { id: "goldenBoot", label: "Golden Boot" },
           { id: "goldenGlove", label: "Golden Glove" },
-          { id: "youngTalent", label: "Young Talent" }
+          { id: "youngTalent", label: "Young Talent" },
+          { id: "ballonDor", label: "International POTY"}
         ]}
         value={tab}
         onChange={setTab}
@@ -213,6 +259,95 @@ export default function Awards() {
                         />
                       </td>
                     </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Panel>
+      )}
+
+      {tab === "ballonDor" && (
+        <Panel title="Yearly International POTY">
+          {goldenBoot.length === 0 ? (
+            <Empty>No awards have been recorded yet.</Empty>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="tbl">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Finish</th>
+                    <th>Winner</th>
+                    <th>POS</th>
+                    <th className="num">OVR</th>
+                    <th>Nationality</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ballonDOr.map(({ year, winner, winnerSeason, runnerUp, ruSeason, thirdPlace, p3Season }) => (
+                    <>
+                      <tr key={`${winner.id}-${year}`} className={`${year % 2 == 1 ? "bg-blue-500/10" : ""}`}>
+                        <td className="tabular-nums">{year}-{(year+1)%100}</td>
+                        <td className="font-semibold text-[1.1rem]">1st</td>
+                        <td className="font-semibold text-[1.1rem]">
+                          <PlayerLink
+                            id={winner.id}
+                            name={getPlayerName(winner)}
+                          />
+                        </td>
+                        <td><PosBadge position={winner.position} /></td>
+                        <td className="num">
+                          <OvrBadge value={winnerSeason.overall} />
+                        </td>
+                        <td>
+                          <NationTag
+                            code={winner.primaryNationality}
+                            label="name"
+                          />
+                        </td>
+                      </tr>
+                      <tr key={`${runnerUp.id}-${year}`} className={`${year % 2 == 1 ? "bg-blue-500/10" : ""}`}>
+                        <td className="tabular-nums"></td>
+                        <td>2nd</td>
+                        <td>
+                          <PlayerLink
+                            id={runnerUp.id}
+                            name={getPlayerName(runnerUp)}
+                          />
+                        </td>
+                        <td><PosBadge position={runnerUp.position} /></td>
+                        <td className="num">
+                          <OvrBadge value={ruSeason.overall} />
+                        </td>
+                        <td>
+                          <NationTag
+                            code={runnerUp.primaryNationality}
+                            label="name"
+                          />
+                        </td>
+                      </tr>
+                      <tr key={`${thirdPlace.id}-${year}`} className={`${year % 2 == 1 ? "bg-blue-500/10" : ""}`}>
+                        <td className="tabular-nums"></td>
+                        <td>3rd</td>
+                        <td>
+                          <PlayerLink
+                            id={thirdPlace.id}
+                            name={getPlayerName(thirdPlace)}
+                          />
+                        </td>
+                        <td><PosBadge position={thirdPlace.position} /></td>
+                        <td className="num">
+                          <OvrBadge value={p3Season.overall} />
+                        </td>
+                        <td>
+                          <NationTag
+                            code={thirdPlace.primaryNationality}
+                            label="name"
+                          />
+                        </td>
+                      </tr>
+                    </>
                   ))}
                 </tbody>
               </table>
