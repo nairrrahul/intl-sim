@@ -52,17 +52,17 @@ export function calculateOverallChange(player: Player, facilityRating = 3): numb
   let newOverall = overall;
 
   if (age < peakStart) {
-    if (age < 19) {
+    if (age < 20) {
       newOverall = Math.min(
         growthPotential,
-        overall + Math.floor(0.65 * randInt(3, 5) * (19 - age))
+        overall + Math.floor(0.65 * randInt(3, 5) * (20 - age))
       );
     } else {
       const coefficient = age < 23 ? 0.8 : 0.7;
       newOverall = Math.min(
         growthPotential,
         overall + Math.floor(
-          coefficient * randInt(4, 7 + (age - 18)) / (age - 18)
+          coefficient * randInt(4, 7 + (age - 18)) / ((age - 18) * (coefficient+0.05))
         )
       );
     }
