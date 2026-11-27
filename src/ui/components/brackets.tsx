@@ -64,7 +64,7 @@ function CupMatchCardBody(props: { match: CupMatchSnap; highlightID?: number; sh
   const decided = match.score !== null;
   const homeWon = decided && match.winner?.id === match.home?.id;
   const awayWon = decided && match.winner?.id === match.away?.id;
-  const hasExtraTime = !!(decided && match.fixture?.goals?.length && match.fixture.homeGoals !== match.fixture.awayGoals && (match.fixture.goals.at(-1)?.minute ?? 0) > 90);
+  const hasExtraTime = !!(decided && match.fixture?.goalInfo?.goals.length && match.fixture.goalInfo.homeGoals !== match.fixture.goalInfo.awayGoals && (match.fixture.goalInfo.goals.at(-1)?.minute ?? 0) > 90);
   const legs = match.legs;
   const tiebreak = match.tiebreak;
   if (legs && match.aggregate) {

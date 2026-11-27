@@ -20,8 +20,8 @@ function toTeamRef(code: string, id: number): TeamRef {
 function toTie(tie: GoldCupPlayoffTie): EuroTieSnap {
   const home = toTeamRef(tie.team1, 1);
   const away = toTeamRef(tie.team2, 2);
-  const firstPlayed = tie.firstLeg.homeGoals !== null && tie.firstLeg.awayGoals !== null;
-  const secondPlayed = tie.secondLeg.homeGoals !== null && tie.secondLeg.awayGoals !== null;
+  const firstPlayed = tie.firstLeg.goalInfo !== null;
+  const secondPlayed = tie.secondLeg.goalInfo !== null;
   return {
     id: tie.id,
     fixtures: [tie.firstLeg, tie.secondLeg],
@@ -29,13 +29,13 @@ function toTie(tie: GoldCupPlayoffTie): EuroTieSnap {
     away,
     bye: false,
     legs: [
-      ...(firstPlayed ? [{ matchday: 1, score: { h: tie.firstLeg.homeGoals!, a: tie.firstLeg.awayGoals! } }] : []),
-      ...(secondPlayed ? [{ matchday: 2, score: { h: tie.secondLeg.awayGoals!, a: tie.secondLeg.homeGoals! } }] : [])
+      ...(firstPlayed ? [{ matchday: 1, score: { h: tie.firstLeg.goalInfo!.homeGoals, a: tie.firstLeg.goalInfo!.awayGoals } }] : []),
+      ...(secondPlayed ? [{ matchday: 2, score: { h: tie.secondLeg.goalInfo!.awayGoals, a: tie.secondLeg.goalInfo!.homeGoals } }] : [])
     ],
     aggregate: firstPlayed && secondPlayed
       ? {
-          h: tie.firstLeg.homeGoals! + tie.secondLeg.awayGoals!,
-          a: tie.firstLeg.awayGoals! + tie.secondLeg.homeGoals!
+          h: tie.firstLeg.goalInfo!.homeGoals + tie.secondLeg.goalInfo!.awayGoals,
+          a: tie.firstLeg.goalInfo!.awayGoals + tie.secondLeg.goalInfo!.homeGoals
         }
       : null,
     tiebreak: tie.penalties

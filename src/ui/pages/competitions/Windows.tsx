@@ -1,3 +1,4 @@
+import { isYouthMatch } from "../../../engine/international/matchResolution";
 import { useMatchInteractions } from "../../components/matchInteractions";
 import { useState } from "react";
 import { useGame } from "../../../store/gameStore";
@@ -15,7 +16,11 @@ function change(value: number | null): string {
 
 function FixtureRow(props: { match: InternationalMatch }) {
   const { match } = props;
-  const played = match.homeGoals !== null && match.awayGoals !== null;
+  const played = match.goalInfo !== null;
+  // U20 matches do not move the world rankings, so they show no ranking-point change.
+  const youth = isYouthMatch(match);
+  const homeChange = youth || !match.goalInfo ? null : match.goalInfo.homeChange;
+  const awayChange = youth || !match.goalInfo ? null : match.goalInfo.awayChange;
   const interactions = useMatchInteractions();
   return (
     <div
@@ -23,15 +28,15 @@ function FixtureRow(props: { match: InternationalMatch }) {
       {...interactions.matchProps(match)}
     >
       <div className="flex items-center justify-end gap-2">
-        {played && <span className={`text-xs tabular-nums ${match.homeChange! > 0 ? "text-accent-yellow" : "text-navy-300"}`}>{change(match.homeChange)}</span>}
+        {played && <span className={`text-xs tabular-nums ${homeChange! > 0 ? "text-accent-yellow" : "text-navy-300"}`}>{change(homeChange)}</span>}
         <NationLink code={match.home} />
       </div>
       <div className="min-w-[4.5rem] text-center font-bold tabular-nums bg-navy-900 rounded px-2 py-0.5">
-        {played ? `${match.homeGoals}-${match.awayGoals}` : "–"}
+        {match.goalInfo ? `${match.goalInfo.homeGoals}-${match.goalInfo.awayGoals}` : "–"}
       </div>
       <div className="flex items-center gap-2">
         <NationLink code={match.away} />
-        {played && <span className={`text-xs tabular-nums ${match.awayChange! > 0 ? "text-accent-yellow" : "text-navy-300"}`}>{change(match.awayChange)}</span>}
+        {played && <span className={`text-xs tabular-nums ${awayChange! > 0 ? "text-accent-yellow" : "text-navy-300"}`}>{change(awayChange)}</span>}
       </div>
     </div>
   );
@@ -62,7 +67,7 @@ const WINDOW_SECTIONS: { kind: string; title: string; splitByConfederation?: boo
 function groupByConfederation(matches: InternationalMatch[]): [string, InternationalMatch[]][] {
   const groups = new Map<string, InternationalMatch[]>();
   for (const match of matches) {
-    const confederation = match.nationsLeagueConfederation ?? "Confederation unavailable";
+    const confederation = match.nationsLeagueInfo?.leagueConfederation ?? "Confederation unavailable";
     groups.set(confederation, [...(groups.get(confederation) ?? []), match]);
   }
   return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b));

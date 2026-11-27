@@ -211,11 +211,11 @@ function toCupSnap(edition: InternationalCompetitionEdition): CupSnap {
         id: match.id,
         home: toTeamRef(match.home, edition),
         away: toTeamRef(match.away, edition),
-        score: match.fixture.homeGoals === null || match.fixture.awayGoals === null
+        score: match.fixture.goalInfo === null
           ? null
           : {
-              h: match.fixture.homeGoals,
-              a: match.fixture.awayGoals,
+              h: match.fixture.goalInfo.homeGoals,
+              a: match.fixture.goalInfo.awayGoals,
               ...(match.fixture.homePenalties && match.fixture.awayPenalties
                 ? {
                     ph: match.fixture.homePenalties.filter(kick => kick === "O").length,

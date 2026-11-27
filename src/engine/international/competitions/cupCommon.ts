@@ -1,5 +1,6 @@
 import { shuffledCopy } from "../../shared/random";
 import hostGroupAllocationRaw from "../data/host_group_allocation.json";
+import { createMatch, finalsCompetition, windowOptions } from "../matchInfo";
 import type { InternationalMatch, InternationalRound, PredictedTier, StatLeaders } from "../types";
 
 export type InternationalCup = "goldCup" | "copaAmerica" | "confedCup" | "u20WorldCup" | "afcon" | "afcCup" | "ofcCup" | "euro";
@@ -77,28 +78,6 @@ export interface InternationalCompetitionEdition {
   statLeaders?: StatLeaders;
   youthRatingImpactApplied?: boolean;
   playoffTeams?: string[];
-}
-
-export function createMatch(
-  home: string,
-  away: string,
-  kind: InternationalMatch["kind"],
-  year: number,
-  windowId: string,
-  extra: Partial<InternationalMatch>
-): InternationalMatch {
-  return {
-    home,
-    away,
-    kind,
-    homeGoals: null,
-    awayGoals: null,
-    homeChange: null,
-    awayChange: null,
-    windowYear: year,
-    windowId,
-    ...extra
-  };
 }
 
 export function drawInternationalCupGroups(
@@ -185,13 +164,12 @@ export function createInternationalCupGroupMatches(
   const editionId = competitionEditionId ?? `${EDITION_PREFIXES[competition]}-${year}-${windowId}`;
   return GROUP_PAIRINGS.map((pairing, roundIndex) =>
     pairing.map(([homeIndex, awayIndex]) =>
-      // Every cup stores its fields under the same keys, prefixed with the competition name.
-      createMatch(teams[homeIndex], teams[awayIndex], `${competition}Group`, year, windowId, {
-        [`${competition}EditionId`]: editionId,
-        [`${competition}Stage`]: "group",
-        [`${competition}Group`]: group,
-        [`${competition}Round`]: roundIndex + 1
-      } as Partial<InternationalMatch>)
+      createMatch(teams[homeIndex], teams[awayIndex], `${competition}Group`, {
+        windowInfo: windowOptions(year, windowId),
+        competitionInformation: finalsCompetition(competition, year, {
+          editionId, stage: "group", group, round: roundIndex + 1
+        })
+      })
     )
   );
 }
@@ -204,21 +182,22 @@ export function getInternationalCupStandings(
     code, played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0
   }]));
   for (const match of group.matches.flat()) {
-    if (match.homeGoals === null || match.awayGoals === null) continue;
+    if (match.goalInfo === null) continue;
+    const { homeGoals, awayGoals } = match.goalInfo;
     const home = rows.get(match.home);
     const away = rows.get(match.away);
     if (!home || !away) throw new Error(`Invalid fixture in international Group ${group.name}.`);
     home.played++;
     away.played++;
-    home.goalsFor += match.homeGoals;
-    home.goalsAgainst += match.awayGoals;
-    away.goalsFor += match.awayGoals;
-    away.goalsAgainst += match.homeGoals;
-    if (match.homeGoals > match.awayGoals) {
+    home.goalsFor += homeGoals;
+    home.goalsAgainst += awayGoals;
+    away.goalsFor += awayGoals;
+    away.goalsAgainst += homeGoals;
+    if (homeGoals > awayGoals) {
       home.won++;
       away.lost++;
       home.points += 3;
-    } else if (match.homeGoals < match.awayGoals) {
+    } else if (homeGoals < awayGoals) {
       away.won++;
       home.lost++;
       away.points += 3;
@@ -248,11 +227,12 @@ export function makeKnockoutMatch(
   away: string,
   competition: KnockoutFixtureCup
 ): InternationalCompetitionKnockoutMatch {
-  const fixture = createMatch(home, away, `${competition}Knockout`, edition.year, edition.windowId, {
-    [`${competition}EditionId`]: edition.id,
-    [`${competition}Stage`]: "knockout",
-    [`${competition}KnockoutMatchId`]: id
-  } as Partial<InternationalMatch>);
+  const fixture = createMatch(home, away, `${competition}Knockout`, {
+    windowInfo: windowOptions(edition.year, edition.windowId),
+    competitionInformation: finalsCompetition(competition, edition.year, {
+      editionId: edition.id, stage: "knockout", knockoutMatchId: id
+    })
+  });
   return { id, home, away, fixture, winner: null };
 }
 
@@ -263,7 +243,7 @@ export function advanceInternationalCupRound(
 ): InternationalRound | null {
   const competitionLabel = CUP_LABELS[competition];
   if (roundIndex === -1) {
-    if (edition.groups.some(group => group.matches.flat().some(match => match.homeGoals === null || match.awayGoals === null))) {
+    if (edition.groups.some(group => group.matches.flat().some(match => match.goalInfo === null))) {
       return null;
     }
     const topTwo = Object.fromEntries(edition.groups.map(group => [

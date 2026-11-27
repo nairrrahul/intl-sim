@@ -1,6 +1,7 @@
 import hostOptionsRaw from "../data/tournament_hosts.json";
 import { getNationName } from "../../nations/nations";
 import { getNationsLeagueStandings, type NationsLeagueEdition } from "./nationsLeague";
+import { createMatch, playoffCompetition, windowOptions } from "../matchInfo";
 import type { InternationalMatch, InternationalRound } from "../types";
 import type { InternationalCompetitionEdition } from "./cupCommon";
 import { getInternationalWindowType } from "../calendar/windowCalendar";
@@ -46,28 +47,6 @@ export interface GoldCupState {
 
 export function createGoldCupState(): GoldCupState {
   return { playoffEditions: [], editions: [] };
-}
-
-function createMatch(
-  home: string,
-  away: string,
-  kind: "goldCupPlayoff",
-  year: number,
-  windowId: string,
-  extra: Partial<InternationalMatch> = {}
-): InternationalMatch {
-  return {
-    home,
-    away,
-    kind,
-    homeGoals: null,
-    awayGoals: null,
-    homeChange: null,
-    awayChange: null,
-    windowYear: year,
-    windowId,
-    ...extra
-  };
 }
 
 function standingsFor(edition: NationsLeagueEdition, division: string) {
@@ -123,15 +102,17 @@ export function createGoldCupPlayoffEdition(
       id: `${id}-T${index + 1}`,
       team1,
       team2,
-      firstLeg: createMatch(team1, team2, "goldCupPlayoff", year, windowId, {
-        goldCupPlayoffId: id,
-        goldCupTieId: `${id}-T${index + 1}`,
-        goldCupLeg: 1
+      firstLeg: createMatch(team1, team2, "goldCupPlayoff", {
+        windowInfo: windowOptions(year, windowId),
+        competitionInformation: playoffCompetition("goldCup", year, {
+          playoffId: id, stage: "playoff", tieId: `${id}-T${index + 1}`, leg: 1
+        })
       }),
-      secondLeg: createMatch(team2, team1, "goldCupPlayoff", year, windowId, {
-        goldCupPlayoffId: id,
-        goldCupTieId: `${id}-T${index + 1}`,
-        goldCupLeg: 2
+      secondLeg: createMatch(team2, team1, "goldCupPlayoff", {
+        windowInfo: windowOptions(year, windowId),
+        competitionInformation: playoffCompetition("goldCup", year, {
+          playoffId: id, stage: "playoff", tieId: `${id}-T${index + 1}`, leg: 2
+        })
       }),
       winner: null,
       penalties: null
@@ -269,12 +250,13 @@ export function getGoldCupHostNames(hosts: string[]): string {
 }
 
 export function playoffAggregate(tie: GoldCupPlayoffTie): { team1: number; team2: number } {
-  if (tie.firstLeg.homeGoals === null || tie.firstLeg.awayGoals === null ||
-    tie.secondLeg.homeGoals === null || tie.secondLeg.awayGoals === null) {
+  const first = tie.firstLeg.goalInfo;
+  const second = tie.secondLeg.goalInfo;
+  if (first === null || second === null) {
     throw new Error(`Gold Cup playoff tie "${tie.id}" has unplayed legs.`);
   }
   return {
-    team1: tie.firstLeg.homeGoals + tie.secondLeg.awayGoals,
-    team2: tie.firstLeg.awayGoals + tie.secondLeg.homeGoals
+    team1: first.homeGoals + second.awayGoals,
+    team2: first.awayGoals + second.homeGoals
   };
 }

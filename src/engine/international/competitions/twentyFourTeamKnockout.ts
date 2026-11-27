@@ -1,7 +1,8 @@
 import { createTwentyFourTeamRoundOf16, pairKnockoutWinners } from "../../shared/knockout24";
 import type { InternationalRound } from "../types";
+import { createMatch, finalsCompetition, windowOptions } from "../matchInfo";
 import {
-  THIRD_PLACE_MATCH_ID, createMatch, getInternationalCupStandings, getKnockoutLosers
+  THIRD_PLACE_MATCH_ID, getInternationalCupStandings, getKnockoutLosers
 } from "./cupCommon";
 import type {
   InternationalCompetitionEdition, InternationalCompetitionKnockoutMatch, InternationalCompetitionKnockoutRound
@@ -10,7 +11,7 @@ import type {
 /**
  * The knockout of a 24-team tournament (six groups of four): round of 16, quarter-finals, semi-finals,
  * then a final with a third-place match. Shared by AFCON and the U20 World Cup; their fixtures differ only
- * in the competition-prefixed fields (e.g. `afconStage`, `u20WorldCupStage`).
+ * in their competition name (`afcon` or `u20WorldCup`).
  */
 export type TwentyFourTeamCup = "afcon" | "u20WorldCup";
 
@@ -21,10 +22,11 @@ function makeKnockoutMatch(
   home: string,
   away: string
 ): InternationalCompetitionKnockoutMatch {
-  const fixture = createMatch(home, away, `${competition}Knockout`, edition.year, edition.windowId, {
-    [`${competition}EditionId`]: edition.id,
-    [`${competition}Stage`]: "knockout",
-    [`${competition}KnockoutMatchId`]: id
+  const fixture = createMatch(home, away, `${competition}Knockout`, {
+    windowInfo: windowOptions(edition.year, edition.windowId),
+    competitionInformation: finalsCompetition(competition, edition.year, {
+      editionId: edition.id, stage: "knockout", knockoutMatchId: id
+    })
   });
   return { id, home, away, fixture, winner: null };
 }
@@ -44,7 +46,7 @@ export function startTwentyFourTeamRoundOf16(
   competition: TwentyFourTeamCup,
   labelPrefix: string
 ): InternationalRound | null {
-  if (edition.groups.some(group => group.matches.flat().some(match => match.homeGoals === null || match.awayGoals === null))) {
+  if (edition.groups.some(group => group.matches.flat().some(match => match.goalInfo === null))) {
     return null;
   }
   const groups = edition.groups.map(group => getInternationalCupStandings(edition, group).map((row, index) => ({

@@ -140,7 +140,7 @@ function roundOf(label: string, matches: ReturnType<typeof makeKnockoutMatch>[])
  */
 export function advanceConfedCupRound(edition: ConfedCupEdition, roundIndex: number): InternationalRound | null {
   if (roundIndex === -1) {
-    if (edition.groups.some(group => group.matches.flat().some(match => match.homeGoals === null || match.awayGoals === null))) {
+    if (edition.groups.some(group => group.matches.flat().some(match => match.goalInfo === null))) {
       return null;
     }
     const placed = Object.fromEntries(edition.groups.map(group => [

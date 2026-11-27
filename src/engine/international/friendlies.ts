@@ -1,3 +1,4 @@
+import { createMatch } from "./matchInfo";
 import { gaussian } from "../shared/random";
 import type { InternationalRound, InternationalState } from "./types";
 
@@ -86,8 +87,6 @@ export function scheduleFriendlies(
   return {
     kind: "friendly",
     leftOut,
-    matches: best.map(([home, away]) => ({
-      home, away, kind: "friendly", homeGoals: null, awayGoals: null, homeChange: null, awayChange: null
-    }))
+    matches: best.map(([home, away]) => createMatch(home, away, "friendly"))
   };
 }

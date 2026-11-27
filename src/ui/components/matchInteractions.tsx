@@ -10,7 +10,7 @@ import { MatchModal } from "./MatchModal";
 /** Red outline marking a rigged match (an outline, not a fill, so it never reads as a highlight). */
 const RIGGED_CLASS = "outline outline-2 -outline-offset-2 outline-red-500 rounded-sm";
 
-const isPlayed = (match: InternationalMatch): boolean => match.homeGoals !== null && match.awayGoals !== null;
+const isPlayed = (match: InternationalMatch): boolean => match.goalInfo !== null;
 
 /** One fixture, or every leg of a two-legged tie. */
 type MatchTarget = InternationalMatch | InternationalMatch[] | undefined;

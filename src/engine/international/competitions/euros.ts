@@ -3,7 +3,8 @@ import { shuffledCopy } from "../../shared/random";
 import { assignHostsToGroups, createInternationalCupGroupMatches, getInternationalCupStandings } from "./cupCommon";
 import type { InternationalCompetitionEdition, InternationalCompetitionKnockoutMatch, InternationalCompetitionKnockoutRound } from "./cupCommon";
 import type { EuroQualifyingEdition } from "./euroQualifiers";
-import type { InternationalMatch, InternationalRound } from "../types";
+import { createMatch, finalsCompetition, windowOptions } from "../matchInfo";
+import type { InternationalRound } from "../types";
 
 const groupNames = [..."ABCDEF"];
 
@@ -109,20 +110,12 @@ function createKnockoutMatch(
   home: string,
   away: string
 ): InternationalCompetitionKnockoutMatch {
-  const fixture: InternationalMatch = {
-    home,
-    away,
-    kind: "euroKnockout",
-    homeGoals: null,
-    awayGoals: null,
-    homeChange: null,
-    awayChange: null,
-    windowYear: edition.year,
-    windowId: edition.windowId,
-    euroEditionId: edition.id,
-    euroStage: "knockout",
-    euroKnockoutMatchId: id
-  };
+  const fixture = createMatch(home, away, "euroKnockout", {
+    windowInfo: windowOptions(edition.year, edition.windowId),
+    competitionInformation: finalsCompetition("euro", edition.year, {
+      editionId: edition.id, stage: "knockout", knockoutMatchId: id
+    })
+  });
   return { id, home, away, fixture, winner: null };
 }
 
@@ -137,7 +130,7 @@ export function getEuroTournamentRounds(edition: InternationalCompetitionEdition
 
 export function startEuroRoundOf16(edition: InternationalCompetitionEdition): InternationalRound | null {
   if (edition.groups.some(group => group.matches.flat().some(match =>
-    match.homeGoals === null || match.awayGoals === null
+    match.goalInfo === null
   ))) return null;
   const groups = edition.groups.map(group => getInternationalCupStandings(edition, group).map((row, index) => ({
     group: group.name,

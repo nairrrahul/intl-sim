@@ -1,3 +1,4 @@
+import { getPlayoff, getQualifying } from "./matchInfo";
 import type { InternationalRound, ScheduledRound, WindowRecord } from "./types";
 
 /**
@@ -13,7 +14,7 @@ export function getLaneKey(round: InternationalRound): string {
     case "afcCupQualifier": return `afcCupQualifier:${round.afcCupQualifierId}`;
     case "ofcCupQualifier": return `ofcCupQualifier:${round.ofcCupQualifierId}`;
     case "euroQualifier": return `euroQualifier:${round.euroQualifierId}:${round.euroStage}`;
-    case "u20Qualifier": return `u20Qualifier:${round.matches[0]?.u20QualifierConfederation ?? ""}`;
+    case "u20Qualifier": return `u20Qualifier:${(round.matches[0] && (getQualifying(round.matches[0], "u20Qualifier") ?? getPlayoff(round.matches[0], "u20Qualifier"))?.confederation) ?? ""}`;
     default: return round.kind ?? "friendly";
   }
 }

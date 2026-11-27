@@ -3,7 +3,8 @@ import { getConfederation } from "../../../nations/nations";
 import { pairKnockoutWinners } from "../../../shared/knockout24";
 import { shuffledCopy } from "../../../shared/random";
 import { THIRD_PLACE_MATCH_ID, assignHostsToGroups, getKnockoutLosers } from "../cupCommon";
-import { createGroupFixtures, getStandings } from "./utils";
+import { createGroupFixtures, getStandings, worldCupTournamentYear } from "./utils";
+import { createMatch, finalsCompetition, setCompetitionInformation } from "../../matchInfo";
 import type { WorldCupTournament } from "./types";
 import type { InternationalMatch, InternationalRound } from "../../types";
 
@@ -107,11 +108,11 @@ export function createWorldCupTournament(
 }
 
 function fixture(tournament: WorldCupTournament, id: string, home: string, away: string): InternationalMatch {
-  return {
-    home, away, kind: "worldCupKnockout",
-    homeGoals: null, awayGoals: null, homeChange: null, awayChange: null,
-    worldCupEditionId: tournament.id, worldCupStage: "knockout", worldCupKnockoutMatchId: id
-  };
+  return createMatch(home, away, "worldCupKnockout", {
+    competitionInformation: finalsCompetition("worldCup", worldCupTournamentYear(tournament.id), {
+      editionId: tournament.id, stage: "knockout", knockoutMatchId: id
+    })
+  });
 }
 
 export function getWorldCupGroupRounds(tournament: WorldCupTournament): InternationalRound[] {
@@ -130,19 +131,22 @@ export function getWorldCupGroupRounds(tournament: WorldCupTournament): Internat
     worldCupStage: "group",
     worldCupRound: roundIndex + 1,
     matches: tournament.groups.flatMap(group => group.matches[roundIndex])
-      .map(match => Object.assign(match, {
-        kind: "worldCupGroup",
-        worldCupEditionId: tournament.id,
-        worldCupStage: "group",
-        worldCupRound: roundIndex + 1,
-        worldCupGroup: tournament.groups.find(group => group.matches[roundIndex].includes(match))?.name
-      }))
+      .map(match => {
+        match.kind = "worldCupGroup";
+        setCompetitionInformation(match, finalsCompetition("worldCup", worldCupTournamentYear(tournament.id), {
+          editionId: tournament.id,
+          stage: "group",
+          round: roundIndex + 1,
+          group: tournament.groups.find(group => group.matches[roundIndex].includes(match))?.name
+        }));
+        return match;
+      })
   }));
 }
 
 export function startWorldCupRoundOf32(tournament: WorldCupTournament): InternationalRound | null {
   if (tournament.groups.some(group => group.matches.flat().some(match =>
-    match.homeGoals === null || match.awayGoals === null
+    match.goalInfo === null
   ))) return null;
   const rows = tournament.groups.map(group => {
     const ranked = getStandings(group, tournament.seedRanks);

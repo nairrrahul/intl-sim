@@ -39,7 +39,7 @@ export function toggleShortlist(game: Game, playerId: string): ActionResult {
 /** Assigns and stores stoppage-time display labels for goals when their match report is first opened. */
 export function initializeGoalDisplayMinutes(game: Game, matches: InternationalMatch[]): ActionResult {
   for (const match of matches) {
-    for (const goal of match.goals ?? []) {
+    for (const goal of match.goalInfo?.goals ?? []) {
       if (goal.displayMinute !== undefined || ![45, 90, 105, 120].includes(goal.minute)) continue;
       if (goal.minute < 91) {
         goal.displayMinute = `${goal.minute}+${randInt(1, 5)}`;

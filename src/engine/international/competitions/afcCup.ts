@@ -8,6 +8,7 @@ import { getFixedInternationalCompetitionHosts } from "./fixedHosts";
 import { createInternationalCupGroupMatches, drawInternationalCupGroups, getInternationalCupStandings } from "./cupCommon";
 import type { InternationalCompetitionEdition, InternationalCompetitionGroup, InternationalCompetitionKnockoutMatch, InternationalCompetitionKnockoutRound } from "./cupCommon";
 import type { GoldCupPlayoffTie } from "./goldCup";
+import { createMatch, finalsCompetition, qualifyingCompetition, setWindow, windowOptions } from "../matchInfo";
 import type { InternationalMatch, InternationalRound } from "../types";
 
 const hostOptions = (hostOptionsRaw as Record<string, string[]>).AFCCUP ?? [];
@@ -43,34 +44,13 @@ export function getAfcCupWindowType(year: number, windowId: string): "AFCQP" | "
   return type === "AFCQP" || type === "AFCQM" || type === "AFCCUP" ? type : null;
 }
 
-function createMatch(
-  home: string,
-  away: string,
-  kind: string,
-  year: number,
-  windowId: string,
-  extra: Partial<InternationalMatch> = {}
-): InternationalMatch {
-  return {
-    home,
-    away,
-    kind,
-    homeGoals: null,
-    awayGoals: null,
-    homeChange: null,
-    awayChange: null,
-    windowYear: year,
-    windowId,
-    ...extra
-  };
-}
-
 function createMainGroupMatches(
   teams: string[],
   group: string,
   editionId: string,
   year: number,
-  windowId: string
+  windowId: string,
+  tournamentYear: number = year
 ): InternationalMatch[][] {
   const [a, b, c, d] = teams;
   const firstLegs: [string, string][][] = [
@@ -80,12 +60,11 @@ function createMainGroupMatches(
   ];
   const fixtures = [...firstLegs, ...firstLegs.map(round => round.map(([home, away]) => [away, home] as [string, string]))];
   return fixtures.map((matches, roundIndex) => matches.map(([home, away]) =>
-    createMatch(home, away, "afcCupQualifier", year, windowId, {
-      afcCupEditionId: editionId,
-      afcCupQualifierId: editionId,
-      afcCupStage: "main",
-      afcCupGroup: group,
-      afcCupRound: roundIndex + 1
+    createMatch(home, away, "afcCupQualifier", {
+      windowInfo: windowOptions(year, windowId),
+      competitionInformation: qualifyingCompetition("afcCup", tournamentYear, {
+        qualifierId: editionId, stage: "main", group, round: roundIndex + 1
+      })
     })
   ));
 }
@@ -125,7 +104,7 @@ function drawMainQualifiers(
   edition.mainGroups = groups.map((teams, index) => ({
     name: qualifyingGroupNames[index],
     teams,
-    matches: createMainGroupMatches(teams, qualifyingGroupNames[index], edition.id, year, windowId)
+    matches: createMainGroupMatches(teams, qualifyingGroupNames[index], edition.id, year, windowId, edition.year)
   }));
   edition.mainRoundsPlayed = 0;
   edition.preliminaryComplete = true;
@@ -164,17 +143,17 @@ export function createAfcCupQualifierEdition(
       id: tieId,
       team1,
       team2,
-      firstLeg: createMatch(team1, team2, "afcCupQualifier", year, windowId, {
-        afcCupQualifierId: id,
-        afcCupTieId: tieId,
-        afcCupStage: "preliminary",
-        afcCupLeg: 1
+      firstLeg: createMatch(team1, team2, "afcCupQualifier", {
+        windowInfo: windowOptions(year, windowId),
+        competitionInformation: qualifyingCompetition("afcCup", year, {
+          qualifierId: id, stage: "preliminary", tieId, leg: 1
+        })
       }),
-      secondLeg: createMatch(team2, team1, "afcCupQualifier", year, windowId, {
-        afcCupQualifierId: id,
-        afcCupTieId: tieId,
-        afcCupStage: "preliminary",
-        afcCupLeg: 2
+      secondLeg: createMatch(team2, team1, "afcCupQualifier", {
+        windowInfo: windowOptions(year, windowId),
+        competitionInformation: qualifyingCompetition("afcCup", year, {
+          qualifierId: id, stage: "preliminary", tieId, leg: 2
+        })
       }),
       winner: null,
       penalties: null
@@ -279,8 +258,7 @@ export function getAfcCupMainRounds(
     const roundIndex = schedule.start + offset;
     const matches = edition.mainGroups!.flatMap(group => group.matches[roundIndex]);
     matches.forEach(match => {
-      match.windowYear = year;
-      match.windowId = windowId;
+      setWindow(match, year, windowId);
     });
     return {
       kind: "afcCupQualifier" as const,
@@ -375,17 +353,18 @@ function makeKnockoutMatch(
   home: string,
   away: string
 ): InternationalCompetitionKnockoutMatch {
-  const fixture = createMatch(home, away, "afcCupKnockout", edition.year, edition.windowId, {
-    afcCupEditionId: edition.id,
-    afcCupStage: "knockout",
-    afcCupKnockoutMatchId: id
+  const fixture = createMatch(home, away, "afcCupKnockout", {
+    windowInfo: windowOptions(edition.year, edition.windowId),
+    competitionInformation: finalsCompetition("afcCup", edition.year, {
+      editionId: edition.id, stage: "knockout", knockoutMatchId: id
+    })
   });
   return { id, home, away, fixture, winner: null };
 }
 
 export function startAfcCupRoundOf16(edition: InternationalCompetitionEdition): InternationalRound | null {
   if (edition.groups.some(group => group.matches.flat().some(match =>
-    match.homeGoals === null || match.awayGoals === null
+    match.goalInfo === null
   ))) return null;
   const groups = edition.groups.map(group => standings(group, edition.seedRanks).map((row, index) => ({
     group: group.name,

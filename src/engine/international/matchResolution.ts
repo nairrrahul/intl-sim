@@ -12,7 +12,9 @@ import { getAfconQualifier } from "./competitions/afcon";
 import { getAfcCupQualifier } from "./competitions/afcCup";
 import { MATCH_IMPORTANCE, rankingPointChange } from "./rankings";
 import type { MatchOutcome } from "./rankings";
-import type { InternationalMatch, InternationalState } from "./types";
+import { createGoalInfo, getFinals, getPlayoff, getQualifying, setMatchWinner } from "./matchInfo";
+import type { CompetitionName, InternationalMatch, InternationalState } from "./types";
+import type { InternationalCompetitionEdition } from "./competitions/cupCommon";
 
 const round2 = (value: number): number => Math.round(value * 100) / 100;
 
@@ -24,11 +26,18 @@ const toMatchTeam = (state: InternationalState, code: string, youth = false): Ma
 });
 
 export function isKnockoutMatch(match: InternationalMatch): boolean {
-  return match.goldCupStage === "knockout" || match.copaAmericaStage === "knockout" || match.confedCupStage === "knockout" ||
-    match.u20WorldCupStage === "knockout" || match.u20QualifierStage === "playoff" ||
-    match.afconStage === "knockout" || match.afcCupStage === "knockout" || match.ofcCupStage === "knockout" ||
-    match.euroStage === "playoff" || match.euroStage === "knockout" ||
-    match.worldCupPathMatch !== undefined || match.worldCupKnockoutMatchId !== undefined;
+  const competition = match.competitionInformation;
+  if (!competition) return false;
+  switch (competition.competitionName) {
+    case "worldCup":
+      return competition.playoffOptions?.pathMatch !== undefined || competition.finalsInfo?.knockoutMatchId !== undefined;
+    case "u20Qualifier":
+      return competition.playoffOptions?.stage === "playoff";
+    case "euro":
+      return competition.playoffOptions?.stage === "playoff" || competition.finalsInfo?.stage === "knockout";
+    default:
+      return competition.finalsInfo?.stage === "knockout";
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -51,8 +60,8 @@ interface TieRef {
 
 /** Winner by aggregate over two legs, or by a penalty shootout when level. */
 function decideTie(state: InternationalState, tie: TieRef, secondLegHomeGoals: number, secondLegAwayGoals: number, youth = false) {
-  const aggregateTeam1 = tie.firstLeg.homeGoals! + secondLegAwayGoals;
-  const aggregateTeam2 = tie.firstLeg.awayGoals! + secondLegHomeGoals;
+  const aggregateTeam1 = tie.firstLeg.goalInfo!.homeGoals + secondLegAwayGoals;
+  const aggregateTeam2 = tie.firstLeg.goalInfo!.awayGoals + secondLegHomeGoals;
   if (aggregateTeam1 !== aggregateTeam2) {
     return { winner: aggregateTeam1 > aggregateTeam2 ? tie.team1 : tie.team2, shootout: null };
   }
@@ -61,7 +70,7 @@ function decideTie(state: InternationalState, tie: TieRef, secondLegHomeGoals: n
 }
 
 function assertFirstLegPlayed(tie: TieRef | undefined | null, description: string): asserts tie is TieRef {
-  if (!tie || tie.firstLeg.homeGoals === null || tie.firstLeg.awayGoals === null) {
+  if (!tie || tie.firstLeg.goalInfo === null) {
     throw new Error(`${description} has no completed first leg.`);
   }
 }
@@ -76,47 +85,55 @@ function resolveSecondLeg(
   const shootoutPenalties = (shootout: MatchResult | null) =>
     shootout ? { home: shootout.homeGoalInfo.penalties ?? [], away: shootout.awayGoalInfo.penalties ?? [] } : null;
 
-  if (match.goldCupPlayoffId && match.goldCupTieId && match.goldCupLeg === 2) {
-    const playoffId = match.goldCupPlayoffId;
-    const tie = getGoldCupPlayoff(state.goldCup, playoffId).ties.find(candidate => candidate.id === match.goldCupTieId);
-    assertFirstLegPlayed(tie, `Gold Cup playoff tie "${match.goldCupTieId}"`);
+  const goldCup = getPlayoff(match, "goldCup");
+  if (goldCup?.playoffId && goldCup.tieId && goldCup.leg === 2) {
+    const { playoffId, tieId } = goldCup;
+    const tie = getGoldCupPlayoff(state.goldCup, playoffId).ties.find(candidate => candidate.id === tieId);
+    assertFirstLegPlayed(tie, `Gold Cup playoff tie "${tieId}"`);
     const { winner, shootout } = decideTie(state, tie, homeGoals, awayGoals);
     return {
       winner, shootout,
       commit: () => resolveGoldCupPlayoffTie(state.goldCup, playoffId, tie.id, winner, shootoutPenalties(shootout))
     };
   }
-  if (match.afconQualifierId && match.afconTieId && match.afconLeg === 2) {
-    const qualifierId = match.afconQualifierId;
-    const tie = getAfconQualifier(state.afcon, qualifierId).preliminaryTies.find(candidate => candidate.id === match.afconTieId);
-    assertFirstLegPlayed(tie, `AFCON preliminary tie "${match.afconTieId}"`);
+  const afcon = getQualifying(match, "afcon");
+  if (afcon?.qualifierId && afcon.tieId && afcon.leg === 2) {
+    const { qualifierId, tieId } = afcon;
+    const tie = getAfconQualifier(state.afcon, qualifierId).preliminaryTies.find(candidate => candidate.id === tieId);
+    assertFirstLegPlayed(tie, `AFCON preliminary tie "${tieId}"`);
     const { winner, shootout } = decideTie(state, tie, homeGoals, awayGoals);
     return {
       winner, shootout,
       commit: () => resolveAfconPreliminaryTie(state.afcon, qualifierId, tie.id, winner, shootoutPenalties(shootout))
     };
   }
-  if (match.afcCupQualifierId && match.afcCupTieId && match.afcCupLeg === 2) {
-    const qualifierId = match.afcCupQualifierId;
-    const tie = getAfcCupQualifier(state.afcCup, qualifierId).preliminaryTies.find(candidate => candidate.id === match.afcCupTieId);
-    assertFirstLegPlayed(tie, `Asian Cup preliminary tie "${match.afcCupTieId}"`);
+  const afcCup = getQualifying(match, "afcCup");
+  if (afcCup?.qualifierId && afcCup.tieId && afcCup.leg === 2) {
+    const { qualifierId, tieId } = afcCup;
+    const tie = getAfcCupQualifier(state.afcCup, qualifierId).preliminaryTies.find(candidate => candidate.id === tieId);
+    assertFirstLegPlayed(tie, `Asian Cup preliminary tie "${tieId}"`);
     const { winner, shootout } = decideTie(state, tie, homeGoals, awayGoals);
     return {
       winner, shootout,
       commit: () => resolveAfcCupPreliminaryTie(state.afcCup, qualifierId, tie.id, winner, shootoutPenalties(shootout))
     };
   }
-  if (match.worldCupEditionId && match.worldCupTieId && match.worldCupLeg === 2) {
-    const edition = state.worldCup.editions.find(item => item.id === match.worldCupEditionId);
-    const tie = edition ? findWorldCupTie(edition, match.worldCupTieId) : null;
-    assertFirstLegPlayed(tie, `World Cup qualifying tie "${match.worldCupTieId}"`);
+  const worldCupQualifying = getQualifying(match, "worldCup");
+  const worldCupPlayoff = getPlayoff(match, "worldCup");
+  const worldCup = worldCupQualifying ?? worldCupPlayoff;
+  const worldCupEditionId = worldCupQualifying ? worldCupQualifying.qualifierId : worldCupPlayoff?.playoffId;
+  if (worldCup && worldCupEditionId && worldCup.tieId && worldCup.leg === 2) {
+    const edition = state.worldCup.editions.find(item => item.id === worldCupEditionId);
+    const tie = edition ? findWorldCupTie(edition, worldCup.tieId) : null;
+    assertFirstLegPlayed(tie, `World Cup qualifying tie "${worldCup.tieId}"`);
     const { winner, shootout } = decideTie(state, tie, homeGoals, awayGoals);
     return { winner, shootout, commit: () => { tie.winner = winner; } };
   }
-  if (match.u20QualifierEditionId && match.u20QualifierTieId && match.u20QualifierLeg === 2) {
-    const edition = state.u20Qualifying.editions.find(item => item.id === match.u20QualifierEditionId);
-    const tie = edition?.confederations[match.u20QualifierConfederation ?? ""]?.ties.find(item => item.id === match.u20QualifierTieId);
-    assertFirstLegPlayed(tie, `U20 qualifying tie "${match.u20QualifierTieId}"`);
+  const u20 = getQualifying(match, "u20Qualifier");
+  if (u20?.qualifierId && u20.tieId && u20.leg === 2) {
+    const edition = state.u20Qualifying.editions.find(item => item.id === u20.qualifierId);
+    const tie = edition?.confederations[u20.confederation ?? ""]?.ties.find(item => item.id === u20.tieId);
+    assertFirstLegPlayed(tie, `U20 qualifying tie "${u20.tieId}"`);
     const { winner, shootout } = decideTie(state, tie, homeGoals, awayGoals, true);
     return { winner, shootout, commit: () => { tie.winner = winner; } };
   }
@@ -127,63 +144,67 @@ function resolveSecondLeg(
 // Knockout winners
 // ---------------------------------------------------------------------------
 
-/** Cups whose knockout fixtures register their winner on the edition (fields are `<prefix>EditionId` etc.). */
-const KNOCKOUT_CUPS = [
-  { prefix: "goldCup", name: "Gold Cup", editions: (s: InternationalState) => s.goldCup.editions },
-  { prefix: "copaAmerica", name: "Copa América", editions: (s: InternationalState) => s.copaAmerica.editions },
-  { prefix: "confedCup", name: "Confederations Cup", editions: (s: InternationalState) => s.confedCup.editions },
-  { prefix: "u20WorldCup", name: "U20 World Cup", editions: (s: InternationalState) => s.u20WorldCup.editions },
-  { prefix: "afcon", name: "AFCON", editions: (s: InternationalState) => s.afcon.editions },
-  { prefix: "afcCup", name: "Asian Cup", editions: (s: InternationalState) => s.afcCup.editions },
-  { prefix: "ofcCup", name: "OFC Cup", editions: (s: InternationalState) => s.ofcCup.editions }
-] as const;
+/** Cups whose knockout fixtures register their winner on the edition. */
+const KNOCKOUT_CUPS: readonly {
+  name: CompetitionName; label: string; editions: (s: InternationalState) => InternationalCompetitionEdition[]
+}[] = [
+  { name: "goldCup", label: "Gold Cup", editions: (s: InternationalState) => s.goldCup.editions },
+  { name: "copaAmerica", label: "Copa América", editions: (s: InternationalState) => s.copaAmerica.editions },
+  { name: "confedCup", label: "Confederations Cup", editions: (s: InternationalState) => s.confedCup.editions },
+  { name: "u20WorldCup", label: "U20 World Cup", editions: (s: InternationalState) => s.u20WorldCup.editions },
+  { name: "afcon", label: "AFCON", editions: (s: InternationalState) => s.afcon.editions },
+  { name: "afcCup", label: "Asian Cup", editions: (s: InternationalState) => s.afcCup.editions },
+  { name: "ofcCup", label: "OFC Cup", editions: (s: InternationalState) => s.ofcCup.editions }
+];
 
 function recordKnockoutWinner(state: InternationalState, match: InternationalMatch, winner: string): void {
-  const fields = match as unknown as Record<string, string | undefined>;
   for (const cup of KNOCKOUT_CUPS) {
-    const editionId = fields[`${cup.prefix}EditionId`];
-    const matchId = fields[`${cup.prefix}KnockoutMatchId`];
-    if (!editionId || !matchId) continue;
-    const edition = cup.editions(state).find(candidate => candidate.id === editionId);
-    if (!edition) throw new Error(`Unknown ${cup.name} edition "${editionId}".`);
-    fields[`${cup.prefix}Winner`] = winner;
-    setInternationalCupKnockoutWinner(edition, matchId, winner);
+    const cupFinals = getFinals(match, cup.name);
+    if (!cupFinals?.editionId || !cupFinals.knockoutMatchId) continue;
+    const edition = cup.editions(state).find(candidate => candidate.id === cupFinals.editionId);
+    if (!edition) throw new Error(`Unknown ${cup.label} edition "${cupFinals.editionId}".`);
+    cupFinals.winner = winner;
+    setInternationalCupKnockoutWinner(edition, cupFinals.knockoutMatchId, winner);
   }
 
-  if (match.u20QualifierStage === "playoff") {
+  const u20 = getPlayoff(match, "u20Qualifier");
+  if (u20?.stage === "playoff") {
     const edition = state.u20Qualifying.editions.find(
-      item => item.id === match.u20QualifierEditionId
+      item => item.id === u20.playoffId
     );
 
-    if (match.u20QualifierConfederation === "CONMEBOL") {
+    if (u20.confederation === "CONMEBOL") {
       const knockoutMatch = edition?.confederations.CONMEBOL.knockout
         .flatMap(round => round.matches)
-        .find(item => item.id === match.u20QualifierKnockoutMatchId);
+        .find(item => item.id === u20.knockoutMatchId);
 
       if (knockoutMatch) knockoutMatch.winner = winner;
-    } else if (match.u20QualifierConfederation === "ICPO") {
+    } else if (u20.confederation === "ICPO") {
       const playoffMatch = edition?.playoff
         ?.flatMap(round => round.matches)
-        .find(item => item.id === match.u20QualifierKnockoutMatchId);
+        .find(item => item.id === u20.knockoutMatchId);
 
       if (playoffMatch) playoffMatch.winner = winner;
     }
   }
 
-  if (match.euroStage === "playoff" || match.euroStage === "knockout") {
-    match.euroWinner = winner;
-    if (match.euroEditionId && match.euroKnockoutMatchId) {
-      const edition = state.euro.editions.find(candidate => candidate.id === match.euroEditionId);
-      if (!edition) throw new Error(`Unknown EURO edition "${match.euroEditionId}".`);
-      setInternationalCupKnockoutWinner(edition, match.euroKnockoutMatchId, winner);
+  const euroPlayoff = getPlayoff(match, "euro");
+  const euroFinals = getFinals(match, "euro");
+  if (euroPlayoff?.stage === "playoff" || euroFinals?.stage === "knockout") {
+    setMatchWinner(match, winner);
+    if (euroFinals?.editionId && euroFinals.knockoutMatchId) {
+      const edition = state.euro.editions.find(candidate => candidate.id === euroFinals.editionId);
+      if (!edition) throw new Error(`Unknown EURO edition "${euroFinals.editionId}".`);
+      setInternationalCupKnockoutWinner(edition, euroFinals.knockoutMatchId, winner);
     }
   }
-  if (match.worldCupStage === "knockout" && match.worldCupEditionId && match.worldCupKnockoutMatchId) {
-    const edition = getWorldCupEdition(state.worldCup, match.worldCupEditionId);
-    match.worldCupWinner = winner;
-    if (edition.tournament) recordWorldCupKnockoutWinner(edition.tournament, match.worldCupKnockoutMatchId, winner);
-  } else if (match.worldCupPathMatch !== undefined) {
-    match.worldCupWinner = winner;
+  const worldCupFinals = getFinals(match, "worldCup");
+  if (worldCupFinals?.stage === "knockout" && worldCupFinals.editionId && worldCupFinals.knockoutMatchId) {
+    const edition = getWorldCupEdition(state.worldCup, worldCupFinals.editionId);
+    worldCupFinals.winner = winner;
+    if (edition.tournament) recordWorldCupKnockoutWinner(edition.tournament, worldCupFinals.knockoutMatchId, winner);
+  } else if (getPlayoff(match, "worldCup")?.pathMatch !== undefined) {
+    setMatchWinner(match, winner);
   }
 }
 
@@ -234,17 +255,17 @@ export function playMatch(state: InternationalState, match: InternationalMatch):
     : homeGoals > awayGoals ? "win" : homeGoals < awayGoals ? "loss" : "draw";
   const awayOutcome: MatchOutcome = homeOutcome === "win" ? "loss" : homeOutcome === "loss" ? "win" : "draw";
 
-  match.homeGoals = homeGoals;
-  match.awayGoals = awayGoals;
-  // Youth matches do not affect the senior world rankings.
+  const goalInfo = createGoalInfo(homeGoals, awayGoals);
+  match.goalInfo = goalInfo;
+  // Youth matches do not affect the senior world rankings (their changes stay 0).
   if (!youth) {
     const importance = MATCH_IMPORTANCE[match.kind];
     const homeChange = rankingPointChange(home.points, away.points, importance, homeOutcome, { shootout: hasShootout });
     const awayChange = rankingPointChange(away.points, home.points, importance, awayOutcome, { shootout: hasShootout });
     home.points = round2(home.points + homeChange);
     away.points = round2(away.points + awayChange);
-    match.homeChange = round2(homeChange);
-    match.awayChange = round2(awayChange);
+    goalInfo.homeChange = round2(homeChange);
+    goalInfo.awayChange = round2(awayChange);
   }
   // The tie shootout was simulated with the first-leg home side first, so its sides are swapped here.
   match.homePenalties = result.homeGoalInfo.penalties ??

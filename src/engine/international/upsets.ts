@@ -1,3 +1,4 @@
+import { getFinals, getPlayoff, getQualifying, getStage } from "./matchInfo";
 import { getNationName } from "../nations/nations";
 import type {
   InternationalMatch,
@@ -59,6 +60,12 @@ function sortRatingUpsets(
  * Draws and U20 matches are excluded.
  */
 
+/** The World Cup qualifying/play-off phase of a match (finals matches have a stage but no phase). */
+const worldCupPhase = (match: InternationalMatch): string | undefined => {
+  const phase = getQualifying(match, "worldCup") ?? getPlayoff(match, "worldCup");
+  return phase?.stage ?? getFinals(match, "worldCup")?.phase;
+};
+
 function createRecord(
   match: InternationalMatch,
   window: WindowRecord,
@@ -67,22 +74,22 @@ function createRecord(
   // Exclude all U20 matches and unfinished matches.
   if (
     match.kind.startsWith("u20") ||
-    match.homeGoals === null ||
-    match.awayGoals === null
+    match.goalInfo === null
   ) {
     return null;
   }
+  const { homeGoals, awayGoals } = match.goalInfo;
 
   // Draws are not upsets.
-  if (match.homeGoals === match.awayGoals) {
+  if (homeGoals === awayGoals) {
     return null;
   }
 
   // These values must have been captured immediately before the match.
-  const homeRank = match.homeRankBefore;
-  const awayRank = match.awayRankBefore;
-  const homeOverall = match.homeOverallBefore;
-  const awayOverall = match.awayOverallBefore;
+  const homeRank = match.matchChangeInfo?.homeRankBefore;
+  const awayRank = match.matchChangeInfo?.awayRankBefore;
+  const homeOverall = match.matchChangeInfo?.homeOverallBefore;
+  const awayOverall = match.matchChangeInfo?.awayOverallBefore;
 
   if (
     homeRank === undefined ||
@@ -93,7 +100,7 @@ function createRecord(
     return null;
   }
 
-  const homeWon = match.homeGoals > match.awayGoals;
+  const homeWon = homeGoals > awayGoals;
 
   const winner = homeWon ? match.home : match.away;
   const loser = homeWon ? match.away : match.home;
@@ -123,8 +130,8 @@ function createRecord(
     winner,
     loser,
 
-    homeGoals: match.homeGoals,
-    awayGoals: match.awayGoals,
+    homeGoals,
+    awayGoals,
 
     homeRank,
     awayRank,
@@ -137,8 +144,8 @@ function createRecord(
     ratingDifference: Math.abs(homeOverall - awayOverall),
     ratingUnderdogOverall: Math.min(homeOverall, awayOverall),
     
-    worldCupPhase: match.worldCupPhase,
-    worldCupStage: match.worldCupStage
+    worldCupPhase: worldCupPhase(match),
+    worldCupStage: getStage(match, "worldCup")
   };
 }
 

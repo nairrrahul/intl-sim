@@ -1,4 +1,5 @@
-import { emptyWorldCupPhase, drawPaths } from "./utils";
+import { createMatch, getPlayoff, playoffCompetition, windowOptions } from "../../matchInfo";
+import { emptyWorldCupPhase, drawPaths, worldCupTournamentYear } from "./utils";
 import type { WorldCupEdition, WorldCupPath, WorldCupRegionalQualifying } from "./types";
 import type { InternationalMatch, InternationalRound } from "../../types";
 
@@ -48,15 +49,13 @@ export function getIntercontinentalPlayoffRounds(
       const home = bracketMatch.player1?.team;
       const away = bracketMatch.player2?.team;
       if (!home || !away) return [];
-      return [{
-        home, away, kind: "worldCupQualifier",
-        homeGoals: null, awayGoals: null, homeChange: null, awayChange: null,
-        windowYear: year, windowId,
-        worldCupEditionId: edition.id, worldCupStage: "ICPO",
-        worldCupPhase: "ICPO",
-        worldCupPath: path.name, worldCupPathRound: phase.playoffRoundsPlayed + 1,
-        worldCupPathMatch: index
-      } as InternationalMatch];
+      return [createMatch(home, away, "worldCupQualifier", {
+        windowInfo: windowOptions(year, windowId),
+        competitionInformation: playoffCompetition("worldCup", worldCupTournamentYear(edition.id), {
+          playoffId: edition.id, stage: "ICPO", path: path.name,
+          pathRound: phase.playoffRoundsPlayed + 1, pathMatch: index
+        })
+      })];
     })
   );
   return matches.length === 0 ? [] : [{
@@ -78,22 +77,23 @@ export function recordIntercontinentalPlayoffRound(
   const phase = edition.intercontinental.phases.ICPO;
   if (!phase) throw new Error("Intercontinental playoff was not initialized.");
   for (const match of matches) {
-    const path = phase.paths.find(item => item.name === match.worldCupPath);
-    const bracketMatch = match.worldCupPathMatch === undefined
+    const playoff = getPlayoff(match, "worldCup");
+    const path = phase.paths.find(item => item.name === playoff?.path);
+    const bracketMatch = playoff?.pathMatch === undefined
       ? undefined
-      : path?.bracket.rounds[phase.playoffRoundsPlayed]?.[match.worldCupPathMatch];
-    if (!path || !bracketMatch || !match.worldCupWinner) throw new Error("Invalid intercontinental playoff match result.");
-    if (match.homeGoals === null || match.awayGoals === null) {
+      : path?.bracket.rounds[phase.playoffRoundsPlayed]?.[playoff.pathMatch];
+    if (!path || !bracketMatch || !playoff?.winner) throw new Error("Invalid intercontinental playoff match result.");
+    if (match.goalInfo === null) {
       throw new Error("Intercontinental playoff result is missing its score.");
     }
     path.results[bracketMatch.id] = {
-      homeGoals: match.homeGoals,
-      awayGoals: match.awayGoals,
+      homeGoals: match.goalInfo.homeGoals,
+      awayGoals: match.goalInfo.awayGoals,
       ...(match.homePenalties ? { homePenalties: [...match.homePenalties] } : {}),
       ...(match.awayPenalties ? { awayPenalties: [...match.awayPenalties] } : {}),
       fixture: match
     };
-    bracketMatch.winner = match.worldCupWinner;
+    bracketMatch.winner = playoff.winner;
   }
   settleByes(phase.paths, phase.playoffRoundsPlayed);
   if (!phase.paths.every(path =>

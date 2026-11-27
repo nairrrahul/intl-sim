@@ -2,6 +2,7 @@ import initialAllocationsRaw from "../data/nations_league.json";
 import { getConfederation } from "../../nations/nations";
 import { scheduleLeague } from "../../shared/scheduler";
 import { shuffledCopy } from "../../shared/random";
+import { createMatch, windowOptions } from "../matchInfo";
 import type { InternationalMatch } from "../types";
 import { assertInternationalWindowCoverage, getInternationalWindowIndex, getInternationalWindowLocation, getInternationalWindowTypeAt, INTERNATIONAL_CYCLE_WINDOW_COUNT } from "../calendar/windowCalendar";
 import { getCompetitivelyEligibleTeams } from "./eligibility";
@@ -140,22 +141,16 @@ function createEdition(
         );
         const location = getInternationalWindowLocation(startWindowIndex + windowSlot);
         for (const fixture of fixtures) {
-          matches.push({
-            home: fixture.homeTeam,
-            away: fixture.awayTeam,
-            kind: "nationsLeague",
-            homeGoals: null,
-            awayGoals: null,
-            homeChange: null,
-            awayChange: null,
-            nationsLeagueId: `${confederation}-${competition}-${Math.floor(startWindowIndex / INTERNATIONAL_CYCLE_WINDOW_COUNT)}`,
-            nationsLeagueConfederation: confederation,
-            nationsLeagueDivision: division,
-            nationsLeagueGroup: group.name,
-            nationsLeagueRound: round,
-            windowYear: location.year,
-            windowId: location.windowId
-          });
+          matches.push(createMatch(fixture.homeTeam, fixture.awayTeam, "nationsLeague", {
+            windowInfo: windowOptions(location.year, location.windowId),
+            nationsLeagueInfo: {
+              leagueId: `${confederation}-${competition}-${Math.floor(startWindowIndex / INTERNATIONAL_CYCLE_WINDOW_COUNT)}`,
+              leagueConfederation: confederation,
+              leagueDivision: division,
+              leagueGroup: group.name,
+              leagueRound: round
+            }
+          }));
         }
       });
     }
@@ -209,7 +204,7 @@ export function getNationsLeagueRoundsForWindow(
   const edition = [...state.editions].reverse().find(candidate =>
     candidate.confederation === confederation &&
     candidate.competition === competition &&
-    candidate.matches.some(match => match.windowYear === year && match.windowId === windowId)
+    candidate.matches.some(match => match.windowInfo?.windowYear === year && match.windowInfo?.windowId === windowId)
   );
   const currentEdition = edition ?? (
     isFirstCompetitionWindow(confederation, index)
@@ -221,13 +216,13 @@ export function getNationsLeagueRoundsForWindow(
   }
   if (!edition) state.editions.push(currentEdition);
   currentEdition.status = "active";
-  const matches = currentEdition.matches.filter(match => match.windowYear === year && match.windowId === windowId);
-  const roundNumbers = [...new Set(matches.map(match => match.nationsLeagueRound ?? 0))].sort((a, b) => a - b);
+  const matches = currentEdition.matches.filter(match => match.windowInfo?.windowYear === year && match.windowInfo?.windowId === windowId);
+  const roundNumbers = [...new Set(matches.map(match => match.nationsLeagueInfo?.leagueRound ?? 0))].sort((a, b) => a - b);
   return {
     edition: currentEdition,
     rounds: roundNumbers.map(round => ({
       label: `Nations League · Matchday ${round}`,
-      matches: matches.filter(match => match.nationsLeagueRound === round)
+      matches: matches.filter(match => match.nationsLeagueInfo?.leagueRound === round)
     }))
   };
 }
@@ -240,25 +235,25 @@ function calculateGroupStandings(edition: NationsLeagueEdition, division: string
 
   for (const match of edition.matches) {
     if (
-      match.nationsLeagueDivision !== division ||
-      match.nationsLeagueGroup !== group.name ||
-      match.homeGoals === null ||
-      match.awayGoals === null
+      match.nationsLeagueInfo?.leagueDivision !== division ||
+      match.nationsLeagueInfo?.leagueGroup !== group.name ||
+      match.goalInfo === null
     ) continue;
+    const { homeGoals, awayGoals } = match.goalInfo;
     const home = byCode.get(match.home);
     const away = byCode.get(match.away);
     if (!home || !away) throw new Error(`Invalid ${edition.confederation} Nations League fixture in ${division} group ${group.name}.`);
     home.played++;
     away.played++;
-    home.goalsFor += match.homeGoals;
-    home.goalsAgainst += match.awayGoals;
-    away.goalsFor += match.awayGoals;
-    away.goalsAgainst += match.homeGoals;
-    if (match.homeGoals > match.awayGoals) {
+    home.goalsFor += homeGoals;
+    home.goalsAgainst += awayGoals;
+    away.goalsFor += awayGoals;
+    away.goalsAgainst += homeGoals;
+    if (homeGoals > awayGoals) {
       home.won++;
       away.lost++;
       home.points += 3;
-    } else if (match.homeGoals < match.awayGoals) {
+    } else if (homeGoals < awayGoals) {
       away.won++;
       home.lost++;
       away.points += 3;
@@ -410,7 +405,7 @@ export function finalizeNationsLeagueEdition(state: NationsLeagueState, edition:
 export function completeNationsLeagueEditions(state: NationsLeagueState): void {
   for (const edition of state.editions) {
     if (edition.status === "complete") continue;
-    if (edition.matches.length > 0 && edition.matches.every(match => match.homeGoals !== null && match.awayGoals !== null)) {
+    if (edition.matches.length > 0 && edition.matches.every(match => match.goalInfo !== null)) {
       finalizeNationsLeagueEdition(state, edition);
     }
   }

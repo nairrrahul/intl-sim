@@ -28,7 +28,7 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 const teamRef = (code: string, id: number): TeamRef => ({ id, name: code, countrycode: code });
-const isPlayed = (match: InternationalMatch) => match.homeGoals !== null && match.awayGoals !== null;
+const isPlayed = (match: InternationalMatch) => match.goalInfo !== null;
 const scored = (kicks?: string[]) => (kicks ?? []).filter(kick => kick === "O").length;
 
 function toTieSnap(tie: U20QualifyingTie): EuroTieSnap {
@@ -45,11 +45,11 @@ function toTieSnap(tie: U20QualifyingTie): EuroTieSnap {
     bye: false,
     // The second leg is shown from team 1's side (it is the away team there).
     legs: [
-      ...(isPlayed(firstLeg) ? [{ matchday: 1, score: { h: firstLeg.homeGoals!, a: firstLeg.awayGoals! } }] : []),
-      ...(isPlayed(secondLeg) ? [{ matchday: 2, score: { h: secondLeg.awayGoals!, a: secondLeg.homeGoals! } }] : [])
+      ...(isPlayed(firstLeg) ? [{ matchday: 1, score: { h: firstLeg.goalInfo!.homeGoals, a: firstLeg.goalInfo!.awayGoals } }] : []),
+      ...(isPlayed(secondLeg) ? [{ matchday: 2, score: { h: secondLeg.goalInfo!.awayGoals, a: secondLeg.goalInfo!.homeGoals } }] : [])
     ],
     aggregate: bothPlayed
-      ? { h: firstLeg.homeGoals! + secondLeg.awayGoals!, a: firstLeg.awayGoals! + secondLeg.homeGoals! }
+      ? { h: firstLeg.goalInfo!.homeGoals + secondLeg.goalInfo!.awayGoals, a: firstLeg.goalInfo!.awayGoals + secondLeg.goalInfo!.homeGoals }
       : null,
     tiebreak: shootout ? { h: 0, a: 0, ph: scored(secondLeg.awayPenalties), pa: scored(secondLeg.homePenalties) } : null,
     winner: tie.winner ? (tie.winner === tie.team1 ? team1 : team2) : null
@@ -82,8 +82,8 @@ function ConmebolKnockoutView(props: { confederation: U20QualifyingConfederation
     if (!isPlayed(match)) return null;
 
     return {
-      h: match.homeGoals!,
-      a: match.awayGoals!,
+      h: match.goalInfo!.homeGoals,
+      a: match.goalInfo!.awayGoals,
       ...(match.homePenalties && match.awayPenalties
         ? {
             ph: scored(match.homePenalties),
@@ -194,7 +194,7 @@ function PlayoffView(props: { edition: U20QualifyingEdition }) {
   const refs = new Map<string, TeamRef>();
   const ref = (code: string) => refs.get(code) ?? refs.set(code, teamRef(code, refs.size + 1)).get(code) as TeamRef;
   const score = (match: InternationalMatch): ScoreSnap | null => isPlayed(match)
-    ? { h: match.homeGoals!, a: match.awayGoals!, ...(match.homePenalties && match.awayPenalties ? { ph: scored(match.homePenalties), pa: scored(match.awayPenalties) } : {}) }
+    ? { h: match.goalInfo!.homeGoals, a: match.goalInfo!.awayGoals, ...(match.homePenalties && match.awayPenalties ? { ph: scored(match.homePenalties), pa: scored(match.awayPenalties) } : {}) }
     : null;
   const cup: CupSnap = {
     complete: edition.completed,

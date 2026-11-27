@@ -41,8 +41,8 @@ function getGroupHighlights(confederation: string, division: string, groupSize: 
 function getGroupRounds(edition: NationsLeagueEdition, division: string, group: NationsLeagueGroup): InternationalMatch[][] {
   const rounds: InternationalMatch[][] = [];
   for (const match of edition.matches) {
-    if (match.nationsLeagueDivision !== division || match.nationsLeagueGroup !== group.name) continue;
-    const index = (match.nationsLeagueRound ?? 1) - 1;
+    if (match.nationsLeagueInfo?.leagueDivision !== division || match.nationsLeagueInfo?.leagueGroup !== group.name) continue;
+    const index = (match.nationsLeagueInfo?.leagueRound ?? 1) - 1;
     (rounds[index] ??= []).push(match);
   }
   return Array.from(rounds, round => round ?? []);

@@ -1,7 +1,12 @@
 import { shuffledCopy } from "../../../shared/random";
 import { createInternationalPlayoffPaths } from "../playoffPaths";
 import type { InternationalCompetitionGroup } from "../cupCommon";
-import type { InternationalMatch, InternationalRound } from "../../types";
+import {
+  createMatch, getPlayoff, playoffCompetition, qualifyingCompetition, setCompetitionInformation,
+  setWindow, windowOptions
+} from "../../matchInfo";
+import type { CompetitionOptions, InternationalMatch, InternationalRound } from "../../types";
+import { WORLD_CUP_PLAYOFF_ONLY_PHASES } from "./phases";
 import type { WorldCupEdition, WorldCupPath, WorldCupPhase, WorldCupTie } from "./types";
 
 export function emptyWorldCupPhase(groups: InternationalCompetitionGroup[] = []): WorldCupPhase {
@@ -88,6 +93,29 @@ export function createBalancedGroups(
   return groups.map(group => ({ ...group, matches: createGroupFixtures(group.teams) }));
 }
 
+/** World Cup edition IDs are `WCQ-<tournament year>`. */
+export function worldCupTournamentYear(editionId: string): number {
+  return Number(editionId.split("-").at(-1));
+}
+
+/**
+ * The competition record of a World Cup qualifying or play-off match. Play-off-only phases (and path matches)
+ * are playoff matches; everything else is ordinary qualifying.
+ */
+export function worldCupQualifyingCompetition(
+  editionId: string,
+  stage: string,
+  details: { group?: string; round?: number; matchIndex?: number; tieId?: string; leg?: 1 | 2 }
+): CompetitionOptions {
+  const tournamentYear = worldCupTournamentYear(editionId);
+  if (WORLD_CUP_PLAYOFF_ONLY_PHASES.has(stage)) {
+    return playoffCompetition("worldCup", tournamentYear, {
+      playoffId: editionId, stage, tieId: details.tieId, leg: details.leg, matchIndex: details.matchIndex
+    });
+  }
+  return qualifyingCompetition("worldCup", tournamentYear, { qualifierId: editionId, stage, ...details });
+}
+
 export function createGroupFixtures(
   teams: string[],
   homeAndAway = true
@@ -108,10 +136,7 @@ export function createGroupFixtures(
     ? [...firstLegs, ...firstLegs.map(round => round.map(([home, away]) => [away, home] as [string, string]))]
     : firstLegs;
   return rounds
-    .map(fixtures => fixtures.map(([home, away]) => ({
-      home, away, kind: "worldCupQualifier", homeGoals: null, awayGoals: null,
-      homeChange: null, awayChange: null
-    })));
+    .map(fixtures => fixtures.map(([home, away]) => createMatch(home, away, "worldCupQualifier")));
 }
 
 export function createWorldCupGroupRounds(
@@ -136,17 +161,15 @@ export function createWorldCupGroupRounds(
   return Array.from({ length: count }, (_, offset) => {
     const roundIndex = scheduledStartRound + offset;
     const matches = phase.groups.flatMap(group => group.matches[roundIndex] ?? []);
-    matches.forEach((match, matchIndex) => Object.assign(match, {
-      kind: kind ?? "worldCupQualifier",
-      windowYear: year,
-      windowId,
-      worldCupEditionId: editionId,
-      worldCupStage: stage,
-      worldCupPhase: stage,
-      worldCupRound: roundIndex + 1,
-      worldCupGroup: phase.groups.find(group => group.matches[roundIndex]?.includes(match))?.name,
-      worldCupMatchIndex: matchIndex
-    }));
+    matches.forEach((match, matchIndex) => {
+      match.kind = kind ?? "worldCupQualifier";
+      setWindow(match, year, windowId);
+      setCompetitionInformation(match, worldCupQualifyingCompetition(editionId, stage, {
+        round: roundIndex + 1,
+        group: phase.groups.find(group => group.matches[roundIndex]?.includes(match))?.name,
+        matchIndex
+      }));
+    });
     return {
       kind,
       label: `${stage} · Matchday ${roundIndex + 1}`,
@@ -165,19 +188,20 @@ export function getStandings(group: InternationalCompetitionGroup, ranks: Record
     code, played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0
   }]));
   for (const match of group.matches.flat()) {
-    if (match.homeGoals === null || match.awayGoals === null) continue;
+    if (match.goalInfo === null) continue;
+    const { homeGoals, awayGoals } = match.goalInfo;
     const home = table.get(match.home);
     const away = table.get(match.away);
     if (!home || !away) throw new Error(`Invalid World Cup qualifying fixture in Group ${group.name}.`);
     home.played++;
     away.played++;
-    home.goalsFor += match.homeGoals;
-    home.goalsAgainst += match.awayGoals;
-    away.goalsFor += match.awayGoals;
-    away.goalsAgainst += match.homeGoals;
-    if (match.homeGoals > match.awayGoals) {
+    home.goalsFor += homeGoals;
+    home.goalsAgainst += awayGoals;
+    away.goalsFor += awayGoals;
+    away.goalsAgainst += homeGoals;
+    if (homeGoals > awayGoals) {
       home.won++; away.lost++; home.points += 3;
-    } else if (match.homeGoals < match.awayGoals) {
+    } else if (homeGoals < awayGoals) {
       away.won++; home.lost++; away.points += 3;
     } else {
       home.drawn++; away.drawn++; home.points++; away.points++;
@@ -204,12 +228,12 @@ export function rankGroupPlaces(
       const discarded = group.matches.flat().filter(match => match.home === bottom || match.away === bottom);
       let points = 0, goalDifference = 0, goalsFor = 0;
       for (const match of group.matches.flat()) {
-        if (match.homeGoals === null || match.awayGoals === null ||
+        if (match.goalInfo === null ||
           match.home === bottom || match.away === bottom) continue;
         const isHome = match.home === row.code;
         if (!isHome && match.away !== row.code) continue;
-        const gf = isHome ? match.homeGoals : match.awayGoals;
-        const ga = isHome ? match.awayGoals : match.homeGoals;
+        const gf = isHome ? match.goalInfo.homeGoals : match.goalInfo.awayGoals;
+        const ga = isHome ? match.goalInfo.awayGoals : match.goalInfo.homeGoals;
         goalsFor += gf;
         goalDifference += gf - ga;
         points += gf > ga ? 3 : gf === ga ? 1 : 0;
@@ -227,16 +251,18 @@ export function makeTies(teams: string[], idPrefix: string, year: number, window
   return Array.from({ length: ranked.length / 2 }, (_, index) => {
     const team1 = ranked[index];
     const team2 = ranked[ranked.length - 1 - index];
-    const base = {
-      kind: "worldCupQualifier",
-      homeGoals: null, awayGoals: null, homeChange: null, awayChange: null,
-      windowYear: year, windowId
-    };
+    const tieId = `${idPrefix}-${index + 1}`;
+    // The tie ID prefix is `<phase>-<tournament year>`, which identifies the phase before the ties are scheduled.
+    const [stage, tournamentYear] = idPrefix.split("-");
+    const leg = (home: string, away: string, legNumber: 1 | 2): InternationalMatch => createMatch(home, away, "worldCupQualifier", {
+      windowInfo: windowOptions(year, windowId),
+      competitionInformation: worldCupQualifyingCompetition(`WCQ-${tournamentYear}`, stage, { tieId, leg: legNumber })
+    });
     return {
-      id: `${idPrefix}-${index + 1}`,
+      id: tieId,
       team1, team2, winner: null,
-      firstLeg: { ...base, home: team1, away: team2, worldCupTieId: `${idPrefix}-${index + 1}`, worldCupLeg: 1 },
-      secondLeg: { ...base, home: team2, away: team1, worldCupTieId: `${idPrefix}-${index + 1}`, worldCupLeg: 2 }
+      firstLeg: leg(team1, team2, 1),
+      secondLeg: leg(team2, team1, 2)
     };
   });
 }
@@ -258,16 +284,11 @@ export function getWorldCupTieRounds(
     worldCupRound: leg,
     matches: phase.ties.map(tie => {
       const match = leg === 1 ? tie.firstLeg : tie.secondLeg;
-      Object.assign(match, {
-        kind: "worldCupQualifier",
-        windowYear: year,
-        windowId,
-        worldCupEditionId: editionId,
-        worldCupStage: phaseName,
-        worldCupPhase: phaseName,
-        worldCupTieId: tie.id,
-        worldCupLeg: leg as 1 | 2
-      });
+      match.kind = "worldCupQualifier";
+      setWindow(match, year, windowId);
+      setCompetitionInformation(match, worldCupQualifyingCompetition(editionId, phaseName, {
+        tieId: tie.id, leg: leg as 1 | 2
+      }));
       return match;
     })
   }));
@@ -298,15 +319,12 @@ export function getWorldCupPathRound(
       const home = bracketMatch.player1?.team;
       const away = bracketMatch.player2?.team;
       if (!home || !away) return [];
-      return [{
-        home, away,
-        kind: "worldCupQualifier",
-        homeGoals: null, awayGoals: null, homeChange: null, awayChange: null,
-        windowYear: year, windowId,
-        worldCupEditionId: editionId, worldCupStage: phaseName,
-        worldCupPhase: phaseName, worldCupPath: path.name,
-        worldCupPathRound: roundIndex + 1, worldCupPathMatch: matchIndex
-      } as InternationalMatch];
+      return [createMatch(home, away, "worldCupQualifier", {
+        windowInfo: windowOptions(year, windowId),
+        competitionInformation: playoffCompetition("worldCup", worldCupTournamentYear(editionId), {
+          playoffId: editionId, stage: phaseName, path: path.name, pathRound: roundIndex + 1, pathMatch: matchIndex
+        })
+      })];
     })
   );
   if (matches.length === 0) return null;
@@ -325,21 +343,22 @@ export function getWorldCupPathRound(
 export function recordWorldCupPathRound(phase: WorldCupPhase, matches: InternationalMatch[]): boolean {
   const roundIndex = phase.playoffRoundsPlayed;
   for (const match of matches) {
-    const path = phase.paths.find(item => item.name === match.worldCupPath);
-    const index = match.worldCupPathMatch;
+    const playoff = getPlayoff(match, "worldCup");
+    const path = phase.paths.find(item => item.name === playoff?.path);
+    const index = playoff?.pathMatch;
     const bracketMatch = index === undefined ? undefined : path?.bracket.rounds[roundIndex]?.[index];
-    if (!path || !bracketMatch || !match.worldCupWinner) throw new Error("World Cup playoff result does not match the drawn bracket.");
-    if (match.homeGoals === null || match.awayGoals === null) {
+    if (!path || !bracketMatch || !playoff?.winner) throw new Error("World Cup playoff result does not match the drawn bracket.");
+    if (match.goalInfo === null) {
       throw new Error("World Cup playoff result is missing its score.");
     }
     path.results[bracketMatch.id] = {
-      homeGoals: match.homeGoals,
-      awayGoals: match.awayGoals,
+      homeGoals: match.goalInfo.homeGoals,
+      awayGoals: match.goalInfo.awayGoals,
       ...(match.homePenalties ? { homePenalties: [...match.homePenalties] } : {}),
       ...(match.awayPenalties ? { awayPenalties: [...match.awayPenalties] } : {}),
       fixture: match
     };
-    bracketMatch.winner = match.worldCupWinner;
+    bracketMatch.winner = playoff.winner;
   }
   settleWorldCupByes(phase.paths, roundIndex);
   if (!phase.paths.every(path =>
@@ -378,12 +397,13 @@ export function drawPaths(teams: string[], pathCount: number, ranks: Record<stri
 
 export function recordPathWinners(paths: WorldCupPath[], matches: InternationalMatch[], roundIndex: number): boolean {
   for (const match of matches) {
-    const path = paths.find(item => item.name === match.worldCupPath);
-    const index = match.worldCupPathMatch;
+    const playoff = getPlayoff(match, "worldCup");
+    const path = paths.find(item => item.name === playoff?.path);
+    const index = playoff?.pathMatch;
     const bracketMatch = index === undefined ? undefined : path?.bracket.rounds[roundIndex]?.[index];
     if (!bracketMatch) throw new Error("World Cup playoff fixture does not map to a bracket match.");
-    if (!match.worldCupWinner) throw new Error("World Cup playoff fixture has no recorded winner.");
-    bracketMatch.winner = match.worldCupWinner;
+    if (!playoff?.winner) throw new Error("World Cup playoff fixture has no recorded winner.");
+    bracketMatch.winner = playoff.winner;
   }
   if (!paths.every(path => path.bracket.rounds[roundIndex]?.every(match => match.winner))) return false;
   return true;

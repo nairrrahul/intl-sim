@@ -16,17 +16,16 @@ function toTeamRef(code: string, id: number): TeamRef {
 function toEuroTie(tie: GoldCupPlayoffTie): EuroTieSnap {
   const team1 = toTeamRef(tie.team1, 1);
   const team2 = toTeamRef(tie.team2, 2);
-  const aggregate = tie.firstLeg.homeGoals === null || tie.firstLeg.awayGoals === null ||
-    tie.secondLeg.homeGoals === null || tie.secondLeg.awayGoals === null
+  const aggregate = tie.firstLeg.goalInfo === null || tie.secondLeg.goalInfo === null
     ? null
     : playoffAggregate(tie);
   const legs = [
-    tie.firstLeg.homeGoals === null || tie.firstLeg.awayGoals === null
+    tie.firstLeg.goalInfo === null
       ? null
-      : { matchday: 1, score: { h: tie.firstLeg.homeGoals, a: tie.firstLeg.awayGoals } },
-    tie.secondLeg.homeGoals === null || tie.secondLeg.awayGoals === null
+      : { matchday: 1, score: { h: tie.firstLeg.goalInfo.homeGoals, a: tie.firstLeg.goalInfo.awayGoals } },
+    tie.secondLeg.goalInfo === null
       ? null
-      : { matchday: 2, score: { h: tie.secondLeg.awayGoals, a: tie.secondLeg.homeGoals } }
+      : { matchday: 2, score: { h: tie.secondLeg.goalInfo.awayGoals, a: tie.secondLeg.goalInfo.homeGoals } }
   ].filter((leg): leg is NonNullable<typeof leg> => leg !== null);
   return {
     id: tie.id,

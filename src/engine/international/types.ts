@@ -97,123 +97,203 @@ export interface StatLeaders {
   cleanSheets: StatLeader[];
 }
 
+/** Everything that is known about a match once it has been played. */
+export interface MatchGoalInfo {
+  homeGoals: number;
+  awayGoals: number;
+  /** Ranking-point change of each side (0 for U20 matches, which do not move the senior rankings). */
+  homeChange: number;
+  awayChange: number;
+
+  /** Goals in minute order. */
+  goals: GoalEvent[];
+
+  /** Players who appeared, per side (only recorded for tournament matches, to power competition stats). */
+  appearances: Record<MatchSide, string[]>;
+
+  /** Goalkeepers credited with a clean sheet, per side (tournament matches only). */
+  cleanSheets: Partial<Record<MatchSide, string>>;
+
+  /** Substitutions relevant to goals and assists: those that brought on a goalscorer or assister. */
+  substitutions: SubstitutionEvent[];
+}
+
+/** Nations League metadata. All fields are always populated. */
+export interface NationsLeagueOptions {
+  leagueId: string;
+  leagueConfederation: string;
+  leagueDivision: string;
+  leagueGroup: string;
+  leagueRound: number;
+}
+
+/** The international window a match is played in. */
+export interface WindowOptions {
+  windowYear: number;
+  windowId: string;
+}
+
+/** Ranking and overall values captured just before a (senior) match is played. */
+export interface MatchChangeOptions {
+  homeRankBefore: number;
+  awayRankBefore: number;
+  homeOverallBefore: number;
+  awayOverallBefore: number;
+}
+
+export type CompetitionName =
+  | "goldCup"
+  | "copaAmerica"
+  | "confedCup"
+  | "u20WorldCup"
+  | "u20Qualifier"
+  | "afcon"
+  | "afcCup"
+  | "ofcCup"
+  | "euro"
+  | "worldCup";
+
+/**
+ * Which competition, which tournament and which phase a match belongs to. A match belongs to exactly one phase:
+ * qualifying, playoff or finals. Which stage identifiers are valid for each competition is checked by the
+ * application (see competitionStages.ts), not by this type.
+ */
+export type CompetitionOptions =
+  | {
+      competitionName: CompetitionName;
+      tournamentYear: number;
+      qualifyingInfo: QualifyingOptions;
+      playoffOptions?: never;
+      finalsInfo?: never;
+    }
+  | {
+      competitionName: CompetitionName;
+      tournamentYear: number;
+      qualifyingInfo?: never;
+      playoffOptions: PlayoffOptions;
+      finalsInfo?: never;
+    }
+  | {
+      competitionName: CompetitionName;
+      tournamentYear: number;
+      qualifyingInfo?: never;
+      playoffOptions?: never;
+      finalsInfo: FinalCompOptions;
+    };
+
+/** Ordinary qualifying matches (groups, preliminary ties, ...). */
+export interface QualifyingOptions {
+  /** Qualifying competition/edition identifier, when applicable. */
+  qualifierId?: string;
+
+  /** Existing qualifying stage identifier. */
+  stage: string;
+
+  /** Confederation associated with the qualifying competition. */
+  confederation?: string;
+
+  /** Group-stage information. */
+  group?: string;
+  round?: number;
+
+  /** Two-legged qualifying tie information. */
+  tieId?: string;
+  leg?: 1 | 2;
+
+  /** Knockout match identifier, when used outside playoff metadata. */
+  knockoutMatchId?: string;
+
+  /**
+   * Position of the fixture within its round (World Cup qualifying group matches).
+   * Not part of the originally specified interface: current code records it on qualifying group fixtures.
+   */
+  matchIndex?: number;
+}
+
+/** Playoff matches (paths, bracket knockouts and two-legged playoff ties). */
+export interface PlayoffOptions {
+  /** Existing playoff identifier. */
+  playoffId?: string;
+
+  /** Confederation or playoff region; "ICPO" for intercontinental playoffs. */
+  confederation?: string;
+
+  /** Existing playoff stage identifier. */
+  stage: string;
+
+  /** Playoff path information. */
+  path?: string;
+  pathRound?: number;
+  pathMatch?: number;
+
+  /** Tie information, when the playoff uses a two-legged format. */
+  tieId?: string;
+  leg?: 1 | 2;
+
+  /** Knockout match identifier, if used by the existing playoff logic. */
+  knockoutMatchId?: string;
+
+  /** Existing match index, when applicable. */
+  matchIndex?: number;
+
+  /**
+   * Winner of the match once decided (set by the knockout logic; the playoff bracket reads it back).
+   * Not part of the originally specified interface: current code records it on playoff fixtures.
+   */
+  winner?: string;
+}
+
+/** Finals-tournament matches (group stage and knockout). Finals matches are single-legged: there is no `leg`. */
+export interface FinalCompOptions {
+  /** Finals edition identifier. */
+  editionId?: string;
+
+  /** Existing finals stage identifier. */
+  stage: string;
+
+  /** Additional phase identifier, where applicable. */
+  phase?: string;
+
+  /** Group-stage information. */
+  group?: string;
+  round?: number;
+
+  /** Knockout match identifier. */
+  knockoutMatchId?: string;
+
+  /** Tournament winner, once determined. */
+  winner?: string;
+}
+
 export interface InternationalMatch {
   home: string;
   away: string;
   kind: string;
-  /** null until the window is simulated. */
-  homeGoals: number | null;
-  awayGoals: number | null;
-  homeChange: number | null;
-  awayChange: number | null;
-  /** Goals of the match in minute order (set once it has been played). */
-  goals?: GoalEvent[];
-  /** Players who played, per side (only recorded for tournament matches, to power competition stats). */
-  appearances?: Record<MatchSide, string[]>;
-  /** Goalkeepers credited with a clean sheet, per side (tournament matches only). */
-  cleanSheets?: Partial<Record<MatchSide, string>>;
-  /** Substitutions that matter to the match story: those that brought on a goalscorer or assister. */
-  substitutions?: SubstitutionEvent[];
-  /** God Mode: the result this match is forced to when played (a drawn knockout goes to random penalties). */
-  rigged?: { homeGoals: number; awayGoals: number };
-  nationsLeagueId?: string;
-  nationsLeagueConfederation?: string;
-  nationsLeagueDivision?: string;
-  nationsLeagueGroup?: string;
-  nationsLeagueRound?: number;
-  windowYear?: number;
-  windowId?: string;
-  goldCupPlayoffId?: string;
-  goldCupTieId?: string;
-  goldCupLeg?: 1 | 2;
-  goldCupEditionId?: string;
-  goldCupStage?: "group" | "knockout";
-  goldCupGroup?: string;
-  goldCupRound?: number;
-  goldCupKnockoutMatchId?: string;
-  goldCupWinner?: string;
-  copaAmericaEditionId?: string;
-  copaAmericaStage?: "group" | "knockout";
-  copaAmericaGroup?: string;
-  copaAmericaRound?: number;
-  copaAmericaKnockoutMatchId?: string;
-  copaAmericaWinner?: string;
-  confedCupEditionId?: string;
-  confedCupStage?: "group" | "knockout";
-  confedCupGroup?: string;
-  confedCupRound?: number;
-  confedCupKnockoutMatchId?: string;
-  confedCupWinner?: string;
-  u20WorldCupEditionId?: string;
-  u20WorldCupStage?: "group" | "knockout";
-  u20WorldCupGroup?: string;
-  u20WorldCupRound?: number;
-  u20WorldCupKnockoutMatchId?: string;
-  u20WorldCupWinner?: string;
-  u20QualifierEditionId?: string;
-  /** "CONCACAF" … "CAF", or "ICPO" for the intercontinental playoff. */
-  u20QualifierConfederation?: string;
-  u20QualifierStage?: "group" | "tie" | "playoff";
-  u20QualifierGroup?: string;
-  u20QualifierRound?: number;
-  u20QualifierTieId?: string;
-  u20QualifierLeg?: number;
-  u20QualifierKnockoutMatchId?: string;
-  afconEditionId?: string;
-  afconQualifierId?: string;
-  afconTieId?: string;
-  afconStage?: "preliminary" | "main" | "group" | "knockout";
-  afconGroup?: string;
-  afconRound?: number;
-  afconLeg?: 1 | 2;
-  afconKnockoutMatchId?: string;
-  afconWinner?: string;
-  afcCupEditionId?: string;
-  afcCupQualifierId?: string;
-  afcCupTieId?: string;
-  afcCupStage?: "preliminary" | "main" | "group" | "knockout";
-  afcCupGroup?: string;
-  afcCupRound?: number;
-  afcCupLeg?: 1 | 2;
-  afcCupKnockoutMatchId?: string;
-  afcCupWinner?: string;
-  ofcCupEditionId?: string;
-  ofcCupQualifierId?: string;
-  ofcCupStage?: "qualifying" | "group" | "knockout";
-  ofcCupGroup?: string;
-  ofcCupRound?: number;
-  ofcCupKnockoutMatchId?: string;
-  ofcCupWinner?: string;
-  euroEditionId?: string;
-  euroQualifierId?: string;
-  euroStage?: "qualifying" | "playoff" | "group" | "knockout";
-  euroGroup?: string;
-  euroRound?: number;
-  euroTournamentYear?: number;
-  euroPath?: string;
-  euroPathRound?: number;
-  euroPathMatch?: number;
-  euroWinner?: string;
-  euroKnockoutMatchId?: string;
-  worldCupEditionId?: string;
-  worldCupStage?: string;
-  worldCupPhase?: string;
-  worldCupGroup?: string;
-  worldCupRound?: number;
-  worldCupLeg?: 1 | 2;
-  worldCupTieId?: string;
-  worldCupPath?: string;
-  worldCupPathRound?: number;
-  worldCupPathMatch?: number;
-  worldCupMatchIndex?: number;
-  worldCupWinner?: string;
-  worldCupKnockoutMatchId?: string;
+
+  /** Null until the match has been played. */
+  goalInfo: MatchGoalInfo | null;
+
+  /** Penalty shootout results, when applicable. */
   homePenalties?: string[];
   awayPenalties?: string[];
-  homeRankBefore?: number;
-  awayRankBefore?: number;
-  homeOverallBefore?: number;
-  awayOverallBefore?: number;
+
+  /** God Mode: the result this match is forced to when played (a drawn knockout goes to random penalties). */
+  rigged?: {
+    homeGoals: number;
+    awayGoals: number;
+  };
+
+  /** Nations League metadata; null for non-Nations League matches. */
+  nationsLeagueInfo: NationsLeagueOptions | null;
+
+  /** International window metadata; null when not applicable (yet). */
+  windowInfo: WindowOptions | null;
+
+  /** Competition metadata; null for non-competition matches. */
+  competitionInformation: CompetitionOptions | null;
+
+  /** Ranking and overall values captured before the match. */
+  matchChangeInfo: MatchChangeOptions | null;
 }
 
 export interface InternationalRound {

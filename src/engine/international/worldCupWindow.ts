@@ -12,6 +12,7 @@ import {
   createWorldCupGroupRounds, getWorldCupPathRound, getWorldCupTieRounds
 } from "./competitions/worldcup/utils";
 import { getWorldRanks } from "./rankings";
+import { WORLD_CUP_WINDOW_TYPES } from "./competitions/worldcup/phases";
 import type { WorldCupEdition, WorldCupPhase } from "./competitions/worldcup/types";
 import type { WindowBuild } from "./windowBuilder";
 
@@ -19,12 +20,7 @@ const CONFEDERATIONS = ["UEFA", "CONCACAF", "CONMEBOL", "OFC", "AFC", "CAF"] as 
 type Confederation = typeof CONFEDERATIONS[number];
 type RegionName = keyof WorldCupEdition["regions"];
 
-/** Window types that belong to the World Cup (qualifying phases, intercontinental play-off, finals). */
-export const WORLD_CUP_WINDOW_TYPES = new Set([
-  "SAWCQ", "CAFWCQ", "CAFWCQP", "CCWCQ1", "CCWCQ2", "CCWCQ3",
-  "AFCWCQ1", "AFCWCQ2", "AFCWCQ3", "OFCWCQ1", "OFCWCQ2", "OFCWCQ3",
-  "UEFAWCQM", "UEFAWCQP", "ICPO", "WC"
-]);
+export { WORLD_CUP_WINDOW_TYPES };
 
 /**
  * Draws the World Cup finals from the qualified teams. When `validateField` is set the field must

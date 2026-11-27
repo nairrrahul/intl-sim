@@ -39,7 +39,12 @@ import { getWorldCupEdition } from "./competitions/worldcup/worldCup";
 import { getWorldCupPathRound, recordWorldCupPathRound } from "./competitions/worldcup/utils";
 import { addRoundToWindow } from "./lanes";
 import { getWorldRanks } from "./rankings";
-import type { InternationalRound, InternationalState, ScheduledRound, WindowRecord } from "./types";
+import { getFinals, getPlayoff, getQualifying } from "./matchInfo";
+import type { CompetitionName, InternationalRound, InternationalState, ScheduledRound, WindowRecord } from "./types";
+
+/** The finals metadata of the first match of a round (tournament rounds contain finals matches only). */
+const finalsOfRound = (round: InternationalRound, name: CompetitionName) =>
+  round.matches[0] ? getFinals(round.matches[0], name) : undefined;
 import { advanceU20Playoff, advanceU20ConmebolKnockout, settleU20Qualifying } from "./competitions/u20Qualifying";
 
 /**
@@ -98,8 +103,8 @@ export const TOURNAMENTS: Record<string, TournamentRules> = {
     trophy: "Gold Cup",
     team: "senior",
     editions: s => s.goldCup.editions,
-    editionId: r => r.matches[0]?.goldCupEditionId,
-    stage: r => r.matches[0]?.goldCupStage,
+    editionId: r => finalsOfRound(r, "goldCup")?.editionId,
+    stage: r => finalsOfRound(r, "goldCup")?.stage,
     afterGroup: edition => advanceInternationalCupRound(edition, -1),
     afterKnockout: (edition, index) => advanceInternationalCupRound(edition, index)
   },
@@ -108,8 +113,8 @@ export const TOURNAMENTS: Record<string, TournamentRules> = {
     trophy: "Copa América",
     team: "senior",
     editions: s => s.copaAmerica.editions,
-    editionId: r => r.matches[0]?.copaAmericaEditionId,
-    stage: r => r.matches[0]?.copaAmericaStage,
+    editionId: r => finalsOfRound(r, "copaAmerica")?.editionId,
+    stage: r => finalsOfRound(r, "copaAmerica")?.stage,
     afterGroup: edition => advanceInternationalCupRound(edition, -1, "copaAmerica"),
     afterKnockout: (edition, index) => advanceInternationalCupRound(edition, index, "copaAmerica")
   },
@@ -118,8 +123,8 @@ export const TOURNAMENTS: Record<string, TournamentRules> = {
     trophy: "Confederations Cup",
     team: "senior",
     editions: s => s.confedCup.editions,
-    editionId: r => r.matches[0]?.confedCupEditionId,
-    stage: r => r.matches[0]?.confedCupStage,
+    editionId: r => finalsOfRound(r, "confedCup")?.editionId,
+    stage: r => finalsOfRound(r, "confedCup")?.stage,
     afterGroup: edition => advanceConfedCupRound(edition, -1),
     afterKnockout: (edition, index) => advanceConfedCupRound(edition, index)
   },
@@ -128,8 +133,8 @@ export const TOURNAMENTS: Record<string, TournamentRules> = {
     trophy: "U20 World Cup",
     team: "u20",
     editions: s => s.u20WorldCup.editions,
-    editionId: r => r.matches[0]?.u20WorldCupEditionId,
-    stage: r => r.matches[0]?.u20WorldCupStage,
+    editionId: r => finalsOfRound(r, "u20WorldCup")?.editionId,
+    stage: r => finalsOfRound(r, "u20WorldCup")?.stage,
     afterGroup: edition => startTwentyFourTeamRoundOf16(edition, "u20WorldCup", "U20 World Cup"),
     afterKnockout: (edition, index) => advanceTwentyFourTeamKnockout(edition, index, "u20WorldCup", "U20 World Cup")
   },
@@ -138,8 +143,8 @@ export const TOURNAMENTS: Record<string, TournamentRules> = {
     trophy: "AFCON",
     team: "senior",
     editions: s => s.afcon.editions,
-    editionId: r => r.matches[0]?.afconEditionId,
-    stage: r => r.matches[0]?.afconStage,
+    editionId: r => finalsOfRound(r, "afcon")?.editionId,
+    stage: r => finalsOfRound(r, "afcon")?.stage,
     afterGroup: startAfconRoundOf16,
     afterKnockout: advanceAfconKnockoutRound
   },
@@ -148,8 +153,8 @@ export const TOURNAMENTS: Record<string, TournamentRules> = {
     trophy: "Asian Cup",
     team: "senior",
     editions: s => s.afcCup.editions,
-    editionId: r => r.matches[0]?.afcCupEditionId,
-    stage: r => r.matches[0]?.afcCupStage,
+    editionId: r => finalsOfRound(r, "afcCup")?.editionId,
+    stage: r => finalsOfRound(r, "afcCup")?.stage,
     afterGroup: startAfcCupRoundOf16,
     afterKnockout: advanceAfcCupKnockoutRound
   },
@@ -158,8 +163,8 @@ export const TOURNAMENTS: Record<string, TournamentRules> = {
     trophy: "OFC Cup",
     team: "senior",
     editions: s => s.ofcCup.editions,
-    editionId: r => r.matches[0]?.ofcCupEditionId,
-    stage: r => r.matches[0]?.ofcCupStage,
+    editionId: r => finalsOfRound(r, "ofcCup")?.editionId,
+    stage: r => finalsOfRound(r, "ofcCup")?.stage,
     afterGroup: startOfcCupSemiFinals,
     afterKnockout: advanceOfcCupKnockoutRound
   },
@@ -168,8 +173,8 @@ export const TOURNAMENTS: Record<string, TournamentRules> = {
     trophy: "EURO",
     team: "senior",
     editions: s => s.euro.editions,
-    editionId: r => r.matches[0]?.euroEditionId,
-    stage: r => r.matches[0]?.euroStage,
+    editionId: r => finalsOfRound(r, "euro")?.editionId,
+    stage: r => finalsOfRound(r, "euro")?.stage,
     afterGroup: startEuroRoundOf16,
     afterKnockout: advanceEuroKnockoutRound
   }
@@ -211,7 +216,7 @@ function drawGoldCupAfterPlayoff(state: InternationalState, playoffId: string, y
 
 const goldCupPlayoff: Handler = (state, window, round) => {
   if (!round.label?.endsWith("Second leg")) return;
-  const playoffId = round.matches[0]?.goldCupPlayoffId;
+  const playoffId = (round.matches[0] && getPlayoff(round.matches[0], "goldCup")?.playoffId);
   if (!playoffId) return;
   completeGoldCupPlayoff(state.goldCup, playoffId);
   drawGoldCupAfterPlayoff(state, playoffId, window.year, window.windowId);
@@ -379,17 +384,18 @@ const worldCupFinals: Handler = (state, window, round, awardTrophy) => {
 const u20Qualifier: Handler = (state, window, round) => {
   const match = round.matches[0];
 
-  const editionId = match?.u20QualifierEditionId;
+  const u20Playoff = match && getPlayoff(match, "u20Qualifier");
+  const editionId = (match && getQualifying(match, "u20Qualifier")?.qualifierId) ?? u20Playoff?.playoffId;
   const edition = state.u20Qualifying.editions.find(
     item => item.id === editionId
   );
 
   if (!edition) return;
 
-  if (match.u20QualifierStage === "playoff") {
-    if (match.u20QualifierConfederation === "CONMEBOL") {
+  if (u20Playoff?.stage === "playoff") {
+    if (u20Playoff.confederation === "CONMEBOL") {
       addNext(window, advanceU20ConmebolKnockout(edition));
-    } else if (match.u20QualifierConfederation === "ICPO") {
+    } else if (u20Playoff.confederation === "ICPO") {
       addNext(window, advanceU20Playoff(edition, window.windowId));
     }
   }

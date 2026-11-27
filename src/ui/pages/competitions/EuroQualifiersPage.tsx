@@ -1,3 +1,4 @@
+import { getPlayoff } from "../../../engine/international/matchInfo";
 import { ROW_HIGHLIGHT } from "../../styles";
 import type { WindowRecord } from "../../../engine/international/types";
 import { useState } from "react";
@@ -56,10 +57,10 @@ function Playoffs(props: {
 }) {
   const { edition } = props;
   const matches = props.windows.flatMap(window => window.rounds.flatMap(round => round.matches))
-    .filter(match => match.euroQualifierId === edition.id && match.euroStage === "playoff")
-    .sort((a, b) => (a.euroPathRound ?? 0) - (b.euroPathRound ?? 0) ||
-      (a.euroPath ?? "").localeCompare(b.euroPath ?? "") ||
-      (a.euroPathMatch ?? 0) - (b.euroPathMatch ?? 0));
+    .filter(match => getPlayoff(match, "euro")?.playoffId === edition.id && getPlayoff(match, "euro")?.stage === "playoff")
+    .sort((a, b) => (getPlayoff(a, "euro")?.pathRound ?? 0) - (getPlayoff(b, "euro")?.pathRound ?? 0) ||
+      (getPlayoff(a, "euro")?.path ?? "").localeCompare(getPlayoff(b, "euro")?.path ?? "") ||
+      (getPlayoff(a, "euro")?.pathMatch ?? 0) - (getPlayoff(b, "euro")?.pathMatch ?? 0));
   if (!edition.completed) {
     return <Panel><Empty>The play-off draw will be made after the main qualifying round.</Empty></Panel>;
   }
@@ -76,9 +77,9 @@ function Playoffs(props: {
         matchday: roundIndex + 1,
         matches: round.map((bracketMatch, matchIndex) => {
           const fixture = matches.find(match =>
-            match.euroPath === path.name &&
-            match.euroPathRound === roundIndex + 1 &&
-            match.euroPathMatch === matchIndex
+            getPlayoff(match, "euro")?.path === path.name &&
+            getPlayoff(match, "euro")?.pathRound === roundIndex + 1 &&
+            getPlayoff(match, "euro")?.pathMatch === matchIndex
           );
           const home = bracketMatch.player1?.team ?? fixture?.home ?? null;
           const away = bracketMatch.player2?.team ?? fixture?.away ?? null;
@@ -87,10 +88,10 @@ function Playoffs(props: {
             fixture,
             home: toTeamRef(home),
             away: toTeamRef(away),
-            score: fixture && fixture.homeGoals !== null && fixture.awayGoals !== null
+            score: fixture && fixture.goalInfo !== null
               ? {
-                  h: fixture.homeGoals,
-                  a: fixture.awayGoals,
+                  h: fixture.goalInfo.homeGoals,
+                  a: fixture.goalInfo.awayGoals,
                   ...(fixture.homePenalties && fixture.awayPenalties
                     ? {
                         ph: fixture.homePenalties.filter(kick => kick === "O").length,

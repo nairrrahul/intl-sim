@@ -128,7 +128,7 @@ export const useGameStore = create<GameStore>()((set, get) => {
     toggleShortlist: playerId => { act(game => toggleShortlist(game, playerId), true); },
     initializeGoalDisplayMinutes: matches => {
       const needsInitialization = matches.some(match =>
-        match.goals?.some(goal => goal.displayMinute === undefined && [45, 90, 105, 120].includes(goal.minute))
+        match.goalInfo?.goals.some(goal => goal.displayMinute === undefined && [45, 90, 105, 120].includes(goal.minute))
       );
       if (needsInitialization) act(game => initializeGoalDisplayMinutesAction(game, matches), true);
     },

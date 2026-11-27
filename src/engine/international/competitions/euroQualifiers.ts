@@ -11,6 +11,7 @@ import type { InternationalPlayoffPath } from "./playoffPaths";
 import type { InternationalCompetitionGroup } from "./cupCommon";
 import { getNationsLeagueDivisionHistory } from "./nationsLeague";
 import type { NationsLeagueEdition } from "./nationsLeague";
+import { createMatch, getPlayoff, playoffCompetition, qualifyingCompetition, setWindow, windowOptions } from "../matchInfo";
 import type { InternationalMatch, InternationalRound } from "../types";
 
 const hostOptions = (hostOptionsRaw as Record<string, string[]>).EURO ?? [];
@@ -46,28 +47,6 @@ export function getEuroWindowType(year: number, windowId: string): "EUROQ" | "EU
   return type === "EUROQ" || type === "EUROQP" || type === "EURO" ? type : null;
 }
 
-function createMatch(
-  home: string,
-  away: string,
-  kind: InternationalMatch["kind"],
-  year: number,
-  windowId: string,
-  extra: Partial<InternationalMatch> = {}
-): InternationalMatch {
-  return {
-    home,
-    away,
-    kind: kind ?? "euroQualifier",
-    homeGoals: null,
-    awayGoals: null,
-    homeChange: null,
-    awayChange: null,
-    windowYear: year,
-    windowId,
-    ...extra
-  };
-}
-
 function createQualifyingFixtures(
   teams: string[],
   group: string,
@@ -92,12 +71,11 @@ function createQualifyingFixtures(
     getEuroWindowType(year, id) === "EUROQ"
   );
   return fullFixtures.map((fixtures, roundIndex) => fixtures.map(([home, away]) =>
-    createMatch(home, away, "euroQualifier", qualifyingWindow.year, qualifyingWindow.windowId, {
-      euroQualifierId: editionId,
-      euroStage: "qualifying",
-      euroGroup: group,
-      euroRound: roundIndex + 1,
-      euroTournamentYear: tournamentYear
+    createMatch(home, away, "euroQualifier", {
+      windowInfo: windowOptions(qualifyingWindow.year, qualifyingWindow.windowId),
+      competitionInformation: qualifyingCompetition("euro", tournamentYear, {
+        qualifierId: editionId, stage: "qualifying", group, round: roundIndex + 1
+      })
     })
   ));
 }
@@ -230,8 +208,7 @@ export function getEuroQualifyingRounds(
     const roundIndex = schedule.start + offset;
     const matches = edition.groups.flatMap(group => group.matches[roundIndex] ?? []);
     matches.forEach(match => {
-      match.windowYear = year;
-      match.windowId = windowId;
+      setWindow(match, year, windowId);
     });
     return {
       kind: "euroQualifier" as const,
@@ -320,13 +297,11 @@ function pathMatchFixture(
   year: number,
   windowId: string
 ): InternationalMatch {
-  return createMatch(home, away, "euroQualifier", year, windowId, {
-    euroQualifierId: edition.id,
-    euroStage: "playoff",
-    euroPath: pathName,
-    euroPathRound: pathRound,
-    euroPathMatch: matchIndex,
-    euroTournamentYear: edition.tournamentYear
+  return createMatch(home, away, "euroQualifier", {
+    windowInfo: windowOptions(year, windowId),
+    competitionInformation: playoffCompetition("euro", edition.tournamentYear, {
+      playoffId: edition.id, stage: "playoff", path: pathName, pathRound, pathMatch: matchIndex
+    })
   });
 }
 
@@ -368,14 +343,15 @@ export function recordEuroPlayoffRound(
 ): boolean {
   const roundIndex = edition.playoffRoundsPlayed;
   for (const match of matches) {
-    if (!match.euroPath || match.euroPathMatch === undefined) {
+    const playoff = getPlayoff(match, "euro");
+    if (!playoff?.path || playoff.pathMatch === undefined) {
       throw new Error(`EURO playoff fixture in "${edition.id}" is missing path identifiers.`);
     }
-    const path = edition.playoffPaths.find(item => item.name === match.euroPath);
-    const bracketMatch = path?.bracket.rounds[roundIndex]?.[match.euroPathMatch];
-    if (!bracketMatch) throw new Error(`Unknown EURO playoff fixture for Path ${match.euroPath}.`);
-    const winner = match.euroWinner;
-    if (!winner) throw new Error(`EURO playoff fixture in Path ${match.euroPath} has no winner.`);
+    const path = edition.playoffPaths.find(item => item.name === playoff.path);
+    const bracketMatch = path?.bracket.rounds[roundIndex]?.[playoff.pathMatch];
+    if (!bracketMatch) throw new Error(`Unknown EURO playoff fixture for Path ${playoff.path}.`);
+    const winner = playoff.winner;
+    if (!winner) throw new Error(`EURO playoff fixture in Path ${playoff.path} has no winner.`);
     bracketMatch.winner = winner;
   }
   const currentRoundComplete = edition.playoffPaths.every(path =>

@@ -38,25 +38,26 @@ function getU20MatchSquad(world: World, code: string, playersById: PlayersById):
  */
 function recordMatchDetails(match: InternationalMatch, window: WindowRecord, world: World, playersById: PlayersById): void {
   const youth = isYouthMatch(match);
+  const goalInfo = match.goalInfo!;
   const details = generateMatchDetails(
-    match.homeGoals ?? 0,
-    match.awayGoals ?? 0,
+    goalInfo.homeGoals,
+    goalInfo.awayGoals,
     youth ? getU20MatchSquad(world, match.home, playersById) : getMatchSquad(window, match.home, playersById),
     youth ? getU20MatchSquad(world, match.away, playersById) : getMatchSquad(window, match.away, playersById),
     isKnockoutMatch(match)
   );
-  match.goals = details.goals;
-  match.substitutions = details.substitutions;
+  goalInfo.goals = details.goals;
+  goalInfo.substitutions = details.substitutions;
 
   // Tournament matches also keep who played and who kept clean sheets, for the competition stats tab.
   if (isTrackedTournamentMatch(match)) {
-    match.appearances = {
+    goalInfo.appearances = {
       home: details.appearances.home.map(player => player.id),
       away: details.appearances.away.map(player => player.id)
     };
-    match.cleanSheets = {};
-    if (details.cleanSheets.home) match.cleanSheets.home = details.cleanSheets.home.id;
-    if (details.cleanSheets.away) match.cleanSheets.away = details.cleanSheets.away.id;
+    goalInfo.cleanSheets = {};
+    if (details.cleanSheets.home) goalInfo.cleanSheets.home = details.cleanSheets.home.id;
+    if (details.cleanSheets.away) goalInfo.cleanSheets.away = details.cleanSheets.away.id;
   }
 
   if (youth) {
@@ -113,14 +114,12 @@ function playRound(world: World, window: WindowRecord, round: ScheduledRound, pl
         ranks.map(row => [row.code, row.rank])
       );
 
-      match.homeRankBefore = rankMap.get(match.home);
-      match.awayRankBefore = rankMap.get(match.away);
-
-      match.homeOverallBefore =
-        world.international.nations[match.home].overall;
-
-      match.awayOverallBefore =
-        world.international.nations[match.away].overall;
+      match.matchChangeInfo = {
+        homeRankBefore: rankMap.get(match.home)!,
+        awayRankBefore: rankMap.get(match.away)!,
+        homeOverallBefore: world.international.nations[match.home].overall,
+        awayOverallBefore: world.international.nations[match.away].overall
+      };
     }
 
     playMatch(world.international, match);

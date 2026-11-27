@@ -26,8 +26,8 @@ const countScored = (kicks: string[] | undefined): number => (kicks ?? []).filte
 /** Goals and the substitutions behind them in minute order (a substitution comes before a goal in the same minute). */
 function buildTimeline(match: InternationalMatch): MatchTimeline {
   const events: TimelineEvent[] = [
-    ...(match.substitutions ?? []).map(substitution => ({ type: "substitution" as const, minute: substitution.minute, side: substitution.side, substitution })),
-    ...(match.goals ?? []).map(goal => ({ type: "goal" as const, minute: goal.minute, side: goal.side, goal }))
+    ...(match.goalInfo?.substitutions ?? []).map(substitution => ({ type: "substitution" as const, minute: substitution.minute, side: substitution.side, substitution })),
+    ...(match.goalInfo?.goals ?? []).map(goal => ({ type: "goal" as const, minute: goal.minute, side: goal.side, goal }))
   ].sort((a, b) => a.minute - b.minute || (a.type === b.type ? 0 : a.type === "substitution" ? -1 : 1));
   const firstHalf = events.filter(e => e.minute >= 1 && e.minute <= 45);
   const secondHalf = events.filter(e => e.minute >= 46 && e.minute <= 90);
@@ -64,7 +64,8 @@ function MatchReport(props: { match: InternationalMatch; heading?: string; onClo
   };
 
   const {firstHalf, secondHalf, firstExtraTime, secondExtraTime, hasExtraTime, totalEvents} = buildTimeline(match);
-  const hasDetails = match.goals !== undefined;
+  // Matches from saves that predate goal recording have a score but no goal events.
+  const hasDetails = match.goalInfo !== null && (match.goalInfo.goals.length > 0 || match.goalInfo.homeGoals + match.goalInfo.awayGoals === 0);
   const homePens = countScored(match.homePenalties);
   const awayPens = countScored(match.awayPenalties);
   const shootout = match.homePenalties && match.awayPenalties;
@@ -98,18 +99,18 @@ function MatchReport(props: { match: InternationalMatch; heading?: string; onClo
     <section>
       {props.heading && <h3 className="text-center text-sm font-bold uppercase tracking-wider text-accent-yellow mb-1">{props.heading}</h3>}
       <div className="text-center text-xs text-navy-300 mb-4">
-        {[stage, match.windowYear !== undefined && match.windowId ? formatWindowLabel(match.windowYear, match.windowId) : null]
+        {[stage, match.windowInfo ? formatWindowLabel(match.windowInfo.windowYear, match.windowInfo.windowId) : null]
           .filter(Boolean).join(" · ")}
       </div>
 
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-4 gap-y-2 mb-5">
         <div className="text-right text-lg font-semibold"><NationLink code={match.home} /></div>
         <div className="text-center">
-          <div className="text-3xl font-bold tabular-nums">{match.homeGoals} – {match.awayGoals}</div>
+          <div className="text-3xl font-bold tabular-nums">{match.goalInfo?.homeGoals} – {match.goalInfo?.awayGoals}</div>
           {shootout && <div className="text-xs text-navy-300">{homePens} – {awayPens} on penalties</div>}
         </div>
         <div className="text-left text-lg font-semibold"><NationLink code={match.away} /></div>
-        {((match.homeGoals != match.awayGoals) && hasExtraTime) && 
+        {((match.goalInfo?.homeGoals != match.goalInfo?.awayGoals) && hasExtraTime) && 
           <div className="col-start-2 text-center text-[12px] uppercase tracking-widest text-navy-200 font-bold">A.E.T.</div>
         }
       </div>

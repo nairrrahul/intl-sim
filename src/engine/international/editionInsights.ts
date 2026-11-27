@@ -1,3 +1,4 @@
+import { createGoalInfo } from "./matchInfo";
 import { advanceWorldCupKnockout, startWorldCupRoundOf32 } from "./competitions/worldcup/tournament";
 import type { InternationalCompetitionEdition } from "./competitions/cupCommon";
 import { getInternationalCupStandings } from "./competitions/cupCommon";
@@ -116,8 +117,10 @@ export function predictRanking(competition: CompetitionKey, source: CupEditionLi
   edition.seedRanks = Object.fromEntries([...edition.teams].sort(better).map((code, index) => [code, index + 1]));
 
   const setResult = (fixture: InternationalMatch, winnerIsHome: boolean) => {
-    fixture.homeGoals = winnerIsHome ? 1 : 0;
-    fixture.awayGoals = winnerIsHome ? 0 : 1;
+    const result = fixture.goalInfo ?? createGoalInfo(0, 0);
+    result.homeGoals = winnerIsHome ? 1 : 0;
+    result.awayGoals = winnerIsHome ? 0 : 1;
+    fixture.goalInfo = result;
   };
   for (const group of edition.groups) {
     for (const fixture of group.matches.flat()) setResult(fixture, stronger(fixture.home, fixture.away) === fixture.home);
@@ -331,16 +334,16 @@ export function computeStatLeaders(
   const bump = (counter: Map<string, number>, id: string) => counter.set(id, (counter.get(id) ?? 0) + 1);
 
   for (const match of tournamentMatches(edition)) {
-    if (match.homeGoals === null || match.awayGoals === null) continue;
+    if (match.goalInfo === null) continue;
     for (const side of ["home", "away"] as MatchSide[]) {
-      for (const id of match.appearances?.[side] ?? []) {
+      for (const id of match.goalInfo.appearances[side]) {
         bump(games, id);
         nationOf.set(id, match[side]);
       }
-      const keeper = match.cleanSheets?.[side];
+      const keeper = match.goalInfo.cleanSheets[side];
       if (keeper) bump(cleanSheets, keeper);
     }
-    for (const goal of match.goals ?? []) {
+    for (const goal of match.goalInfo.goals) {
       bump(goals, goal.scorerId);
       if (goal.assistId) bump(assists, goal.assistId);
     }

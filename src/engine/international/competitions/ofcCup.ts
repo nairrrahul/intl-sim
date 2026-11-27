@@ -9,6 +9,7 @@ import {
   getKnockoutLosers
 } from "./cupCommon";
 import type { InternationalCompetitionEdition, InternationalCompetitionGroup, InternationalCompetitionKnockoutMatch } from "./cupCommon";
+import { createMatch, finalsCompetition, qualifyingCompetition, setWindow, windowOptions } from "../matchInfo";
 import type { InternationalMatch, InternationalRound } from "../types";
 
 const hostOptions = (hostOptionsRaw as Record<string, string[]>).OFCCUP ?? [];
@@ -42,28 +43,6 @@ export function getOfcCupWindowType(year: number, windowId: string): "OFCCUPQ" |
   return type === "OFCCUPQ" || type === "OFCCUP" ? type : null;
 }
 
-function createMatch(
-  home: string,
-  away: string,
-  kind: string,
-  year: number,
-  windowId: string,
-  extra: Partial<InternationalMatch> = {}
-): InternationalMatch {
-  return {
-    home,
-    away,
-    kind,
-    homeGoals: null,
-    awayGoals: null,
-    homeChange: null,
-    awayChange: null,
-    windowYear: year,
-    windowId,
-    ...extra
-  };
-}
-
 function createFiveTeamGroupMatches(
   teams: string[],
   group: string,
@@ -86,11 +65,11 @@ function createFiveTeamGroupMatches(
   }
   const fixtures = [...firstLegs, ...firstLegs.map(round => round.map(([home, away]) => [away, home] as [string, string]))];
   return fixtures.map((round, roundIndex) => round.map(([home, away]) =>
-    createMatch(home, away, "ofcCupQualifier", year, windowId, {
-      ofcCupQualifierId: editionId,
-      ofcCupStage: "qualifying",
-      ofcCupGroup: group,
-      ofcCupRound: roundIndex + 1
+    createMatch(home, away, "ofcCupQualifier", {
+      windowInfo: windowOptions(year, windowId),
+      competitionInformation: qualifyingCompetition("ofcCup", year, {
+        qualifierId: editionId, stage: "qualifying", group, round: roundIndex + 1
+      })
     })
   ));
 }
@@ -179,8 +158,7 @@ export function getOfcCupQualifyingRounds(
     const roundIndex = schedule.start + offset;
     const matches = edition.groups.flatMap(group => group.matches[roundIndex]);
     matches.forEach(match => {
-      match.windowYear = year;
-      match.windowId = windowId;
+      setWindow(match, year, windowId);
     });
     return {
       kind: "ofcCupQualifier" as const,
@@ -284,17 +262,18 @@ function makeKnockoutMatch(
   home: string,
   away: string
 ): InternationalCompetitionKnockoutMatch {
-  const fixture = createMatch(home, away, "ofcCupKnockout", edition.year, edition.windowId, {
-    ofcCupEditionId: edition.id,
-    ofcCupStage: "knockout",
-    ofcCupKnockoutMatchId: id
+  const fixture = createMatch(home, away, "ofcCupKnockout", {
+    windowInfo: windowOptions(edition.year, edition.windowId),
+    competitionInformation: finalsCompetition("ofcCup", edition.year, {
+      editionId: edition.id, stage: "knockout", knockoutMatchId: id
+    })
   });
   return { id, home, away, fixture, winner: null };
 }
 
 export function startOfcCupSemiFinals(edition: InternationalCompetitionEdition): InternationalRound | null {
   if (edition.groups.some(group => group.matches.flat().some(match =>
-    match.homeGoals === null || match.awayGoals === null
+    match.goalInfo === null
   ))) return null;
   const groupA = getInternationalCupStandings(edition, edition.groups.find(group => group.name === "A")!).map(row => row.code);
   const groupB = getInternationalCupStandings(edition, edition.groups.find(group => group.name === "B")!).map(row => row.code);

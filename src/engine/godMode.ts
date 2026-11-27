@@ -171,7 +171,7 @@ export function setPlayerRatings(game: Game, playerId: string, overall: number, 
 }
 
 export function isMatchPlayed(match: InternationalMatch): boolean {
-  return match.homeGoals !== null && match.awayGoals !== null;
+  return match.goalInfo !== null;
 }
 
 /** Forces the result of an unplayed match (a drawn knockout match goes to a randomized shootout). */

@@ -5,6 +5,7 @@ import { createU20WorldCupState } from "../international/competitions/u20WorldCu
 import { createEmptySquadState, refreshAllNationSquads } from "../international/squads";
 import { initializeSavedTournamentInsights } from "../international/editionInsights";
 import { getPlayersById } from "../players/lookup";
+import { migrateLegacyMatches } from "./legacyMatches";
 import { compareGraphs, deserializeGraph, serializeGraph } from "./graphSerializer";
 import type { World } from "../world/world";
 import { createU20QualifyingState } from "../international/competitions/u20Qualifying";
@@ -17,8 +18,11 @@ export const SAVE_FORMAT = "international-soccer-simulator-save";
  * v1: the world (season year, international competitions, random players).
  * v2: players loaded from players.json, nation squads/formations, retirement, God Mode, rigged matches.
  *     (v2 saves made before goals/assists/trophies/Confederations Cup are upgraded when loaded.)
+ * v3: InternationalMatch is nested (goalInfo, nationsLeagueInfo, windowInfo, competitionInformation, matchChangeInfo).
+ *     v2 saves hold flat matches and are converted when loaded (see legacyMatches.ts).
  */
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
+const OLDEST_LOADABLE_VERSION = 2;
 
 export interface SaveMeta {
   season: string;
@@ -70,7 +74,7 @@ export function parseSaveFile(value: unknown): SaveFile {
   if (typeof file.version !== "number" || file.version > SAVE_VERSION) {
     throw new Error("This save was created by a newer version of the game and cannot be loaded.");
   }
-  if (file.version < SAVE_VERSION) {
+  if (file.version < OLDEST_LOADABLE_VERSION) {
     throw new Error("This save was created by an older version of the game and cannot be loaded.");
   }
   if (!file.meta || !Array.isArray(file.nodes) || file.root === undefined) {
@@ -106,6 +110,7 @@ function validateWorld(root: unknown): World {
 
 export function gameFromSave(file: SaveFile): Game {
   const world = validateWorld(deserializeGraph(file.root, file.nodes));
+  if (file.version < 3) migrateLegacyMatches(world.international);
   // Saves made before per-season caps were tracked have no `caps` on their progression rows.
   world.international.confedCup ??= createConfedCupState();
   world.international.u20WorldCup ??= createU20WorldCupState();

@@ -3,8 +3,10 @@ import { NationLink } from "./common";
 import { useMatchInteractions } from "./matchInteractions";
 
 function Fixture(props: { match: InternationalMatch }) {
-  const { home, away, homeGoals, awayGoals } = props.match;
-  const played = homeGoals !== null && awayGoals !== null;
+  const { home, away, goalInfo } = props.match;
+  const homeGoals = goalInfo?.homeGoals ?? null;
+  const awayGoals = goalInfo?.awayGoals ?? null;
+  const played = goalInfo !== null;
   const interactions = useMatchInteractions();
   return (
     <div

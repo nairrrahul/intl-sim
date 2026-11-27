@@ -1,7 +1,7 @@
 import { getConfederation } from "../../nations/nations";
 import { randInt, shuffledCopy } from "../../shared/random";
-import type { InternationalMatch, InternationalRound, InternationalState } from "../types";
-import { createMatch } from "./cupCommon";
+import type { CompetitionOptions, InternationalMatch, InternationalRound, InternationalState } from "../types";
+import { createMatch, playoffCompetition, qualifyingCompetition, windowOptions } from "../matchInfo";
 import { getCompetitivelyEligibleTeams } from "./eligibility";
 import { getU20WorldCupWindowType } from "./u20WorldCup";
 import { createGroupFixtures } from "./worldcup/utils";
@@ -133,14 +133,15 @@ export function getU20QualifyingStandings(group: U20QualifyingGroup): U20Qualify
     code, played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0
   }]));
   for (const match of group.matches.flat()) {
-    if (match.homeGoals === null || match.awayGoals === null) continue;
+    if (match.goalInfo === null) continue;
+    const { homeGoals, awayGoals } = match.goalInfo;
     const home = rows.get(match.home) as U20QualifyingRow;
     const away = rows.get(match.away) as U20QualifyingRow;
     home.played++; away.played++;
-    home.goalsFor += match.homeGoals; home.goalsAgainst += match.awayGoals;
-    away.goalsFor += match.awayGoals; away.goalsAgainst += match.homeGoals;
-    if (match.homeGoals > match.awayGoals) { home.won++; away.lost++; home.points += 3; }
-    else if (match.homeGoals < match.awayGoals) { away.won++; home.lost++; away.points += 3; }
+    home.goalsFor += homeGoals; home.goalsAgainst += awayGoals;
+    away.goalsFor += awayGoals; away.goalsAgainst += homeGoals;
+    if (homeGoals > awayGoals) { home.won++; away.lost++; home.points += 3; }
+    else if (homeGoals < awayGoals) { away.won++; home.lost++; away.points += 3; }
     else { home.drawn++; away.drawn++; home.points++; away.points++; }
   }
   return [...rows.values()]
@@ -163,10 +164,8 @@ function rankedFormedTeams(state: InternationalState, year: number): Record<stri
   return byConfederation;
 }
 
-type MatchFields = Partial<InternationalMatch>;
-
-function qualifierMatch(home: string, away: string, year: number, windowId: string, fields: MatchFields): InternationalMatch {
-  return createMatch(home, away, "u20Qualifier", year, windowId, fields);
+function qualifierMatch(home: string, away: string, year: number, windowId: string, competitionInformation: CompetitionOptions): InternationalMatch {
+  return createMatch(home, away, "u20Qualifier", { windowInfo: windowOptions(year, windowId), competitionInformation });
 }
 
 /** Pots by rating (best `groups` teams in pot 1, and so on); each group takes one team from every pot. */
@@ -192,10 +191,10 @@ function createGroupConfederation(
       name: GROUP_NAMES[index],
       teams: groupTeams,
       matches: rounds.map((round, roundIndex) => round.map(fixture => qualifierMatch(
-        fixture.home, fixture.away, year, roundIndex < firstWindowRounds ? "IW1" : "IW2", {
-          u20QualifierEditionId: editionId, u20QualifierConfederation: confederation,
-          u20QualifierStage: "group", u20QualifierGroup: GROUP_NAMES[index], u20QualifierRound: roundIndex + 1
-        }
+        fixture.home, fixture.away, year, roundIndex < firstWindowRounds ? "IW1" : "IW2",
+        qualifyingCompetition("u20Qualifier", year, {
+          qualifierId: editionId, confederation, stage: "group", group: GROUP_NAMES[index], round: roundIndex + 1
+        })
       )))
     };
   });
@@ -206,9 +205,8 @@ function createGroupConfederation(
 function createTie(
   confederation: string, id: string, first: string, second: string, year: number, editionId: string
 ): U20QualifyingTie {
-  const fields = (leg: number): MatchFields => ({
-    u20QualifierEditionId: editionId, u20QualifierConfederation: confederation,
-    u20QualifierStage: "tie", u20QualifierTieId: id, u20QualifierLeg: leg
+  const fields = (leg: 1 | 2): CompetitionOptions => qualifyingCompetition("u20Qualifier", year, {
+    qualifierId: editionId, confederation, stage: "tie", tieId: id, leg
   });
   return {
     id, team1: first, team2: second, winner: null,
@@ -316,7 +314,7 @@ export function getU20QualifyingRounds(edition: U20QualifyingEdition, phase: U20
 // Progress: who qualified
 // ---------------------------------------------------------------------------
 
-const isPlayed = (match: InternationalMatch): boolean => match.homeGoals !== null && match.awayGoals !== null;
+const isPlayed = (match: InternationalMatch): boolean => match.goalInfo !== null;
 
 function settleConfederation(confederation: U20QualifyingConfederation): void {
   if (confederation.completed) return;
@@ -376,12 +374,9 @@ function conmebolKnockoutMatch(
     home,
     away,
     winner: null,
-    fixture: qualifierMatch(home, away, year, "IW2", {
-      u20QualifierEditionId: editionId,
-      u20QualifierConfederation: "CONMEBOL",
-      u20QualifierStage: "playoff",
-      u20QualifierKnockoutMatchId: id
-    })
+    fixture: qualifierMatch(home, away, year, "IW2", playoffCompetition("u20Qualifier", year, {
+      playoffId: editionId, confederation: "CONMEBOL", stage: "playoff", knockoutMatchId: id
+    }))
   };
 }
 
@@ -390,10 +385,9 @@ function playoffMatch(
 ): U20PlayoffMatch {
   return {
     id, home, away, winner: null,
-    fixture: qualifierMatch(home, away, edition.year, windowId, {
-      u20QualifierEditionId: edition.id, u20QualifierConfederation: "ICPO",
-      u20QualifierStage: "playoff", u20QualifierKnockoutMatchId: id
-    })
+    fixture: qualifierMatch(home, away, edition.year, windowId, playoffCompetition("u20Qualifier", edition.year, {
+      playoffId: edition.id, confederation: "ICPO", stage: "playoff", knockoutMatchId: id
+    }))
   };
 }
 

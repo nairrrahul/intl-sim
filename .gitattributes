@@ -1,0 +1,13 @@
+
+# Keep text files using LF consistently
+* text=auto eol=lf
+
+# Preserve binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.db binary
+*.sqlite binary
+*.otf binary
+*.ttf binary
